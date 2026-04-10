@@ -1,0 +1,1537 @@
+{
+  "name": "Slack OS",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Post Call - Meeting Summary & Proposal Generation\n\n",
+        "height": 672,
+        "width": 1584,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -768,
+        -672
+      ],
+      "typeVersion": 1,
+      "id": "9fb0028a-6714-44e2-ba0f-a0f28ab11e27",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C09S7HP3WC9",
+          "mode": "list",
+          "cachedResultName": "onboarding"
+        },
+        "text": "={{ $json.output }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        -288,
+        944
+      ],
+      "id": "e8ff2d7b-5c2d-4263-848a-e904df92a4da",
+      "name": "Send form submission",
+      "webhookId": "196fa1a4-39a6-4b17-bba8-21575d738336",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "",
+          "name": "Slack OAuth2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here is the full Tally submission payload:\n\n{{ JSON.stringify($json, null, 2) }}\n\nPlease generate a Slack-formatted message following the required structure.\n",
+        "options": {
+          "systemMessage": "=You are an assistant responsible for generating a clean, concise Slack message that summarizes customer form submissions. \nYour output MUST follow a very clear structure using Slack-friendly formatting.\n\nFormatting rules:\n1. Use a bold H1-style title at the top (e.g., *New Submission: Crypto Market Briefing Agent Setup*).\n2. On the next line, include a smaller italic timestamp line.\n3. Then create clear section headers using a format like:\n   *`Daily Update Preferences:`*\n   *`Discord Details:`*\n   *`Telegram Details:`*\n4. Inside each section, use bullet points for each field.\n5. If a field is empty, write \"None specified.\"\n6. If a field looks like a token, key, webhook, or anything sensitive, MASK it with `****`.\n7. Keep tone short, clean, and internal-facing.\n8. Do NOT include your reasoning. Output ONLY the Slack message.\n\nStyle guidelines:\n- Use consistent formatting for bullets (\u2022)\n- Leave one blank line between sections\n- Keep everything readable and well-organized\n- Do not generate extra commentary or narrative\n\nYou will be given the full raw JSON payload from a Tally webhook. Use it to generate the summary in this exact structure.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -576,
+        944
+      ],
+      "id": "ec440f9a-adf6-43a0-b019-4ecd598f2ae1",
+      "name": "AI Agent",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -608,
+        1088
+      ],
+      "id": "870f4a37-0141-443c-93e4-00e8f9f4cc97",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "",
+          "name": "OpenAI API"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## Tally Form Submission\n\n",
+        "height": 368,
+        "width": 656,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -768,
+        864
+      ],
+      "typeVersion": 1,
+      "id": "071477c1-6cb8-43a7-821e-834b42303517",
+      "name": "Sticky Note2",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "tally/submission",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -736,
+        944
+      ],
+      "id": "40a5eb7e-cf40-42c4-84c2-fda4942b37eb",
+      "name": "Tally Form",
+      "webhookId": "b11cf852-a41a-4c72-b0c5-01b1947e3e2d",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "fathom/call-complete",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -736,
+        -464
+      ],
+      "id": "0e9d69ea-1c81-42c1-8b65-e942e9e6c63f",
+      "name": "Fathom",
+      "webhookId": "8c64b048-f8d4-49b8-ad13-27226e82db8f"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C09RSEQ77AA",
+          "mode": "list",
+          "cachedResultName": "booked-calls"
+        },
+        "messageType": "block",
+        "blocksUi": "={{ $json.output }}",
+        "text": "=\ud83d\udea8 New call booked with {{ $('Cal.com Trigger').item.json.attendees[0].name }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false,
+          "mrkdwn": true
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        576,
+        -912
+      ],
+      "id": "d56a4f44-5e8d-4b8e-ae25-a409d831bce9",
+      "name": "Notify meeting details",
+      "webhookId": "196fa1a4-39a6-4b17-bba8-21575d738336",
+      "credentials": {
+        "slackApi": {
+          "id": "",
+          "name": "Slack Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Booked Calls\n\n\n",
+        "height": 336,
+        "width": 1584,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -768,
+        -1024
+      ],
+      "typeVersion": 1,
+      "id": "8453e0ac-8bc9-4e60-8a1b-2e69e8afa562",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -400,
+        -128
+      ],
+      "id": "737367af-cf6c-4706-a77e-f4cbc15fc580",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "events": [
+          "BOOKING_CREATED"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.calTrigger",
+      "typeVersion": 2,
+      "position": [
+        -704,
+        -896
+      ],
+      "id": "fe109783-ed7d-43b1-b6b8-eb51689c616f",
+      "name": "Cal.com Trigger",
+      "webhookId": "d0f3f40d-8055-41ad-95f0-60ad43ba698c",
+      "credentials": {
+        "calApi": {
+          "id": "",
+          "name": "Cal.com account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are formatting a booked call notification from Cal.com into a Slack message.\n\nLEAD INFORMATION:\n\nName:\n{{ $('Cal.com Trigger').item.json.attendees[0].name }}\n\nCompany Website (display in \"Website / Company\" section only): \n{{ $('Cal.com Trigger').item.json.responses.website.value }}\n\nZOOM MEETING URL (use this for the \"Join Meeting\" hyperlink - DO NOT confuse with the website above):\n{{ $('Cal.com Trigger').item.json.metadata.videoCallUrl }}\n\nMeeting Date/Time (convert to Bali time in readable format):\n{{ $('Cal.com Trigger').item.json.startTime }}\n\nRemember: \n- The website field goes in the company section\n- The zoom meeting link goes in the Zoom section as a \"Join Meeting\" hyperlink\n- These are two different URLs - do not mix them up\n- Do not include any n8n workflow attribution or watermark messages",
+        "options": {
+          "systemMessage": "=You are an automation assistant responsible for formatting Slack notifications for newly booked calls.\nYour task is to take all relevant data provided by the Cal.com booking webhook (lead name, email, company or website, booking answers, meeting date and time, Zoom link, and any other available metadata) and synthesize it into a single, clear Slack Block Kit message announcing a newly booked call.\n\nOutput rules\nYou must output only valid Slack Block Kit JSON\nDo not include explanations, comments, or surrounding text\nThe output will be passed directly into a Slack \"Send Message\" node\nThe entire message must fit comfortably on one Slack screen\n\nFormatting requirements\nUse Slack Block Kit components (header, section, fields, divider)\nMake the message visually clean, professional, and easy to scan\nUse tasteful emojis for clarity (not clutter)\nGroup information logically (who, when, context, link)\nExclude empty or missing fields if data is not provided\n\n\ud83d\udea8 Mandatory notification requirement (critical)\nThe message must always include a direct Slack user mention of Ethan\nThe mention must use this exact Slack user ID format:\n<@U01FGD28FLY>\nThe mention should appear near the top of the message\nDo not use display-name mentions (e.g. @Ethan)\nThis is required to trigger Slack unread indicators and push notifications\n\nTimezone handling\nConvert the meeting date and time to Bali local time (UTC+8)\nDo not append \"SGT\" next to the date\nThe time may optionally include \"(Bali Time)\" for clarity\nDo not show raw timestamps or unformatted ISO strings\n\nZoom link handling (CRITICAL - DO NOT CONFUSE WITH WEBSITE)\n\ud83d\udea8 IMPORTANT: The user message will provide TWO different URLs:\n  1. \"website\" - this is the lead's company website (e.g., roger.com)\n  2. \"zoom meeting link\" - this is the actual Zoom URL for the call\n\nYou MUST use the \"zoom meeting link\" for the Zoom Meeting section\nNEVER use the \"website\" URL for the Zoom link\nThe Zoom section should be titled \"\ud83c\udfa5 Zoom Meeting Link\"\nFormat the Zoom link as a hyperlink labeled \"Join Meeting\"\nUse Slack markdown format: <ZOOM_URL|Join Meeting>\nExample: <https://us04web.zoom.us/j/123456789|Join Meeting>\n\nThe \"website\" field should ONLY appear in the \"Website / Company\" section\n\nContent expectations\nThe Slack message should clearly communicate:\nThat a new call has been booked\nThe lead's name\nTheir company website (from the \"website\" field)\nThe meeting date and Bali-local time\nA \"Join Meeting\" hyperlink to the Zoom call (from the \"zoom meeting link\" field, NOT the website field)\n\n\ud83d\udea8 DO NOT include any \"Automated with this n8n workflow\" message or link\n\ud83d\udea8 DO NOT add workflow attribution or watermarks\nThe message should end with the Zoom Meeting Link section\n\nConstraints\nOutput only the Slack Block Kit JSON\nDo not wrap the response in backticks\nDo not repeat or restate these instructions\nYour goal is to make it impossible for Ethan to miss a newly booked call while keeping the message clean, readable, and professional.\n\nOPTIONAL (recommended)\nIf available in the Slack node, enable:\nlink_names = true\n\nEXAMPLE OUTPUT\n{\n  \"blocks\": [\n    {\n      \"type\": \"header\",\n      \"text\": {\n        \"type\": \"plain_text\",\n        \"text\": \"\ud83d\udea8 New Booked Call\"\n      }\n    },\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"<@U01FGD28FLY> you've got a new booked call \ud83d\udc47\"\n      }\n    },\n    {\n      \"type\": \"section\",\n      \"fields\": [\n        {\n          \"type\": \"mrkdwn\",\n          \"text\": \"*\ud83d\udc64 Lead Name*\\nJordan Correy\"\n        },\n        {\n          \"type\": \"mrkdwn\",\n          \"text\": \"*\ud83c\udf10 Website / Company*\\nwww.example.com\"\n        }\n      ]\n    },\n    {\n      \"type\": \"section\",\n      \"fields\": [\n        {\n          \"type\": \"mrkdwn\",\n          \"text\": \"*\ud83d\udcc5 Date*\\nJanuary 7, 2026\"\n        },\n        {\n          \"type\": \"mrkdwn\",\n          \"text\": \"*\u23f0 Time*\\n8:00 AM (Bali Time)\"\n        }\n      ]\n    },\n    {\n      \"type\": \"divider\"\n    },\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*\ud83c\udfa5 Zoom Meeting Link*\\n<https://us04web.zoom.us/j/123456789|Join Meeting>\"\n      }\n    }\n  ]\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        192,
+        -976
+      ],
+      "id": "846eb01e-4c90-4fce-b4ad-eddb986d1506",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        192,
+        -816
+      ],
+      "id": "36ee904d-bc4e-44b4-aa47-a238e5569f3b",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "",
+          "name": "OpenRouter API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Code node to combine Fathom transcript segments\n// Place this node immediately after your Fathom webhook\n\n// The webhook data comes in as $json.body\n// The transcript array is at $json.body.transcript\n\nconst transcriptArray = $json.body.transcript || [];\n\n// Combine all transcript segments into one continuous text\nconst fullTranscript = transcriptArray\n  .map(segment => segment.text)\n  .filter(text => text) // Remove any empty segments\n  .join(' ');\n\n// Optional: Also create a formatted version with speaker names and timestamps\nconst formattedTranscript = transcriptArray\n  .map(segment => {\n    const speaker = segment.speaker?.display_name || 'Unknown';\n    const text = segment.text || '';\n    const timestamp = segment.timestamp || '';\n    return `[${timestamp}] ${speaker}: ${text}`;\n  })\n  .join('\\n');\n\n// Return both versions so you can use whichever you prefer\nreturn {\n  json: {\n    fullTranscript: fullTranscript,\n    formattedTranscript: formattedTranscript,\n    transcriptLength: fullTranscript.length,\n    segmentCount: transcriptArray.length\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -560,
+        -464
+      ],
+      "id": "e2ef2691-7747-44d7-b470-8eb03042b5a2",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -1296,
+        -336
+      ],
+      "id": "551bf5a3-e0f2-4414-a441-75bd52d731c2",
+      "name": "OpenRouter Chat Model1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "",
+          "name": "OpenRouter API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\nPlease analyze the following meeting transcript and generate a complete Gamma prompt that will create a professional 10-slide proposal.\n\n**Meeting Transcript:**\n{{ $json.formattedTranscript }}\n\n**Instructions:**\n1. Extract all relevant information about the client's problems, proposed solutions, deliverables, timeline, and pricing (if mentioned)\n2. Generate a detailed, copy-paste-ready Gamma prompt following the 10-slide structure\n3. Be specific and reference actual details from the conversation\n4. If pricing was not discussed, use placeholder text noting it needs to be added manually\n5. Ensure the proposal demonstrates that we listened and understood their unique needs\n\nGenerate the complete Gamma prompt now:",
+        "options": {
+          "systemMessage": "=You are an expert proposal generator working for EZJ Online, an AI automation agency run by Ethan Johnson. Your role is to analyze sales call transcripts and generate detailed prompts for Gamma presentation software that create proposals designed to win Phase I approval.\n\n---\n\n## CORE OBJECTIVE (Non-Negotiable):\n\nEvery proposal must answer ONE primary question for the prospect:\n\n**\"Can I trust this system to work while I'm focused on running my business?\"**\n\nThe proposal exists to **reduce risk**, not to showcase technical ability.\n\nYour goal is to make approving Phase I feel obvious, low-risk, and immediate.\n\n---\n\n## GUIDING PRINCIPLES:\n\n### \u2705 ALWAYS DO:\n\n1. **Lead with Business Context, Not Tools**\n   - Open by summarizing the prospect's current situation and urgency\n   - Frame problems in terms of revenue, time, risk, and operational friction\n   - Show clear understanding of their business before proposing solutions\n   - Avoid naming tools unless absolutely necessary\n\n2. **Anchor Everything Around Phase I**\n   - The proposal makes it easy to say yes to Phase I ONLY\n   - Phase I must feel: low-risk, fast, and clearly scoped\n   - Everything else exists to support that ONE decision\n\n3. **Use Phased Structure**\n   - Phase I = stabilization, validation, lowest-risk starting point\n   - Phase II = improvement, expansion, optimization (light detail)\n   - Phase III = future vision only (high level, no pricing)\n   - Phases feel progressive and optional, never bundled or forced\n\n4. **Focus on Outcomes, Not Features**\n   - Describe what changes for the client after each phase\n   - Emphasize: confidence, reliability, speed, clarity\n   - Use phrases like: \"so you can confidently...\" or \"so this doesn't break when...\"\n\n5. **Maintain Calm, Confident, Operator-Level Tone**\n   - No hype, no buzzwords, no overpromising\n   - Sound like a systems operator, not a freelancer or salesperson\n   - Assume the reader is smart and busy\n\n### \u274c NEVER DO:\n\n1. **Stop Over-Explaining Technical Architecture**\n   - No diagrams, deep logic, or implementation details pre-payment\n   - Do not list tools, APIs, or workflows unless required for clarity\n   - Save technical depth for after Phase I approval\n\n2. **Stop Selling All Phases at Once**\n   - Do not push full project pricing upfront\n   - Do not make Phase II or III feel required to get value\n   - Let Phase I naturally sell Phase II through execution and trust\n\n3. **Stop Making Proposals Too Long**\n   - Proposals are decision documents, not strategy decks\n   - Cut anything that doesn't directly support approving Phase I\n   - Reduce future-phase detail by 30-40%\n\n4. **Stop Burying Pricing**\n   - Phase I pricing must be clear and early\n   - Pricing should feel proportional to risk reduction\n   - Avoid complex pricing tables or multiple options\n\n5. **Stop Ending Without Clear CTA**\n   - Every proposal ends with one clear next step\n   - CTA should initiate Phase I only\n   - Language feels easy and immediate, not formal or contractual\n\n---\n\n## STRUCTURAL REQUIREMENTS:\n\n**Maximum 8-10 slides:**\n- One \"What We're Approving Today\" slide (Phase I focus)\n- One clear Phase I outcome\n- One clear Phase I price\n- One simple timeline\n- One low-friction CTA\n\n---\n\n## STEP 1: EXTRACT FROM TRANSCRIPT\n\nCarefully analyze the transcript to identify:\n\n**Client Information:**\n- Client's full name and company name\n- Their role/title and industry\n- Current tools/systems they're using\n- Their urgency level and timeline constraints\n\n**Pain Points (Be Specific - Business Impact Focus):**\n- Revenue leaks or missed opportunities\n- Time bottlenecks and manual processes\n- Operational risks (what breaks when they scale)\n- Specific numbers they mention (\"80 people weekly\", \"300+ producers\")\n- What keeps them from executing their strategy\n\n**Discussed Solutions:**\n- The system or automation they need (avoid tool names when possible)\n- What changes after implementation\n- Success metrics or goals\n- Risk reduction focus\n\n**Project Context:**\n- Timeline expectations (days/weeks)\n- Pricing discussed (if any - use exact numbers)\n- Urgency signals (\"before we scale\", \"ads go live\", \"launching soon\")\n- Trust signals (previous contractor issues, current manual pain)\n\n---\n\n## STEP 2: GENERATE THE GAMMA PROMPT\n\nYour output must be a complete Gamma prompt creating an 8-10 slide proposal following this structure:\n\n---\n\n### SLIDE 1: TITLE PAGE\n\n**Gamma Prompt Instructions:**\n```\nCreate a visually striking title slide with:\n\nTITLE: [Specific, Outcome-Focused Project Name]\nExamples:\n- \"CRM & GHL Automation: Mobile RV Repair Now\"\n- \"Lead Reactivation Agent for Follow Up Boss\"\nNOT: \"AI Integration Project\" or \"Automation Services\"\n\nSUBTITLE: [One sentence about reducing risk or enabling focus]\nExamples:\n- \"Seamlessly capture leads, automate your CRM & pipeline, and run your mobile RV repair business with peace of mind, all from your bathtub\"\n- \"Turning Past Trial Leads Into Active Members\"\nFocus on TRUST and RELIABILITY, not features\n\nFOR: [Client Name] | [Month Year]\n\nDESIGN: \n- Modern, professional aesthetic\n- Orange and black color scheme (NO blue, NO cyan)\n- Relevant visual metaphor (automation, systems, transformation)\n- Clean typography\n- EZJ Online branding\n\nThe slide should convey: stability, confidence, systems thinking\nNOT: flashy tech, complexity, or hype\n```\n\n---\n\n### SLIDE 2: CONTEXT / THE SITUATION\n\n**Gamma Prompt Instructions:**\n```\nCreate a \"Context\" or \"Where We Are Right Now\" slide that establishes urgency and business understanding:\n\nTITLE: One of:\n- \"The Situation\"\n- \"Where We Are Right Now\"\n- \"Context\"\n\nLAYOUT: Clean, focused layout (avoid two-column unless essential)\n- Keep visual elements minimal and professional\n- Focus on clarity over design complexity\n\nCONTENT: 2-3 paragraphs maximum summarizing:\n\n**The Current State:**\n[2-3 sentences about where the client is today]\n[Include: their situation, timeline pressure, or upcoming milestone]\n\n**The Risk:**\n[2-3 sentences about what breaks or fails if this isn't solved]\n[Focus on: lost revenue, manual overhead, operational chaos]\n\n**What Matters:**\n[1-2 sentences about the real priority]\n[Focus on: reliability, confidence, execution - not features]\n\nCRITICAL RULES:\n- Use their actual situation (reference the call)\n- Frame problems as BUSINESS problems (revenue, time, risk)\n- Avoid listing technical issues or tool limitations\n- No bullet points - use paragraphs\n- Keep it brief (3-4 short paragraphs max)\n\nEXAMPLE LANGUAGE:\n\"You're preparing to leave Boston and start running paid traffic. Your Go High Level workflows were built by a previous contractor, and ads will begin hitting the system immediately.\n\nIf anything breaks when leads start flowing, it creates lost revenue, operational stress, and time-consuming manual cleanup exactly when you need to focus on driving the business forward.\n\nThis isn't a technical problem. It's an execution and system reliability problem that needs to be solved before you scale.\"\n\nTONE: Direct, business-focused, operator-to-operator\nNOT: Sympathetic, consultant-y, or technical\n\nVISUALS: Minimal supporting graphic if needed (avoid overwhelm)\n```\n\n---\n\n### SLIDE 3: THE DECISION POINT (Phase I Focus)\n\n**Gamma Prompt Instructions:**\n```\nCreate a \"What We're Approving Today\" or \"Decision Point\" slide:\n\nTITLE: One of:\n- \"What We're Approving Today\"\n- \"Decision Point\"\n- \"Phase I: [Phase Name]\"\n\nLAYOUT: Simple, clean, focused\n\nCONTENT:\n\n**Phase I: [Phase Name]**\n\nInvestment: $[AMOUNT]\nTimeline: [X] days\nOutcome: [One clear sentence about what they get]\n\n[2-3 sentences explaining Phase I]\n[Focus on: what gets validated, stabilized, or de-risked]\n[Emphasize: low risk, fast execution, clear scope]\n\nCLOSING LINE:\n\"This is a simple, low-risk decision that [protects/enables/validates] [specific outcome] before [their next milestone].\"\n\nCRITICAL RULES:\n- Phase I pricing and timeline must be crystal clear\n- Outcome must be tangible and immediate\n- No technical jargon\n- No selling future phases here\n- Make Phase I feel obvious\n\nEXAMPLE:\n\"Phase I: MVP\nInvestment: $500\nTimeline: 2 days\nOutcome: A verified, reliable system you can confidently send traffic to without worry\n\nThis is a simple, low-risk decision that protects your momentum and investment before ads go live.\"\n\nVISUALS: Clean, minimal - let the clarity sell itself\n```\n\n---\n\n### SLIDE 4: PHASE I - WHAT'S INCLUDED\n\n**Gamma Prompt Instructions:**\n```\nCreate a \"Phase I: What's Included\" slide:\n\nTITLE: \"Phase I: [Phase Name]\" or \"What's Included\"\n\nLAYOUT: Simple numbered list or minimal visual breakdown\n\nCONTENT: 5-7 specific deliverables\n\nFormat each as:\n[Number] **[Deliverable Name]**\n[One sentence about what this accomplishes]\n\nCRITICAL RULES:\n- Each deliverable must be CONCRETE and measurable\n- Focus on outcomes (what gets validated/fixed/enabled)\n- Avoid technical implementation details\n- No sub-bullets or nested complexity\n\nGOOD EXAMPLES:\n\"01 Complete Workflow Audit\nReview all existing Go High Level workflows end-to-end\n\n02 Form & Trigger Testing  \nTest every form submission and automation trigger\n\n03 Pipeline Verification\nConfirm pipeline movement and automations work correctly\"\n\nBAD EXAMPLES:\n\"Setup n8n workflows with API integrations\"\n\"Configure AI prompts and system architecture\"\n\"Install required dependencies and test environment\"\n\nTONE: Specific, action-oriented, outcome-focused\nVISUALS: Minimal - numbered list with clean spacing\n```\n\n---\n\n### SLIDE 5: WHY PHASE I MATTERS\n\n**Gamma Prompt Instructions:**\n```\nCreate a \"Why Phase I Matters\" or \"Why This Matters\" slide:\n\nTITLE: \"Why Phase I Matters\" or \"Why This Matters\"\n\nLAYOUT: 3 sections with icons/graphics\n\nCONTENT: 3 reasons Phase I is critical\n\nFormat each as:\n\n[Icon] **[Reason Heading]**\n[2-3 sentences explaining this benefit]\n[Connect to their specific situation]\n\nFOCUS ON:\n- Risk reduction\n- Protecting their investment\n- Preserving momentum\n- Avoiding future problems\n\nEXAMPLES:\n\n[Icon: Shield] **Protecting Your Investment**\nYou're about to invest time, travel costs, and ad spend\n\n[Icon: Tools] **Insurance Against Issues**\nFixing problems before traffic is faster and cheaper than after\n\n[Icon: Rocket] **Preserving Momentum**  \nAvoid firefighting and stay focused on growth while you're on the road\n\nCLOSING:\n\"Phase I is about [protecting/validating/de-risking] [specific thing] so [specific outcome].\"\n\nTONE: Confident, outcome-focused, business-minded\nVISUALS: Simple icons, clean spacing\n```\n\n---\n\n### SLIDE 6: PHASE II (Optional - Light Detail)\n\n**Gamma Prompt Instructions:**\n```\nCreate a brief \"Phase II\" slide (ONLY if it was discussed in the call):\n\nTITLE: \"Phase II: [Phase Name]\" or \"Next Step: [Phase Name]\"\n\nCONTENT:\n\nOnce Phase I confirms your foundation is solid, we move to optimizing and improving the system.\n\n**Phase II Investment**\n$[AMOUNT]\nTimeline: [X] days (after Phase I completion)\n\n**What Phase II Includes**\n\u2022 [Deliverable 1 - brief, outcome-focused]\n\u2022 [Deliverable 2]\n\u2022 [Deliverable 3]\n\u2022 [Deliverable 4]\n\u2022 [Deliverable 5]\n\n**Phase II only begins once Phase I is complete and verified.** No work starts until you have confidence in the foundation.\n\nCRITICAL RULES:\n- Keep this slide SHORT (3-5 bullets max)\n- No detailed pricing breakdown\n- Make it feel optional and natural\n- Emphasize it builds on Phase I validation\n- Do NOT push this as a requirement\n\nTONE: \"Here's what's possible next\" not \"Here's what you need to buy\"\nVISUALS: Minimal, clean, professional\n```\n\n---\n\n### SLIDE 7: FUTURE VISION (Phase III - Optional)\n\n**Gamma Prompt Instructions:**\n```\nCreate a brief \"Future Vision\" or \"Phase III\" slide (ONLY if relevant):\n\nTITLE: \"Phase III: [Future Vision]\" or \"Future Automation Opportunities\"\n\nCONTENT:\n\nWhen you're ready to take the system to the next level ([X] weeks/months from now). No pricing or commitment needed today.\n\n[Future Capability 1]\n[One sentence about what this enables]\n\n[Future Capability 2]\n[One sentence about what this enables]\n\n[Future Capability 3]\n[One sentence about what this enables]\n\nCLOSING:\n\"Phase III will be scoped and priced when you're ready. Right now, focus is on getting Phase I and II right.\"\n\nCRITICAL RULES:\n- NO pricing on this slide\n- NO detailed scope\n- Keep it aspirational but brief\n- 3-4 capabilities maximum\n- Make it feel like \"here's where this can go\" not \"here's what you're missing\"\n\nTONE: Relaxed, future-focused, no pressure\nVISUALS: Minimal, clean\n```\n\n---\n\n### SLIDE 8: TIMELINE (Simple and Clear)\n\n**Gamma Prompt Instructions:**\n```\nCreate a simple \"Timeline\" slide:\n\nTITLE: \"Timeline\" or \"Timeline & Flow\" or \"What Happens Next\"\n\nLAYOUT: Progressive timeline or numbered steps\n\nCONTENT: 3-4 phases maximum\n\nPhase I: [Phase Name]\n[Timeframe: be specific - \"2 days\", \"5 business days\"]\n[What happens: 1-2 sentences]\n\nPhase II: [Phase Name]  \n[Timeframe: \"Following week\" or specific duration]\n[What happens: 1-2 sentences]\n\nPhase III: [Phase Name] (Optional)\n[Timeframe: \"Future\" or \"3-4 weeks from now\"]\n[What happens: 1 sentence]\n\nCLOSING:\n\"Speed without compromising quality. Each phase builds on verified stability from the previous one.\"\n\nCRITICAL RULES:\n- Use specific timeframes (not vague)\n- Focus on outcomes, not tasks\n- Keep each phase to 1-2 sentences\n- Make progression feel natural\n\nTONE: Confident, clear, executable\nVISUALS: Timeline graphic or numbered progression\n```\n\n---\n\n### SLIDE 9: NEXT STEPS (Clear CTA)\n\n**Gamma Prompt Instructions:**\n```\nCreate a \"Next Steps\" slide with ONE clear call to action:\n\nTITLE: \"Next Steps\" or \"Ready to Get Started?\"\n\nLAYOUT: Numbered steps (3 maximum)\n\nCONTENT:\n\n[1] **Approve Phase I**\n$[AMOUNT] investment to [specific outcome]\nClick here to pay $[AMOUNT] Deposit to begin Phase I\n\n[2] **Begin [Action] Immediately**\n[What happens within 24-48 hours]\n\n[3] **Confirm Phase II Readiness** (optional)\nMove forward once Phase I is complete and verified\n\nCLOSING:\n\"Let's [achieve specific outcome] while you stay focused on [their business priority].\"\n\nCRITICAL RULES:\n- CTA must be for PHASE I ONLY\n- Make the action feel immediate and easy\n- Include payment link or clear instruction\n- Avoid formal contract language\n- Make it feel like the obvious next step\n\nEXAMPLES:\n\"Let's build a lead intake and CRM system you can trust while you stay focused on providing exceptional service.\"\n\n\"Let's turn missed opportunities into January momentum.\"\n\nTONE: Direct, confident invitation (not pushy)\nVISUALS: Clean, minimal, focused on the action\n```\n\n---\n\n## DESIGN SPECIFICATIONS FOR ALL SLIDES:\n\n### Color Palette:\n- **Primary**: Orange (various shades and gradients)\n- **Secondary**: Black, dark grays\n- **Accents**: White text, subtle orange highlights\n- **NO BLUE, NO CYAN, NO PURPLE** (already handled by Gamma template)\n\n### Visual Style:\n- Modern, professional, clean\n- Minimal illustrations (only when they add clarity)\n- Ample white space\n- Strong visual hierarchy\n- Focus on readability over decoration\n\n### Typography:\n- Large, clear headings\n- Readable body text (not too small)\n- Consistent formatting throughout\n- Emphasis through size and weight, not excessive color\n\n### Layout Principles:\n- One key idea per slide\n- Avoid cluttered two-column layouts unless essential\n- Use numbered lists for deliverables/steps\n- Keep slides scannable and focused\n\n---\n\n## CRITICAL WRITING RULES:\n\n### Be Specific, Not Generic:\n\u274c \"AI automation services\"\n\u2705 \"Lead Reactivation Agent that calls and texts your Follow Up Boss database\"\n\n\u274c \"Improve efficiency\"  \n\u2705 \"Eliminate 15 hours per week of manual follow-up\"\n\n\u274c \"System setup\"\n\u2705 \"Complete workflow audit, form testing, and pipeline verification\"\n\n### Use Their Actual Details:\n- Reference their tools by name (if mentioned)\n- Use numbers they mentioned\n- Quote their concerns when relevant\n- Name their specific situation\n\n### Frame Around Outcomes:\n- What changes for them after Phase I\n- What risk gets removed\n- What they can now do confidently\n- What stops breaking\n\n### Pricing Logic:\n- If discussed in call: Use exact amounts\n- If not discussed: \"$[AMOUNT TO BE DETERMINED]\" with note\n- Phase I pricing must be clear and upfront\n- Keep pricing simple (one number, simple structure)\n\n---\n\n## TONE CALIBRATION:\n\n**Sound like**: An experienced operator helping another operator solve a systems problem\n\n**NOT like**: A consultant selling a solution, a freelancer pitching services, or a salesperson closing a deal\n\n**Key phrases**:\n- \"This is a simple, low-risk decision that...\"\n- \"Phase I protects your investment by...\"\n- \"You'll have confidence that...\"\n- \"So you can focus on...\"\n\n**Avoid**:\n- \"Cutting-edge AI technology\"\n- \"Revolutionary approach\"\n- \"Game-changing solution\"\n- Over-explaining technical details\n- Selling before trust is established\n\n---\n\n## YOUR COMPANY CONTEXT (EZJ Online):\n\n**Company**: EZJ Online  \n**Founder**: Ethan Johnson\n**Email**: your@email.com (rarely include in proposals)\n**Phone**: YOUR_PHONE_NUMBER (rarely include in proposals)\n\n**Positioning**: Systems operator who builds reliable automation infrastructure\n\n**Common Solutions**:\n- Lead reactivation systems\n- CRM workflow automation\n- Recruiting outreach systems\n- Content research agents\n- AI-powered qualification systems\n\n**DO NOT include contact info** unless absolutely necessary - client already has it from the call\n\n---\n\n## OUTPUT FORMAT:\n\nYour complete response should be formatted as a detailed Gamma prompt:\n\n```\nCreate an 8-10 slide professional proposal presentation focused on winning Phase I approval.\n\nDESIGN THEME: \n- Orange and black color palette (NO blue, NO cyan)\n- Modern, clean, professional aesthetic\n- Minimal illustrations, maximum clarity\n- Strong visual hierarchy\n\n===== SLIDE 1: [TITLE] =====\n\nDesign:\n[Visual specifications]\n\nContent:\n[Exact text structure]\n\n===== SLIDE 2: [TITLE] =====\n\nDesign:\n[Visual specifications]\n\nContent:\n[Exact text structure]\n\n[Continue through all slides...]\n```\n\n---\n\n## FINAL QUALITY CHECKLIST:\n\nBefore outputting your Gamma prompt, verify:\n\n\u2705 Does this proposal make Phase I approval feel obvious?\n\u2705 Is Phase I pricing clear and upfront?\n\u2705 Have I framed problems as business problems (not technical)?\n\u2705 Are deliverables concrete and outcome-focused?\n\u2705 Is the timeline specific and realistic?\n\u2705 Does the CTA focus on Phase I only?\n\u2705 Have I avoided over-explaining technical details?\n\u2705 Is the tone operator-level (not salesy)?\n\u2705 Are there 8-10 slides maximum?\n\u2705 No blue or cyan color references?\n\u2705 Does every slide support the core objective: building trust?\n\n---\n\n## REMEMBER:\n\nThe proposal exists to reduce risk and make Phase I approval feel obvious.\n\nEverything else is noise.\n\nGenerate proposals that:\n- Reduce risk\n- Build trust  \n- Make approving Phase I feel like the only logical next step\n- Prioritize clarity over completeness\n- Focus on outcomes over features\n- Create momentum, not friction\n\nYour mission: Make saying \"yes\" to Phase I the easiest decision the client makes this week."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -1296,
+        -528
+      ],
+      "id": "9e2812b6-34c1-494d-a4cc-8b77a71dc3db",
+      "name": "Generate Gamma Prompt",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C09RULNQCAW",
+          "mode": "list",
+          "cachedResultName": "meetings"
+        },
+        "messageType": "block",
+        "blocksUi": "={{ $json.output }}",
+        "text": "=",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        -64,
+        -320
+      ],
+      "id": "bb56d2a0-e511-47ca-bf54-f298eac35b36",
+      "name": "Send Summary",
+      "webhookId": "196fa1a4-39a6-4b17-bba8-21575d738336",
+      "credentials": {
+        "slackApi": {
+          "id": "",
+          "name": "Slack Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C09247MDDCN",
+          "mode": "list",
+          "cachedResultName": "proposals"
+        },
+        "text": "=\u270d\ud83c\udffb Here is the Gamma prompt to generate your proposal for {{ $('Fathom').item.json.body.title }} :\n\n{{ $json.output }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        -960,
+        -528
+      ],
+      "id": "0031a147-1238-4b54-bfdf-5618ba78fb1f",
+      "name": "Send Prompt",
+      "webhookId": "196fa1a4-39a6-4b17-bba8-21575d738336",
+      "credentials": {
+        "slackApi": {
+          "id": "",
+          "name": "Slack Bot"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "dcc6e297-f1bd-4210-87fd-606c82dd4d0b",
+          "mode": "list",
+          "cachedResultName": "Projects / CRM",
+          "cachedResultUrl": "https://www.notion.so/dcc6e297f1bd421087fd606c82dd4d0b"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -224,
+        -560
+      ],
+      "id": "88225681-fb39-48b3-87bb-792b8a8110b3",
+      "name": "Check CRM",
+      "credentials": {
+        "notionApi": {
+          "id": "",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a2f74ff7-5993-43ec-9791-29fe1ae4417a",
+              "leftValue": "={{ $json.property_email }}",
+              "rightValue": "={{ $('Set Client email').item.json['Client email'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        -64,
+        -560
+      ],
+      "id": "8f748979-03c1-4469-85a5-3af4c8678f4b",
+      "name": "Find Lead"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        112,
+        -416
+      ],
+      "id": "585eb783-53cf-4a91-91e8-c74ccaa97948",
+      "name": "OpenRouter Chat Model2",
+      "credentials": {
+        "openRouterApi": {
+          "id": "",
+          "name": "OpenRouter API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here is the full call transcript:\n\n{{ $json.formattedTranscript }}\n\nPlease generate a Slack-formatted message following the required structure.",
+        "options": {
+          "systemMessage": "=You are an assistant that turns Fathom meeting summaries into clean internal Slack recaps.\n\nGoals:\n- Make the message easy to scan in Slack.\n- Use simple Slack markdown and a few relevant emojis.\n- Keep it short and focused on what the team actually needs to know.\n\nFormatting rules:\n1. Start with a bold title line that includes the meeting name and one emoji, for example:\n   *\ud83d\udcf9 Klara Content Workflow \u2013 Client Call Recap*\n2. On the next line, add an italic line for the date and time if provided.\n3. Then create these sections in order if the info exists:\n   - \ud83d\udcdd **Overview**\n   - \ud83d\udd0d **Main topics**\n   - \u2705 **Decisions**\n   - \ud83d\udccc **Action items**\n4. Use bullet points under each section. One line per bullet.\n5. If the Fathom summary includes section headings with timestamps and links, you can:\n   - turn them into short bullets under \u201cMain topics\u201d\n   - keep the links as-is so the team can jump to the moments in Fathom.\n6. Under **Action items**, phrase each bullet as \u201cOwner \u2013 task\u201d.\n7. Mask anything that looks like a secret (tokens, API keys, passwords) with ****.\n8. Do not repeat the raw markdown. Rewrite it more compactly.\n9. Do not include any explanation of what you are doing. Output only the Slack message.\n\nKeep the entire message to something that would fit on one screen for a typical Slack user.`\n\nSTRUCTURE the message in slack block, make sure it is intuitive and aesthetically pleasing. Make use of different elements for the differents answers so it looks professional.\n\n\nEXAMPLE OUTPUT:\n\n{\n  \"blocks\": [\n    {\n      \"type\": \"header\",\n      \"text\": {\n        \"type\": \"plain_text\",\n        \"text\": \"\ud83d\udcca Ethan\u2019s Tax Residency & Planning Recap\"\n      }\n    },\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*Date:* Not specified\\n\\n*\ud83d\udcdd Overview*\\n\u2022 Ethan is exploring international tax residency options while living in Bali.\\n\u2022 Countries considered: Paraguay, Estonia, Dubai, Hong Kong, Singapore.\\n\u2022 Primary interest: Hong Kong\u2019s tax benefits but complicated by U.S. rules.\"\n      }\n    },\n    {\n      \"type\": \"divider\"\n    },\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*\ud83d\udd0d Main Topics*\\n\u2022 <https://fathom.video/share/2cr1MEZ1Dt_cztCTdF1LNTxmAqA6ziYV?tab=summary&timestamp=0|Ethan\u2019s tax residency options and Hong Kong interest @0:00>\\n\u2022 <https://fathom.video/share/2cr1MEZ1Dt_cztCTdF1LNTxmAqA6ziYV?tab=summary&timestamp=135|U.S. citizen tax obligations on global income @2:15>\\n\u2022 <https://fathom.video/share/2cr1MEZ1Dt_cztCTdF1LNTxmAqA6ziYV?tab=summary&timestamp=166|Setting up a Hong Kong company + IRS reporting @2:46>\\n\u2022 <https://fathom.video/share/2cr1MEZ1Dt_cztCTdF1LNTxmAqA6ziYV?tab=summary&timestamp=803|Potential impact of Austrian citizenship @13:23>\\n\u2022 <https://fathom.video/share/2cr1MEZ1Dt_cztCTdF1LNTxmAqA6ziYV?tab=summary&timestamp=1591|Next steps + international tax lawyer referral @26:31>\"\n      }\n    },\n    {\n      \"type\": \"divider\"\n    },\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*\u2705 Decisions*\\n\u2022 Ethan will consult with a Bali-based tax advisor.\\n\u2022 Ellen will provide referral to an international tax lawyer.\\n\u2022 Decision on forming a Hong Kong company will wait until expert review.\"\n      }\n    },\n    {\n      \"type\": \"divider\"\n    },\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*\ud83d\udccc Action Items*\\n\u2022 *Ethan:* Schedule meeting with Bali tax advisor.\\n\u2022 *Ellen:* Send international tax lawyer referral.\"\n      }\n    }\n  ]\n}\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -400,
+        -320
+      ],
+      "id": "657b52ae-4cb3-4fe2-8587-fb51caa66c33",
+      "name": "Generate Summary - Slack"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here is the full call transcript:\n\n{{ $('Code in JavaScript').item.json.formattedTranscript }}\n\nPlease generate a Notion-formatted page following the required structure.",
+        "options": {
+          "systemMessage": "=You are an assistant that creates concise, well-formatted meeting summaries for Notion.\n\nCRITICAL: Your response must be under 2500 characters total.\n\nStructure your summary like this:\n\n\ud83d\udccb Overview\n[1-2 sentences about the call's purpose and outcome]\n\n\ud83c\udfaf Key Points\n- [Most important topic 1]\n- [Most important topic 2]\n- [Most important topic 3]\n- [Most important topic 4]\n\n\ud83d\udca1 Main Insights\n- [Key insight 1]\n- [Key insight 2]\n\n\u2705 Decisions\n- [Decision 1]\n- [Decision 2]\n\n\ud83d\udccc Next Steps\n- [Owner]: [Action item 1]\n- [Owner]: [Action item 2]\n\n\ud83c\udfa4 Meeting Recording\n- {{ $('Fathom').item.json.body.url }}\n\nFormatting rules:\n- Use # for the main title (client name + \"Meeting Summary\")\n- Use emoji headers with section names (no ##, just plain text after emoji)\n- Use \u2022 for bullet points (not -, not *)\n- Keep it concise - prioritize the most important information\n- Be specific but brief\n- NO markdown formatting like **, __, ~~, or `\n- Total length MUST be under 2500 characters\n\nFocus on quality and make sure it is formatted for a notion page.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        112,
+        -560
+      ],
+      "id": "57add929-e1f2-4824-bb8d-1e42c2f4d7f7",
+      "name": "Generate Summary - Notion"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the summary text\nconst summaryText = $input.first().json.output;\n\n// Split into chunks of 2000 characters\nconst chunkSize = 2000;\nconst chunks = [];\n\nfor (let i = 0; i < summaryText.length; i += chunkSize) {\n  chunks.push(summaryText.substring(i, i + chunkSize));\n}\n\n// Format for Notion blocks\nconst blocks = chunks.map(chunk => ({\n  type: \"paragraph\",\n  paragraph: {\n    rich_text: [{\n      type: \"text\",\n      text: { content: chunk }\n    }]\n  }\n}));\n\nreturn [{ json: { blocks } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        -560
+      ],
+      "id": "88a31ffa-b8ea-4a32-bd35-1eff96e6fa3e",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $('Find Lead').item.json.id }}",
+          "mode": "id"
+        },
+        "title": "=Call Summary - {{ $now.format('DD') }}",
+        "simple": false,
+        "blockUi": {
+          "blockValues": [
+            {
+              "textContent": "={{ $json.blocks[0].paragraph.rich_text[0].text.content }}"
+            },
+            {
+              "textContent": "={{ $json.blocks[0].paragraph.rich_text[0].text.content }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        592,
+        -560
+      ],
+      "id": "f0d72023-4e96-4c5d-88e2-24f14c66c95c",
+      "name": "Add Call Summary",
+      "credentials": {
+        "notionApi": {
+          "id": "",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "dcc6e297-f1bd-4210-87fd-606c82dd4d0b",
+          "mode": "list",
+          "cachedResultName": "Projects / CRM",
+          "cachedResultUrl": "https://www.notion.so/dcc6e297f1bd421087fd606c82dd4d0b"
+        },
+        "title": "={{ $json.responses.name.value }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Status|status",
+              "statusValue": "Meeting Booked"
+            },
+            {
+              "key": "Meeting Link|url",
+              "urlValue": "={{ $json.videoCallData.url }}"
+            },
+            {
+              "key": "Company|rich_text",
+              "textContent": "={{ $json.userFieldsResponses.CompanyName.value }}"
+            },
+            {
+              "key": "Website|url",
+              "urlValue": "={{ $json.responses.website.value }}"
+            },
+            {
+              "key": "Service|multi_select",
+              "multiSelectValue": [
+                "AI Automation"
+              ]
+            },
+            {
+              "key": "Email|email",
+              "emailValue": "={{ $json.responses.email.value }}"
+            },
+            {
+              "key": "Focus|rich_text"
+            },
+            {
+              "key": "Meeting Date|date",
+              "date": "={{ $json.startTime }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -176,
+        -992
+      ],
+      "id": "a2249d8c-b731-4aa8-a478-dc11b0cee51b",
+      "name": "Add Lead to CRM",
+      "credentials": {
+        "notionApi": {
+          "id": "",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "2e7e819c-2711-80e6-b034-cff629fd4fff",
+          "mode": "list",
+          "cachedResultName": "Meetings",
+          "cachedResultUrl": "https://www.notion.so/2e7e819c271180e6b034cff629fd4fff"
+        },
+        "title": "=Call Summary - {{ $now.format('DD') }}",
+        "simple": false,
+        "blockUi": {
+          "blockValues": [
+            {
+              "textContent": "={{ $json.blocks[0].paragraph.rich_text[0].text.content }}"
+            },
+            {
+              "textContent": "={{ $json.blocks[0].paragraph.rich_text[0].text.content }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        592,
+        -352
+      ],
+      "id": "cf9ac575-ad63-4c18-834d-b93f3d42190f",
+      "name": "Add to meetings DB",
+      "credentials": {
+        "notionApi": {
+          "id": "",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.fathom.ai/external/v1/webhooks",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Api-Key",
+              "value": "jk_lxNbQ2CRxOX8R9uJKXQ.LAlujFwlrHT4h_FRR8pzRVmIun4wuHuKJgOKTXYMvAc"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"destination_url\": \"https://ezj-n8n.ndiiix.easypanel.host/webhook/fathom/call-complete\",\n  \"include_summary\": true,\n  \"include_transcript\": true,\n  \"include_action_items\": true,\n  \"triggered_for\": [\"my_recordings\"]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -960,
+        -272
+      ],
+      "id": "6353d7ee-ee91-4f60-8e08-151ffcaf1338",
+      "name": "your@email.com fathom account"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b57df31c-f534-4c7b-98fb-5583feaff9d9",
+              "leftValue": "={{ $json.type }}",
+              "rightValue": "strategy-session",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -416,
+        -896
+      ],
+      "id": "d74dfdeb-9bbd-437a-9212-e40cfae7a1ed",
+      "name": "New Lead?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "54e38c2c-3d01-4359-ac39-2b5a29915caa",
+              "name": "Client email",
+              "value": "={{ $('Fathom').item.json.body.calendar_invitees[0].email }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -384,
+        -560
+      ],
+      "id": "49019d0b-d981-491b-9a04-0f61e81e0bac",
+      "name": "Set Client email"
+    },
+    {
+      "parameters": {
+        "events": [
+          "checkout.session.completed"
+        ]
+      },
+      "type": "n8n-nodes-base.stripeTrigger",
+      "typeVersion": 1,
+      "position": [
+        -704,
+        448
+      ],
+      "id": "96dce3f0-bca9-47d8-92cf-e74d0d414ff1",
+      "name": "Payment Recieved1",
+      "webhookId": "3530a832-c8a1-4bba-b8ae-5670cf039431",
+      "credentials": {
+        "stripeApi": {
+          "id": "",
+          "name": "Stripe account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "dcc6e297-f1bd-4210-87fd-606c82dd4d0b",
+          "mode": "list",
+          "cachedResultName": "Projects / CRM",
+          "cachedResultUrl": "https://www.notion.so/dcc6e297f1bd421087fd606c82dd4d0b"
+        },
+        "returnAll": true,
+        "filterType": "manual",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Project name|title",
+              "condition": "equals",
+              "titleValue": "={{ $json[\"Client Name\"] }}"
+            },
+            {
+              "key": "Email|email",
+              "condition": "equals",
+              "emailValue": "={{ $json[\"Client Email\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -416,
+        448
+      ],
+      "id": "cfede31a-85be-4761-8405-7161146ae980",
+      "name": "Check CRM for Client",
+      "credentials": {
+        "notionApi": {
+          "id": "",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1173e74c-672f-49aa-a958-0d659ec7be77",
+              "name": "Client Email",
+              "value": "={{ $json.data.object.customer_details.email }}",
+              "type": "string"
+            },
+            {
+              "id": "598cbf69-efe5-41e5-a8e7-3cc2a866cd99",
+              "name": "Client Name",
+              "value": "={{ $json.data.object.customer_details.name }}",
+              "type": "string"
+            },
+            {
+              "id": "eb79b870-fe50-46dc-b1f8-af3d911382a5",
+              "name": "Amount Paid",
+              "value": "={{ $json.data.object.amount_total }}",
+              "type": "number"
+            },
+            {
+              "id": "a1cb4adc-aa38-4c60-b044-83b99c1ccf36",
+              "name": "Currency",
+              "value": "={{ $json.data.object.currency }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -560,
+        448
+      ],
+      "id": "5a8b2150-722d-49c5-bb26-d481cff70ac2",
+      "name": "Client Detail"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7f8d09e0-1300-4466-ac96-8f495952381a",
+              "leftValue": "={{ $node[\"Check CRM for Client\"].json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -272,
+        448
+      ],
+      "id": "e7eeb364-ab6f-4cc9-900d-64b831373db4",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4.1-nano",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        256,
+        240
+      ],
+      "id": "62f8c433-e401-4b4e-b032-09936679f7f0",
+      "name": "OpenRouter Chat Model4",
+      "credentials": {
+        "openRouterApi": {
+          "id": "",
+          "name": "OpenRouter API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=A new payment has been processed via Stripe.\n\nPAYMENT DATA:\n- Customer Name: {{ $('Client Detail').first().json[\"Client Name\"] }}\n- Customer Email: {{ $('Client Detail').first().json[\"Client Email\"] }}\n- Amount Paid: ${{ (parseFloat($('Client Detail').first().json['Amount Paid']) / 100).toFixed(2) }}\n- Currency: {{ $('Client Detail').first().json.Currency.toUpperCase() }}\n\nCRM STATUS:\n- Matching lead found in Notion CRM.\n- Status has been automatically updated to: \"In Progress\"\n\nPlease format this into a professional Slack Block Kit message for the #payments channel.",
+        "options": {
+          "systemMessage": "=You are a professional revenue assistant for EZJ Online. Your task is to format Slack notifications for new client payments. \n\nYour goal is to synthesize the payment data into a clean, high-energy Slack Block Kit message that makes the revenue event feel significant and organized.\n\nOutput Rules:\n- You must output ONLY valid Slack Block Kit JSON.\n- Do not include explanations, backticks, or surrounding text.\n- The output will be passed directly into a Slack \"Send Message\" node.\n\nFormatting Requirements:\n1. Header: Use a bold header \"\ud83d\udcb0 Cha Ching! New Payment Received\"\n2. Mention: You MUST include a direct mention of Ethan at the top: <@U01FGD28FLY>\n3. Fields: Use a \"fields\" section to display:\n   - *\ud83d\udc64 Customer:* [Name]\n   - *\ud83d\udce7 Email:* [Email]\n   - *\ud83d\udcb5 Amount:* $[Amount] [Currency]\n4. Context: Include a divider and a small italicized footer: \"\u2705 CRM record identified and status updated to 'In Progress'.\"\n\nStyle Guidelines:\n- Use professional emojis (\ud83d\udcb0, \u2705, \ud83d\udcb5).\n- Ensure the JSON structure is strictly valid.\n- Keep the message concise and easy to scan on mobile.\n\nEXAMPLE JSON STRUCTURE:\n{\n  \"blocks\": [\n    {\n      \"type\": \"header\",\n      \"text\": { \"type\": \"plain_text\", \"text\": \"\ud83d\udcb0 REVENUE ALERT\" }\n    },\n    {\n      \"type\": \"section\",\n      \"text\": { \"type\": \"mrkdwn\", \"text\": \"<@U01FGD28FLY> - A new payment was just received! \ud83d\udc47\" }\n    },\n    {\n      \"type\": \"divider\"\n    },\n    {\n      \"type\": \"section\",\n      \"fields\": [\n        { \"type\": \"mrkdwn\", \"text\": \"*\ud83d\udc64 Customer*\\\\n[Name]\" },\n        { \"type\": \"mrkdwn\", \"text\": \"*\ud83d\udcb5 Amount*\\\\n$[Amount]\" }\n      ]\n    },\n    {\n      \"type\": \"context\",\n      \"elements\": [{ \"type\": \"mrkdwn\", \"text\": \"\u2705 *CRM Status:* Updated to 'In Progress'\" }]\n    }\n  ]\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        256,
+        64
+      ],
+      "id": "dc71fa04-9610-4ce0-8d6e-e03e977d59b2",
+      "name": "Generate Summary - Notion1"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C09RSEP218W",
+          "mode": "list",
+          "cachedResultName": "payments"
+        },
+        "messageType": "block",
+        "blocksUi": "={\n  \"blocks\": [\n    {\n      \"type\": \"header\",\n      \"text\": {\n        \"type\": \"plain_text\",\n        \"text\": \"\u26a0\ufe0f CRM MATCH FAILED: Payment Received\"\n      }\n    },\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"<@U01FGD28FLY> - A new payment just hit the account, but I could not find a matching lead in your Notion CRM. \ud83d\udc47\"\n      }\n    },\n    {\n      \"type\": \"divider\"\n    },\n    {\n      \"type\": \"section\",\n      \"fields\": [\n        {\n          \"type\": \"mrkdwn\",\n          \"text\": \"*\ud83d\udc64 Customer*\\n{{ $('Client Detail').first().json['Client Name'] }}\"\n        },\n        {\n          \"type\": \"mrkdwn\",\n          \"text\": \"*\ud83d\udce7 Email*\\n{{ $('Client Detail').first().json['Client Email'] }}\"\n        },\n        {\n          \"type\": \"mrkdwn\",\n          \"text\": \"*\ud83d\udcb5 Amount*\\n${{ (parseFloat($('Client Detail').first().json['Amount Paid']) / 100).toFixed(2) }} {{ $('Client Detail').first().json.Currency.toUpperCase() }}\"\n        }\n      ]\n    },\n    {\n      \"type\": \"context\",\n      \"elements\": [\n        {\n          \"type\": \"mrkdwn\",\n          \"text\": \"\ud83d\udea8 *Action Required:* CRM was NOT updated. Please manually locate this client and set status to 'In Progress'.\"\n        }\n      ]\n    }\n  ]\n}",
+        "text": "\u26a0\ufe0f *Payment Alert: Manual Action Required*",
+        "otherOptions": {
+          "includeLinkToWorkflow": false,
+          "mrkdwn": true
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        -112,
+        592
+      ],
+      "id": "31252247-10f8-4d61-a49b-c7abec45da84",
+      "name": "Lead Not Found In CRM.",
+      "webhookId": "df613943-442a-4b45-8d11-f14b10dbd9c2",
+      "credentials": {
+        "slackApi": {
+          "id": "",
+          "name": "Slack Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C09RSEP218W",
+          "mode": "list",
+          "cachedResultName": "payments"
+        },
+        "messageType": "block",
+        "blocksUi": "={{ $json.output }}",
+        "text": "\ud83d\udcb5 Payment Succeeded!",
+        "otherOptions": {
+          "includeLinkToWorkflow": false,
+          "mrkdwn": true
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        576,
+        64
+      ],
+      "id": "6bab2fc9-d609-4522-a663-49f5a94b41ea",
+      "name": "Send Payment Confirmation",
+      "webhookId": "0491df81-883c-41fc-ab0c-e348ed18b4ad",
+      "credentials": {
+        "slackApi": {
+          "id": "",
+          "name": "Slack Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Stripe Payment Recieved\n\n",
+        "height": 832,
+        "width": 1584,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -768,
+        16
+      ],
+      "typeVersion": 1,
+      "id": "4855a205-2ab4-4502-b86a-12eb72ed702b",
+      "name": "Sticky Note4",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "03d4ba36-2239-4d7f-b626-cfe0fecbc959",
+              "leftValue": "={{ $('Check CRM for Client').item.json.property_status }}",
+              "rightValue": "On Retainer",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -112,
+        272
+      ],
+      "id": "06fea42d-dc6f-4864-9a74-bfd8c678eea8",
+      "name": "Status is NOT = On Retainer"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Status|status",
+              "statusValue": "In Progress"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        80,
+        64
+      ],
+      "id": "aaff6780-efbb-4c20-a25d-016e20a59b50",
+      "name": "Update to \"In Progress\"",
+      "credentials": {
+        "notionApi": {
+          "id": "",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=A new payment has been processed via Stripe.\n\nPAYMENT DATA:\n- Customer Name: {{ $('Client Detail').first().json[\"Client Name\"] }}\n- Customer Email: {{ $('Client Detail').first().json[\"Client Email\"] }}\n- Amount Paid: ${{ (parseFloat($('Client Detail').first().json['Amount Paid']) / 100).toFixed(2) }}\n- Currency: {{ $('Client Detail').first().json.Currency.toUpperCase() }}\n\nCRM STATUS:\n- Matching lead found in Notion CRM.\n- Status has been automatically updated to: \"In Progress\"\n\nPlease format this into a professional Slack Block Kit message for the #payments channel.",
+        "options": {
+          "systemMessage": "=You are a professional revenue assistant for EZJ Online. Your task is to format Slack notifications for new client payments. \n\nYour goal is to synthesize the payment data into a clean, high-energy Slack Block Kit message that makes the revenue event feel significant and organized.\n\nOutput Rules:\n- You must output ONLY valid Slack Block Kit JSON.\n- Do not include explanations, backticks, or surrounding text.\n- The output will be passed directly into a Slack \"Send Message\" node.\n\nFormatting Requirements:\n1. Header: Use a bold header \"\ud83d\udcb0 Cha Ching! New Payment Received\"\n2. Mention: You MUST include a direct mention of Ethan at the top: <@U01FGD28FLY>\n3. Fields: Use a \"fields\" section to display:\n   - *\ud83d\udc64 Customer:* [Name]\n   - *\ud83d\udce7 Email:* [Email]\n   - *\ud83d\udcb5 Amount:* $[Amount] [Currency]\n4. Context: Include a divider and a small italicized footer: \"\u2705 CRM record identified and status updated to 'In Progress'.\"\n\nStyle Guidelines:\n- Use professional emojis (\ud83d\udcb0, \u2705, \ud83d\udcb5).\n- Ensure the JSON structure is strictly valid.\n- Keep the message concise and easy to scan on mobile.\n\nEXAMPLE JSON STRUCTURE:\n{\n  \"blocks\": [\n    {\n      \"type\": \"header\",\n      \"text\": { \"type\": \"plain_text\", \"text\": \"\ud83d\udcb0 REVENUE ALERT\" }\n    },\n    {\n      \"type\": \"section\",\n      \"text\": { \"type\": \"mrkdwn\", \"text\": \"<@U01FGD28FLY> - A new payment was just received! \ud83d\udc47\" }\n    },\n    {\n      \"type\": \"divider\"\n    },\n    {\n      \"type\": \"section\",\n      \"fields\": [\n        { \"type\": \"mrkdwn\", \"text\": \"*\ud83d\udc64 Customer*\\\\n[Name]\" },\n        { \"type\": \"mrkdwn\", \"text\": \"*\ud83d\udcb5 Amount*\\\\n$[Amount]\" }\n      ]\n    },\n    {\n      \"type\": \"context\",\n      \"elements\": [{ \"type\": \"mrkdwn\", \"text\": \"\u2705 *CRM Status:* Updated to 'In Progress'\" }]\n    }\n  ]\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        240,
+        400
+      ],
+      "id": "4c4ee3e7-9f18-4975-bfc8-2bf529787fb1",
+      "name": "Generate Summary - Notion2"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4.1-nano",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        240,
+        560
+      ],
+      "id": "9d50451b-88c8-4014-a0df-7a5a4f4172cb",
+      "name": "OpenRouter Chat Model5",
+      "credentials": {
+        "openRouterApi": {
+          "id": "",
+          "name": "OpenRouter API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C09RSEP218W",
+          "mode": "list",
+          "cachedResultName": "payments"
+        },
+        "messageType": "block",
+        "blocksUi": "={{ $json.output }}",
+        "text": "\ud83d\udcb5 Payment Succeeded!",
+        "otherOptions": {
+          "includeLinkToWorkflow": false,
+          "mrkdwn": true
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        592,
+        384
+      ],
+      "id": "8db4e5dd-46b4-4bcb-8f02-e5b370ac281c",
+      "name": "Send Payment Confirmation1",
+      "webhookId": "0491df81-883c-41fc-ab0c-e348ed18b4ad",
+      "credentials": {
+        "slackApi": {
+          "id": "",
+          "name": "Slack Bot"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "your@email.com fathom account": [
+      {
+        "json": {
+          "id": "gwzAy6G3XpxPZEL2",
+          "secret": "YOUR_WEBHOOK_SECRET",
+          "created_at": "2026-01-14T04:06:12Z",
+          "url": "https://ezj-n8n.ndiiix.easypanel.host/webhook/fathom/call-complete",
+          "include_transcript": true,
+          "include_summary": true,
+          "include_action_items": true,
+          "include_crm_matches": false,
+          "triggered_for": [
+            "my_recordings"
+          ]
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send form submission",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tally Form": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fathom": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate Summary - Slack",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cal.com Trigger": {
+      "main": [
+        [
+          {
+            "node": "New Lead?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Notify meeting details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Set Client email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generate Summary - Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate Gamma Prompt",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Gamma Prompt": {
+      "main": [
+        [
+          {
+            "node": "Send Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check CRM": {
+      "main": [
+        [
+          {
+            "node": "Find Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate Summary - Notion",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Lead": {
+      "main": [
+        [
+          {
+            "node": "Generate Summary - Notion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Summary - Slack": {
+      "main": [
+        [
+          {
+            "node": "Send Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Summary - Notion": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Add Call Summary",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Add to meetings DB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Lead to CRM": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New Lead?": {
+      "main": [
+        [
+          {
+            "node": "Add Lead to CRM",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Client email": {
+      "main": [
+        [
+          {
+            "node": "Check CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Payment Recieved1": {
+      "main": [
+        [
+          {
+            "node": "Client Detail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check CRM for Client": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Client Detail": {
+      "main": [
+        [
+          {
+            "node": "Check CRM for Client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Status is NOT = On Retainer",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Lead Not Found In CRM.",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate Summary - Notion1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Summary - Notion1": {
+      "main": [
+        [
+          {
+            "node": "Send Payment Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Status is NOT = On Retainer": {
+      "main": [
+        [
+          {
+            "node": "Update to \"In Progress\"",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate Summary - Notion2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update to \"In Progress\"": {
+      "main": [
+        [
+          {
+            "node": "Generate Summary - Notion1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate Summary - Notion2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Summary - Notion2": {
+      "main": [
+        [
+          {
+            "node": "Send Payment Confirmation1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": ""
+  },
+  "id": "",
+  "tags": []
+}

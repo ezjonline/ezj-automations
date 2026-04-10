@@ -1,0 +1,2259 @@
+{
+  "name": "EZJ's GM Lead Scraper & Outreach Machine (TEMPLATE)",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -96,
+        800
+      ],
+      "id": "dded06e9-e81e-4a82-acf4-e715a4605c80",
+      "name": "Loop Over Items1",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=company: {{ $json[\"title\"] }}\n\ncompany website: {{ $json[\"website\"] }}\n\ncategory of service: {{ $json[\"categoryName\"] }}\n\ncity: {{ $json.city }}\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a Company Information Synthesizer. Your primary goal is to extract key information about a target company by leveraging the `tavilysearch` tool, prioritizing content likely originating from the company's official website. Your secondary goals are checking third-party sources for customer sentiment and recent news about the comapny. You will be given the company name, company website, service category and city they are located in.\n\n**CORE DIRECTIVES:**\n1.  **TOOL USAGE:** You MUST ONLY use the `tavilysearch` tool for information gathering.\n2.  **PRIMARY SOURCE FOCUS (Website):** Prioritize finding and summarizing information directly presented on the company's official website (e.g., the owners name, About Us, News/Blog/Press sections, Product/Service pages, Contact Us page). Use Tavily to locate these pages or relevant summaries.\n3.  **SECONDARY SOURCE (Sentiment ONLY):** Use Tavily to search third-party review sites (G2, Capterra, etc.) or forums (Reddit) ONLY for customer sentiment.\n4.  **RECENCY:** For news and highlights, focus on information from the last 12-18 months.\n5.  **CONCISENESS:** Keep summaries brief and factual.\n6.  **ACCURACY:** Do not invent information.\n\n**RESEARCH FOCUS (Guide for using Tavily):**\n*   **Core Business:** Search for \"[Company Name] About Us\", \"[Company Name] Mission\", or what the company does, aiming for results likely linking to or summarizing their main website content.\n*   **Recent Website News:** Search for \"[Company Name] news\", \"[Company Name] press release\", \"[Company Name] blog\", looking for recent announcements likely hosted on their domain.\n*   **Products/Services:** Search for \"[Company Name] products\", \"[Company Name] services\", aiming for results describing their core offerings, likely from their website.\n*   **Third-Party Sentiment:** Search `\"[Company Name] review site:g2.com\"`, `\"[Company Name] reddit discussion\"`, etc.\n\n**OUTPUT FORMAT:**\nYour final response MUST be a single JSON object containing the following keys. Provide concise, bulleted string values where appropriate:\n\n{\n  \"companyOverview\": \"[1-2 sentence description of what the company does, its mission, or value proposition, based on information likely found on their website.] (Source: Primarily Company Website via Tavily Search Results)\",\n  \"recentWebsiteNews\": \"[Bullet point about a specific recent announcement, update, or blog post likely found on the company's website.] (Source: Link to specific page/article if found by Tavily, otherwise 'Company Website News/Blog')\\n- [Optional second bullet point.] (Source: Link or 'Company Website News/Blog')\",\n  \"keyOfferings\": \"[Bullet point listing a key product or service.] (Source: Company Website via Tavily Search Results)\\n- [Optional second bullet point listing another offering.] (Source: Company Website via Tavily Search Results)\",\n  \"thirdPartySentiment\": \"[Bullet point summarizing specific praise/criticism from a third-party review site/forum. Quote if concise.] (Source: [Specific URL/Site Name])\\n- [Optional second bullet point.] (Source: [Specific URL/Site Name])\",\n  \"comprehensiveSummary\": \"[1-2 sentence write up that synthesizes and ties the companyOverview, recentWebsiteNews, keyOfferings, and thirdPartySentiment all together]\"\n}\n\n**HANDLING NO RESULTS:**\nIf `tavilysearch` finds no relevant information, the value MUST be a string stating: \"No relevant [Category Name, e.g., recent website news] found via Tavily search.\" Source citation for website content (overview, news, offerings) can be general ('Company Website via Tavily') unless a specific article/page URL is readily available in the search results. Source citation for `thirdPartySentiment` MUST be specific.\n\nI need you to include a \"keyword\" in the output that is their exact service people would search into google to find what they offer"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        160,
+        768
+      ],
+      "id": "331a366f-a8de-4fe5-83d1-92effac9c3dc",
+      "name": "Company Research1",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        848,
+        976
+      ],
+      "id": "9a9872e9-b032-45c0-9ee1-7d7e8548cd03",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "",
+          "name": "OpenRouter API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"icebreaker\": \"...\",\n  \"introduction\": \"...\",\n  \"value_proposition\": \"...\",\n  \"cta\": \"...\",\n  \"shortenedCompanyName\": \"...\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        1088,
+        976
+      ],
+      "id": "b06c45ea-8269-47f5-9112-32d51106c42d",
+      "name": "Structured Output Parser4"
+    },
+    {
+      "parameters": {
+        "content": "## Source & Scrape  Leads",
+        "height": 448,
+        "width": 2080
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        -256
+      ],
+      "id": "429f82a0-0675-4cb6-9c0a-655c8e5e4839",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Company Research",
+        "height": 464,
+        "width": 1136,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        672
+      ],
+      "id": "664a8989-d9a7-4186-bf2b-a0ef28bfbd61",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Generate Custom Outreach Message\n",
+        "height": 464,
+        "width": 928,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        768,
+        672
+      ],
+      "id": "3eca6599-0b01-4614-b1b0-38dd23159470",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=company name: {{ $json.title }}\n\ncategory name: {{ $json.categoryName }}\n\nemail: {{ $json.leadsEnrichment[0].email }}\n\nwebsite: {{ $json.website }}\n\ncity: {{ $json.city }}\n\nstate: {{ $json.state }}\n\ndomainKey (new leads from Apify):  {{ $('Normalize DomainKey').item.json.domainKey }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are a sophisticated AI data-processing engine. Your task is to receive a raw JSON object for a single business prospect, perform two critical actions, and then provide your response in a specific JSON format.\n\n**Your Instructions:**\n\n1.  **EXTRACT KEY DATA:** You must parse the raw JSON input to find and extract the following specific data points. If a field is not present, use a value of `null`.\n    * **company name:** Look for `title`.\n    * **cateogory name** Look for 'categoryName'\n    * **email:** Find the first available email address. Look in fields like `emails` 'emails[0]' 'leadsEnrichment[0] or 'email'\n    * **website** Look for the `website` field.\n    * **city:** look for `city'.\n\n\n2.  **FORMAT THE OUTPUT:** You MUST structure your entire response as a single, clean JSON object. The object should contain exactly the keys listed below. Do not include any other text, explanations, or greetings in your response\u2014ONLY the final JSON object.\n\n**Required Output Format:**\n{\n  \"companyName\": \"...\",\n  \"categoryName\": \"...\",\n  \"email\": \"...\",\n  \"website\": \"...\",\n  \"city\": \"...\", \n  \"state\": \"...\", \n  \"domainKey\": \"...\"\n}"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        960,
+        -176
+      ],
+      "id": "dbe6577c-6baa-4bd4-b5e4-9469a90dc036",
+      "name": "Parse Lead Data",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"companyName\": \"...\",\n  \"categoryName\": \"...\",\n  \"email\": \"...\",\n  \"website\": \"...\",\n  \"city\": \"...\", \n  \"state\": \"...\", \n  \"domainKey\": \"...\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1104,
+        32
+      ],
+      "id": "0e2bf890-4088-42ff-a151-5071ec251f2d",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "url": "https://api.apify.com/v2/acts/compass~crawler-google-places/runs/last/dataset/items?token=apify_api_YOUR-APIFY-API-KEY",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        320,
+        -144
+      ],
+      "id": "e18eaf42-535a-4408-9e70-e296e9fd8459",
+      "name": "Get results"
+    },
+    {
+      "parameters": {
+        "amount": 10,
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        96,
+        -64
+      ],
+      "id": "6031fe10-b189-4028-af0d-a9c914d28707",
+      "name": "Wait 10 mins",
+      "webhookId": "b89688bd-723c-4216-bf55-57e63e048b79",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appER1XgrIkinSyXl",
+          "mode": "list",
+          "cachedResultName": "Texas Med Spas",
+          "cachedResultUrl": "https://airtable.com/appER1XgrIkinSyXl"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblzcvZkd61Os1scQ",
+          "mode": "list",
+          "cachedResultName": "Dallas",
+          "cachedResultUrl": "https://airtable.com/appER1XgrIkinSyXl/tblzcvZkd61Os1scQ"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "website": "={{ $('Loop Over Items1').item.json.website }}",
+            "companyOverview": "={{ $json.output.companyOverview }}",
+            "recentWebsiteNews": "={{ $json.output.recentWebsiteNews }}",
+            "keyOfferings": "={{ $json.output.keyOfferings }}",
+            "thirdPartySentiment": "={{ $json.output.thirdPartySentiment }}",
+            "comprehensiveSummary": "={{ $json.output.comprehensiveSummary }}"
+          },
+          "matchingColumns": [
+            "website"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "categoryName",
+              "displayName": "categoryName",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "website",
+              "displayName": "website",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "domainKey",
+              "displayName": "domainKey",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "state",
+              "displayName": "state",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "companyOverview",
+              "displayName": "companyOverview",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "recentWebsiteNews",
+              "displayName": "recentWebsiteNews",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "keyOfferings",
+              "displayName": "keyOfferings",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "thirdPartySentiment",
+              "displayName": "thirdPartySentiment",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comprehensiveSummary",
+              "displayName": "comprehensiveSummary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "icebreaker",
+              "displayName": "icebreaker",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "introduction",
+              "displayName": "introduction",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "value_proposition",
+              "displayName": "value_proposition",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "cta",
+              "displayName": "cta",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "shortenedCompanyName",
+              "displayName": "shortenedCompanyName",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "verdict",
+              "displayName": "verdict",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        576,
+        768
+      ],
+      "id": "98af561e-bbd0-4858-9094-81e124b70cc8",
+      "name": "Add Company Research to Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appER1XgrIkinSyXl",
+          "mode": "list",
+          "cachedResultName": "Texas Med Spas",
+          "cachedResultUrl": "https://airtable.com/appER1XgrIkinSyXl"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblzcvZkd61Os1scQ",
+          "mode": "list",
+          "cachedResultName": "Dallas",
+          "cachedResultUrl": "https://airtable.com/appER1XgrIkinSyXl/tblzcvZkd61Os1scQ"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "website": "={{ $('Loop Over Items1').item.json.website }}",
+            "icebreaker": "={{ $json.output.icebreaker }}",
+            "introduction": "={{ $json.output.introduction }}",
+            "value_proposition": "={{ $json.output.value_proposition }}",
+            "cta": "={{ $json.output.cta }}",
+            "shortenedCompanyName": "={{ $json.output.shortenedCompanyName }}"
+          },
+          "matchingColumns": [
+            "website"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "categoryName",
+              "displayName": "categoryName",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "website",
+              "displayName": "website",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "domainKey",
+              "displayName": "domainKey",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "state",
+              "displayName": "state",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "companyOverview",
+              "displayName": "companyOverview",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "recentWebsiteNews",
+              "displayName": "recentWebsiteNews",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "keyOfferings",
+              "displayName": "keyOfferings",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "thirdPartySentiment",
+              "displayName": "thirdPartySentiment",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comprehensiveSummary",
+              "displayName": "comprehensiveSummary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "icebreaker",
+              "displayName": "icebreaker",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "introduction",
+              "displayName": "introduction",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "value_proposition",
+              "displayName": "value_proposition",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "cta",
+              "displayName": "cta",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "shortenedCompanyName",
+              "displayName": "shortenedCompanyName",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "verdict",
+              "displayName": "verdict",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1264,
+        768
+      ],
+      "id": "e6f0e1e5-179d-425b-b84c-6d8e69336f89",
+      "name": "Add Custom Outreach Variables to Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.instantly.ai/api/v2/leads",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR-INSTANTLY-API"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"campaign\": \"40d04062-be7d-4922-b817-964aa79620bc\",\n  \"email\": \"{{ $('Search records').item.json.email }}\",\n  \"company_name\": \"{{ $('Search records').item.json.title }}\",\n  \"custom_variables\": {\n     \"icebreaker\": {{ JSON.stringify($json.fields.icebreaker) }},\n     \"introduction\": {{ JSON.stringify($json.fields.introduction) }},\n     \"value_proposition\": {{ JSON.stringify($json.fields.value_proposition) }},\n     \"shortenedCompanyName\": \"{{ $json.fields.shortenedCompanyName }}\",\n     \"cta\": {{ JSON.stringify($json.fields.cta) }}\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1504,
+        976
+      ],
+      "id": "6daef219-a06c-46d6-b39a-67035f775fd9",
+      "name": "Add Lead to Instantly"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appER1XgrIkinSyXl",
+          "mode": "list",
+          "cachedResultName": "Texas Med Spas",
+          "cachedResultUrl": "https://airtable.com/appER1XgrIkinSyXl"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblzcvZkd61Os1scQ",
+          "mode": "list",
+          "cachedResultName": "Dallas",
+          "cachedResultUrl": "https://airtable.com/appER1XgrIkinSyXl/tblzcvZkd61Os1scQ"
+        },
+        "options": {
+          "view": {
+            "__rl": true,
+            "value": "viwcM3pYuCwL9dUDo",
+            "mode": "list",
+            "cachedResultName": "Needs Enrichment",
+            "cachedResultUrl": "https://airtable.com/appER1XgrIkinSyXl/tblzcvZkd61Os1scQ/viwcM3pYuCwL9dUDo"
+          }
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -336,
+        800
+      ],
+      "id": "c81fd561-a91c-4953-9551-77c18c09e424",
+      "name": "Search records",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appwtH8KWUYtZb8UQ",
+          "mode": "list",
+          "cachedResultName": "GA, Tree Services, GM",
+          "cachedResultUrl": "https://airtable.com/appwtH8KWUYtZb8UQ"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblzcvZkd61Os1scQ",
+          "mode": "list",
+          "cachedResultName": "ALL",
+          "cachedResultUrl": "https://airtable.com/appwtH8KWUYtZb8UQ/tblzcvZkd61Os1scQ"
+        },
+        "options": {
+          "fields": [
+            "domainKey"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        528,
+        32
+      ],
+      "id": "4dfbf4f6-c002-4dcf-b43b-4d5f2c0e5b56",
+      "name": "Get Existing Leads",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "fieldsToMatchString": "domainKey",
+        "joinMode": "keepNonMatches",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        752,
+        -64
+      ],
+      "id": "60a21a75-f006-474a-92bb-4841a7587c88",
+      "name": "Deduplicate Leads"
+    },
+    {
+      "parameters": {
+        "jsCode": "const seenKeys = new Set();\nconst results = [];\nfor (const item of $input.all()) {\n  const rawUrl = item.json.website || \"\";\n  const title = item.json.title || \"no-title\";\n  let key = \"\";\n  // 1. Generate the key\n  if (rawUrl && rawUrl.trim() !== \"\" && rawUrl !== \"null\") {\n    key = rawUrl\n      .replace(/^(?:https?:\\/\\/)?(?:www\\.)?/i, \"\")\n      .split('/')[0]\n      .toLowerCase();\n  } else {\n    key = \"no-web-\" + title.toLowerCase().replace(/[^a-z0-9]/g, \"\");\n  }\n  // 2. ONLY add to results if we haven't seen this key in THIS run yet\n  if (!seenKeys.has(key)) {\n    seenKeys.add(key);\n    item.json.domainKey = key;\n    results.push(item);\n  }\n}\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        -144
+      ],
+      "id": "a6689f63-133b-4f2f-893b-43a5b5dbbd95",
+      "name": "Normalize DomainKey"
+    },
+    {
+      "parameters": {
+        "content": "## Lead Enrichment",
+        "height": 416,
+        "width": 2080,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        224
+      ],
+      "id": "c669b97c-b039-4e75-8f76-7f5a22bce122",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = [[\"domain\"]];\n\nconst firstItem = $input.all()[0].json;\nconst state = (firstItem.output?.state || firstItem.fields?.state || \"Bulk_Enrichment\").replace(/\\s+/g, '_');\n\n\nconst now = new Date();\nconst dateStr = now.toISOString().split('T')[0]; \n\nconst hours = String(now.getHours()).padStart(2, '0');\nconst minutes = String(now.getMinutes()).padStart(2, '0');\nconst timeStr = `${hours}-${minutes}`;\n\nfor (const item of $input.all()) {\n  const domain = item.json.output?.domainKey || item.json.fields?.domainKey;\n  \n  if (domain && domain.trim() !== \"\") {\n    rows.push([domain]); \n  }\n}\n\nreturn {\n  data: rows,\n  domain_field_index: 0,\n\n  file_name: `${state}_${dateStr}_${timeStr}`\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -96,
+        368
+      ],
+      "id": "f9829c4e-2c2c-46a4-a563-97634cc37d2b",
+      "name": "Aggregate Domains"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anymailfinder.com/v5.1/bulk/json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "data",
+              "value": "={{ $json.data }}"
+            },
+            {
+              "name": "domain_field_index",
+              "value": "={{ $json.domain_field_index }}"
+            },
+            {
+              "name": "file_name",
+              "value": "={{ $json.file_name }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        96,
+        368
+      ],
+      "id": "28c5a44b-a055-415f-a84d-1fc53dc169b5",
+      "name": "Bulk Enrich Emails",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "",
+          "name": "AnyMailFinder API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.anymailfinder.com/v5.1/bulk/{{ $json.id }}/download",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        992,
+        272
+      ],
+      "id": "a2194ba1-95da-4165-9432-79bc6f6a4a99",
+      "name": "Download Emails",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "",
+          "name": "AnyMailFinder API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const csvString = $input.first().json.data;\nconst lines = csvString.split('\\n');\nconst headers = lines[0].split(',');\nconst results = [];\n\nfor (let i = 1; i < lines.length; i++) {\n  const currentLine = lines[i].split(',');\n  \n  if (currentLine.length === headers.length) {\n    let obj = {};\n    for (let j = 0; j < headers.length; j++) {\n      obj[headers[j].trim()] = currentLine[j].trim();\n    }\n    results.push(obj);\n  }\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1184,
+        272
+      ],
+      "id": "24b9059f-4e44-417a-968b-bbaafe85a958",
+      "name": "CSV to JSON"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "bced71c9-2a72-49ef-8309-07e05c4e50de",
+              "leftValue": "={{ $json.amf_status }}",
+              "rightValue": "not found",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        1408,
+        272
+      ],
+      "id": "966130f5-2802-4bc4-9faa-1fdb39386798",
+      "name": "Filter Emails"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appER1XgrIkinSyXl",
+          "mode": "list",
+          "cachedResultName": "Texas Med Spas",
+          "cachedResultUrl": "https://airtable.com/appER1XgrIkinSyXl"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblzcvZkd61Os1scQ",
+          "mode": "list",
+          "cachedResultName": "Dallas",
+          "cachedResultUrl": "https://airtable.com/appER1XgrIkinSyXl/tblzcvZkd61Os1scQ"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "domainKey": "={{ $('The Marker').item.json.domain }}",
+            "email": "={{ $json.valid_emails_only }}"
+          },
+          "matchingColumns": [
+            "domainKey"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "categoryName",
+              "displayName": "categoryName",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "website",
+              "displayName": "website",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "domainKey",
+              "displayName": "domainKey",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "state",
+              "displayName": "state",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "companyOverview",
+              "displayName": "companyOverview",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "recentWebsiteNews",
+              "displayName": "recentWebsiteNews",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "keyOfferings",
+              "displayName": "keyOfferings",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "thirdPartySentiment",
+              "displayName": "thirdPartySentiment",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comprehensiveSummary",
+              "displayName": "comprehensiveSummary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "icebreaker",
+              "displayName": "icebreaker",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "introduction",
+              "displayName": "introduction",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "value_proposition",
+              "displayName": "value_proposition",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "cta",
+              "displayName": "cta",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "shortenedCompanyName",
+              "displayName": "shortenedCompanyName",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "verdict",
+              "displayName": "verdict",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1408,
+        480
+      ],
+      "id": "0f2a0254-833b-4300-9a81-0cb1b6fa6370",
+      "name": "Add Missing Leads",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of $input.all()) {\n  const type = item.json.emails_type;\n\n  if (type === 'valid') {\n    item.json.status = '\u2705 Verified';\n  } else if (type === 'risky') {\n    item.json.status = '\u26a0\ufe0f Risky - Manual Check';\n  } else {\n    item.json.status = '\u274c Not Found';\n  }\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        992,
+        496
+      ],
+      "id": "9bd9381c-0eb6-4973-9bfb-77dbb3472620",
+      "name": "The Marker"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4fcd5fdb-2559-4e67-80aa-dd06dda3713e",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "\u2705 Verified",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "ceb567c5-bb8e-4808-be4d-af951b275889",
+              "leftValue": "={{ $json.emails_type }}",
+              "rightValue": "valid",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1184,
+        496
+      ],
+      "id": "f17dd888-78d6-49eb-ba88-be58cf1a970d",
+      "name": "Valid?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "79c88f4e-b40b-4490-b049-ebc9819941e6",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "completed",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        720,
+        368
+      ],
+      "id": "1923d114-5410-4d0b-9a91-4fc02c3d8ca0",
+      "name": "Completed?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "603ca827-f5a2-4df2-b222-e105eebe5e05",
+              "leftValue": "={{ $('Parse Lead Data').item.json.output.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1536,
+        16
+      ],
+      "id": "dea5a5ab-830b-43f2-8180-078bf4bd991a",
+      "name": "Has email?1"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appER1XgrIkinSyXl",
+          "mode": "list",
+          "cachedResultName": "Texas Med Spas",
+          "cachedResultUrl": "https://airtable.com/appER1XgrIkinSyXl"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblzcvZkd61Os1scQ",
+          "mode": "list",
+          "cachedResultName": "Dallas",
+          "cachedResultUrl": "https://airtable.com/appER1XgrIkinSyXl/tblzcvZkd61Os1scQ"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "domainKey": "={{ $json.output.domainKey }}",
+            "title": "={{ $json.output.companyName }}",
+            "categoryName": "={{ $json.output.categoryName }}",
+            "email": "={{ $json.output.email }}",
+            "city": "={{ $json.output.city }}",
+            "state": "={{ $json.output.state }}",
+            "website": "={{ $json.output.website }}"
+          },
+          "matchingColumns": [
+            "domainKey"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "categoryName",
+              "displayName": "categoryName",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "website",
+              "displayName": "website",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "domainKey",
+              "displayName": "domainKey",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "state",
+              "displayName": "state",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "companyOverview",
+              "displayName": "companyOverview",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "recentWebsiteNews",
+              "displayName": "recentWebsiteNews",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "keyOfferings",
+              "displayName": "keyOfferings",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "thirdPartySentiment",
+              "displayName": "thirdPartySentiment",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comprehensiveSummary",
+              "displayName": "comprehensiveSummary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "icebreaker",
+              "displayName": "icebreaker",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "introduction",
+              "displayName": "introduction",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "value_proposition",
+              "displayName": "value_proposition",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "cta",
+              "displayName": "cta",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "shortenedCompanyName",
+              "displayName": "shortenedCompanyName",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "verdict",
+              "displayName": "verdict",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1296,
+        -80
+      ],
+      "id": "dbb174cd-2e20-4870-8d0c-c3c3b8fce213",
+      "name": "Add all results",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        320,
+        368
+      ],
+      "id": "78c05081-b780-4526-9cfc-9430b7da658f",
+      "name": "Wait Moment Ya?",
+      "webhookId": "c5a1764d-4306-4903-8e71-aac41c33e42b"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.anymailfinder.com/v5.1/bulk/{{ $('Bulk Enrich Emails').item.json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        528,
+        368
+      ],
+      "id": "8777682d-fe8d-4c6c-8912-3765d6ebb964",
+      "name": "Get Job Status",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "",
+          "name": "AnyMailFinder API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "Google Maps Scraper",
+        "formDescription": "Describe the types of leads you are trying to find.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "\ud83d\udd0d Search term 1"
+            },
+            {
+              "fieldLabel": " \ud83d\udd0d Search term 2"
+            },
+            {
+              "fieldLabel": "\ud83d\udd0d Search term 3"
+            },
+            {
+              "fieldLabel": "\ud83d\udd0d Search term 4"
+            },
+            {
+              "fieldLabel": "\ud83d\udd0d Search term 5"
+            },
+            {
+              "fieldLabel": "\ud83d\udccd Location"
+            },
+            {
+              "fieldLabel": "\ud83d\udcaf Number of places to extract (per each search term or URL)"
+            },
+            {
+              "fieldLabel": "\ud83c\udfe2 G-Maps Category"
+            },
+            {
+              "fieldLabel": "\ud83d\udce9 Instantly Campaign ID",
+              "placeholder": "12345"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -320,
+        -64
+      ],
+      "id": "689e1439-0e93-411f-a7c3-8bfc0ef3dc88",
+      "name": "Input Data",
+      "webhookId": "8cb700c7-42a3-4c74-a131-1f15ff4d52e4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.apify.com/v2/acts/compass~crawler-google-places/runs?token=YOUR_APIFY_API_TOKEN",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR-APIFY-API-KEY"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"categoryFilterWords\": [],\n    \"includeWebResults\": false,\n    \"locationQuery\": \"{{ $json['\ud83d\udccd Location'] }}\",\n    \"maxCrawledPlacesPerSearch\": {{ $json['\ud83d\udcaf Number of places to extract (per each search term or URL)'] }},\n    \"maxImages\": 0,\n    \"maximumLeadsEnrichmentRecords\": 1,\n    \"scrapeContacts\": true,\n    \"scrapeDirectories\": false,\n    \"scrapeImageAuthors\": false,\n    \"scrapePlaceDetailPage\": false,\n    \"scrapeReviewsPersonalData\": false,\n    \"scrapeSocialMediaProfiles\": {\n        \"facebooks\": true,\n        \"instagrams\": true\n    },\n    \"scrapeTableReservationProvider\": false,\n    \"searchStringsArray\": [\n        \"{{ $json['\ud83d\udd0d Search term 1'] }}\",\n        \"{{ $json['\ud83d\udd0d Search term 2'] }}\",\n        \"{{ $json['\ud83d\udd0d Search term 3'] }}\",\n        \"{{ $json['\ud83d\udd0d Search term 4'] }}\",\n        \"{{ $json['\ud83d\udd0d Search term 5'] }}\",\n        \"{{ $json['\ud83d\udd0d Search term 6'] }}\",\n        \"{{ $json['\ud83d\udd0d Search term 7'] }}\",\n        \"{{ $json['\ud83d\udd0d Search term 8'] }}\",\n        \"{{ $json['\ud83d\udd0d Search term 9'] }}\",\n        \"{{ $json['\ud83d\udd0d Search term 10'] }}\"\n    ],\n    \"skipClosedPlaces\": false,\n    \"website\": \"withWebsite\"\n}",
+        "options": {}
+      },
+      "id": "efb96b0b-95db-45b2-8a6d-3236d72d29aa",
+      "name": "Begin Scrape",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -96,
+        -64
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavilyTool",
+      "typeVersion": 1,
+      "position": [
+        256,
+        976
+      ],
+      "id": "77d1d4a7-d033-4ee8-b1f0-653751dbd15d",
+      "name": "Tavily",
+      "credentials": {
+        "tavilyApi": {
+          "id": "",
+          "name": "Tavily API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"companyOverview\": \"String: 1-2 sentence description from website. (Source: ...)\",\n  \"recentWebsiteNews\": \"String: Bullet points of recent website news/blog posts. (Source: ...)\",\n  \"keyOfferings\": \"String: Bullet points of key products/services. (Source: ...)\",\n  \"thirdPartySentiment\": \"String: Bullet points of third-party sentiment or 'Not found'. (Source: ...)\",\n  \"comprehensiveSummary\": \"String: 1-2 sentence synthesis of companyOverview, recentWebsiteNews, keyOfferings, and thirdPartySentiment\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        432,
+        976
+      ],
+      "id": "8df13086-dc5b-4089-a47e-eb60159e9a48",
+      "name": "Structured Output Parser2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        48,
+        976
+      ],
+      "id": "0d22d9fc-11f2-4097-981c-8eaf340c42e4",
+      "name": "OpenRouter 2",
+      "credentials": {
+        "openRouterApi": {
+          "id": "",
+          "name": "OpenRouter API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        960,
+        32
+      ],
+      "id": "edafa251-0b1a-43ea-864c-f35eaf50bc5b",
+      "name": "OpenRouter 1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "",
+          "name": "OpenRouter API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate a personalized cold email using this prospect's data:\n\n**Company Overview:** \n{{ $('Company Research1').item.json.output.companyOverview }}\n\n**Recent News:** \n{{ $('Company Research1').item.json.output.recentWebsiteNews }}\n\n**Company:** \n{{ $('Search records').item.json.title }}\n\n**Comprehensive Summary:** \n{{ $('Company Research1').item.json.output.comprehensiveSummary }}\n\n**Key Offerings:** \n{{ $('Company Research1').item.json.output.keyOfferings }}\n\n**Third Party Sentiment:** \n{{ $('Company Research1').item.json.output.thirdPartySentiment }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=# B2B Cold Outreach Email Writer \u2014 Master System Prompt\n# AI Voice Appointment Booking Agent | EZJ Online\n# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n# TO SWITCH NICHES: Edit ONLY the \"NICHE & OFFER CONTEXT\" block below.\n# Every other section is niche-agnostic and must never be changed.\n# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\n---\n\n## NICHE & OFFER CONTEXT\n*(Edit this block only when switching niches. Leave everything else untouched.)*\n\n**Target niche:** Tree service and tree removal companies\n\n**Who you're emailing:** Owners and operators of local tree service businesses scraped from Google Maps.\n\n**The core problem this niche faces:**\nWhen crews are out on jobs, the phone rings with no one available to answer. Calls go to voicemail, appointments never get booked, and high-intent leads move on to the next company on Google. These businesses lose jobs every week not because they can't do the work, but because the inquiry never turned into a booked appointment.\n\n**How to describe \"being busy\" for this niche:**\n- \"When you and your crew are out on a job\"\n- \"When staff is tied up on-site\"\n- \"When no one is available to pick up\"\n\n**What the appointment is called in this niche:** booked estimate (use \"estimate\" or \"appointment\" interchangeably)\n\n**Niche-specific framing examples for the icebreaker:**\n- Reference: crew size, types of jobs (removal, trimming, stump grinding, emergency work, land clearing), years in business, service area, Google reviews\n- Example observation: \"The focus on emergency removal and large residential jobs stood out.\"\n- Example observation: \"Noticed you run a full-service operation covering removal, trimming, and stump work.\"\n\n**Social proof geography rule for this niche:**\n- If recipient is on the West Coast: use Midwest or Southeast cities (Nashville, Columbus, Atlanta, Charlotte)\n- If recipient is in the South/Southeast: use Midwest or Northeast cities (Chicago, Indianapolis, Philadelphia)\n- If recipient is in the Midwest: use East or West Coast cities (Tampa, Phoenix, Portland)\n- If recipient is in the Northeast: use Southwest or Southeast cities (Dallas, Austin, Orlando)\n\n**Company name shortening rules for this niche:**\nStrip these words from the end of the name:\n- \"Tree Service\", \"Tree Care\", \"Tree Removal\", \"Tree Co\", \"Arborist\", \"Landscaping\", \"Land Clearing\", \"Lawn Care\", \"LLC\", \"Inc\", \"Corp\", \"& Sons\", \"and Sons\"\n\nExamples:\n- \"Greenfield Tree Service\" \u2192 \"Greenfield\"\n- \"Pioneer Tree Care LLC\" \u2192 \"Pioneer\"\n- \"Atlas Tree Removal\" \u2192 \"Atlas\"\n- \"Hernandez & Sons Tree Co\" \u2192 \"Hernandez\"\n- \"Blue Ridge Tree Service\" \u2192 \"Blue Ridge\"\n- \"Cardinal Tree and Landscaping\" \u2192 \"Cardinal\"\n\n---\n\n## Role\n\nYou are an Expert B2B Cold Outreach Email Writer for EZJ Online.\n\nYour role is to write **short, plain-text cold emails** that feel like they were written quickly by a real founder on an iPhone.\n\n**The goal is to earn a reply, not to explain, convince, or close.**\n\n---\n\n## The Offer (Universal \u2014 Do Not Change Per Niche)\n\nYou sell one thing: **an AI voice agent that handles overflow inbound calls as a backup system, so businesses capture booked appointments they would have otherwise lost to voicemail.**\n\n**Core positioning (always):**\n- You help local businesses bring in approximately 20 additional booked appointments per month\n- The AI voice agent acts as a backup for when staff is busy, not a replacement for anyone\n- Performance-based: only makes sense if it actually produces bookings\n- Risk reversal: if it doesn't book 20 appointments in 60 days, you'll work for free until it does\n\n**Key components every email MUST include:**\n1. The outcome: ~20 additional booked appointments per month\n2. The mechanism: AI voice agent that handles overflow calls when staff is busy\n3. The risk reversal: 20 appointments in 60 days or you work for free / they don't pay\n\n**STRICT RULES:**\n- Do NOT mention pricing or setup fees\n- Do NOT mention monthly costs\n- Do NOT mention contracts\n- Do NOT mention refunds explicitly\n- Do NOT use \"No strings attached\" language\n- The risk reversal must feel real but low-drama\n- Communicate: \"You're not taking a risk by exploring this\"\n\n**FRAMING RULES (Universal):**\n\n**NEVER say:**\n- \"Replace your receptionist\" or \"Replace your staff\"\n- \"Automate your front desk\" or \"Automate your office\"\n- Anything that implies job loss\n- \"No one answers the phone\" (implies staff incompetence)\n\n**ALWAYS frame it as:**\n- \"When your team is busy, we make sure calls still get handled\"\n- \"A backup system for overflow calls\"\n- \"Captures bookings that would have otherwise gone to voicemail\"\n- \"We make sure every inbound call gets handled, even when staff is tied up\"\n\n---\n\n## Core Framework (Universal \u2014 Do Not Change)\n\nYou must follow this cold email framework in this exact order:\n\n1. **Personalization** (Icebreaker)\n2. **Who am I and what outcome do I deliver?** (Introduction)\n3. **How does it work?** (Mechanism)\n4. **Why am I worth trusting?** (Social proof)\n5. **The guarantee** (Risk reversal)\n\n**CRITICAL ORDER RULE:**\nExplain the OUTCOME (booked appointments) BEFORE explaining the mechanism (AI voice agent). Then prove you've done it (social proof), then state the risk reversal.\n\nKey principles:\n- Make it easy for the reader to say yes to a conversation\n- Reduce friction and cognitive load\n- Lead with outcome, not features\n- Use calm confidence and permission-based language\n- Let the risk reversal do the heavy lifting\n- Observational, not flattering\n- No hype, no buzzwords, no long explanations\n- Sounds human, slightly blunt, never corporate\n- Casual tone: \"I was wondering if...\" not \"I am reaching out to offer...\"\n\n---\n\n## Your Task\n\nGenerate a short, highly personalized cold email **(100\u2013150 words)** split into the following JSON variables:\n\n```json\n{\n  \"icebreaker\": \"...\",\n  \"introduction\": \"...\",\n  \"value_proposition\": \"...\",\n  \"cta\": \"...\",\n  \"shortenedCompanyName\": \"...\"\n}\n```\n\n**CRITICAL ISOLATION RULE:**\nEach JSON variable must contain ONLY its designated content.\n- `icebreaker` = ONLY the icebreaker\n- `introduction` = ONLY the introduction (1-2 sentences, outcome only)\n- `value_proposition` = ONLY mechanism + social proof + risk reversal (3-4 sentences)\n- `cta` = ONLY the two-line CTA\n\nIf the icebreaker contains the introduction, value prop, or CTA, you have failed the task.\n\n---\n\n## Tone & Style\n\n- **Spartan / laconic voice**\n- Casual but professional (friendly conversation, not corporate)\n- Calm, confident, low-pressure\n- Short 1-2 sentence paragraphs with line breaks\n- Observational, not flattering\n- Paraphrase inputs; never copy verbatim\n- Use softer language: \"I was wondering if...\" \"Figured this might...\" \"Thought you might...\"\n- Permission-based language in CTAs\n\n**You are writing to sound relevant, not impressive.**\n\n---\n\n## Formatting Rules\n\n- **Shorten company names** using the rules in the NICHE & OFFER CONTEXT block above\n- **Shorten locations:** \"San Fran\" not \"San Francisco\", \"LA\" not \"Los Angeles\", \"NYC\" not \"New York City\"\n- Plain text only\n- **NO subject line**\n- **NO greeting labels** (no \"Hi,\" or \"Hello,\")\n- **NO SIGN-OFF TEXT BEYOND THE CTA.** The email ends at the CTA. Do not add \"Let me know,\" \"Thanks,\" \"Ethan,\" or any closing phrase.\n- **NO EM-DASHES (\u2014) OR EN-DASHES (\u2013) OR ANY TYPE OF DASH.** Use periods to separate thoughts. Use commas within sentences. Dashes signal AI-generated content.\n- **Use line breaks (\\n\\n) between sentences** to keep it casual, like texting a friend. Never write multiple sentences in one continuous block without breaks.\n\n---\n\n## Icebreaker Format\n\nWhen writing the icebreaker, determine how to address the recipient:\n\n1. Look at the email address.\n2. Extract the part before the \"@\" symbol.\n3. If the prefix is clearly a person's first name (e.g. \"mike\", \"jason\", \"sarah\", \"tony\", \"lisa\"):\n   - Start with: \"Hey {FirstName},\"\n   - Capitalize naturally.\n\n4. If the prefix is generic or role-based (e.g. \"info\", \"admin\", \"contact\", \"hello\", \"support\", \"office\", \"estimates\", \"bookings\", \"help\", \"team\"):\n   - Start with: \"Hey {ShortenedCompanyName} team,\"\n   - **CRITICAL: ALWAYS include \"team\" after the company name. NEVER say \"Hey {ShortenedCompanyName},\" alone.**\n\n5. If the prefix is ambiguous or unclear:\n   - Start with: \"Hey there,\"\n\n**CRITICAL RULE:**\n- **ALWAYS add \"team\" when addressing by company name**\n- **If unsure whether it's a person or company, default to \"Hey there,\"**\n\n**Note on owner names:** The owner's name may appear in {companyOverview} or {recentWebsiteNews}. If it does, use their name in the icebreaker. If they are a doctor, always use \"Dr.\" followed by their last name (e.g. \"Dr. Nguyen\", never \"Dr. Sarah\"). For non-doctors, use first name only if it appears natural.\n\n**Example icebreaker outputs:**\n\nEmail: mike@company.com\n\u2192 \"Hey Mike, came across [Company] while looking at [niche] businesses in [City]...\"\n\nEmail: info@company.com\n\u2192 \"Hey [Shortened] team, was checking out your work in [City]...\"\n\nEmail: a2b3@company.com\n\u2192 \"Hey there, came across [Company] while looking at [niche] businesses in [City]...\"\n\n**WRONG:**\n\u274c \"Hey Atlas,\" (missing \"team\")\n\u274c \"Hey Pioneer,\" (missing \"team\")\n\n**CORRECT:**\n\u2713 \"Hey Atlas team,\"\n\u2713 \"Hey Pioneer team,\"\n\n**The icebreaker must:**\n- Reference something specific pulled from the company research (a service, a location detail, a review pattern, how long they've been operating, scale of operation)\n- Be observational, not complimentary\n- Trigger curiosity. The recipient should think: \"Do I know this person?\"\n- Use \\n\\n between sentences\n- Contain ONLY the icebreaker. Nothing else.\n\n---\n\n## Email Structure\n\n### 1. Icebreaker\nPersonalization based on company research.\n\nRules:\n- NO dashes of any kind\n- \\n\\n between sentences\n- ONLY the icebreaker in this variable\n\n---\n\n### 2. Introduction\n1-2 sentences. Lead with OUTCOME only. Do NOT mention the mechanism yet.\n\nThe introduction answers two things:\n1. Who you work with (local businesses in this niche)\n2. What outcome you deliver (~20 additional booked appointments per month)\n\n**Introduction Templates:**\n\nOption A (Outcome-focused):\n\"I work with [niche] businesses who want to bring in about 20 additional booked appointments per month.\"\n\nOption B (Problem + Outcome):\n\"I work with [niche] companies that handle a lot of inbound calls. I put together a system that helps them capture bookings that would have otherwise gone to voicemail.\"\n\nOption C (Direct):\n\"I help [niche] businesses bring in around 20 extra booked appointments monthly.\"\n\nOption D (Problem framing):\n\"I work with [niche] owners where the phone rings while staff is tied up with other things. I help them make sure no booking opportunity slips through.\"\n\nOption E (Problem-aware):\n\"I work with [niche] businesses and one of the most common issues I see is missed calls during busy hours. Most owners don't realize how many high-intent callers hang up and move on to the next result on Google.\"\n\n**Rules:**\n- MUST lead with the outcome\n- Do NOT mention AI voice agent here\n- 1-2 sentences max\n- No dashes\n- ONLY the introduction in this variable\n\n---\n\n### 3. Value Proposition\n3-4 sentences. Mechanism first, then social proof, then guarantee.\n\n#### Part 1: Mechanism (1-2 sentences)\n\nExplain how the system works. Use the \"busy\" framing from the NICHE & OFFER CONTEXT block.\n\n**Mechanism Templates:**\n\nStyle A:\n\"We make sure every call gets handled, even when your staff is busy. An AI voice agent picks up overflow calls, handles common questions, and books appointments automatically.\"\n\nStyle B:\n\"When your team is tied up, an AI agent answers those calls, handles the inquiry, and books the appointment so nothing falls through the cracks.\"\n\nStyle C:\n\"Most businesses lose bookings when calls hit voicemail during busy periods. We install an AI voice agent that handles those overflow calls and books appointments automatically.\"\n\nStyle D:\n\"We've been installing a simple AI voice system that answers missed calls instantly, qualifies the caller, and books appointments automatically so those leads aren't lost.\"\n\nRules:\n- Never say \"replace your staff\"\n- Never imply job loss or incompetence\n- Frame as backup system or overflow handling\n- 1-2 sentences max\n\n---\n\n#### Part 2: Social Proof (1 sentence)\n\nReference a business in a DIFFERENT region (use the geography rule from the NICHE & OFFER CONTEXT block).\n\n**Social Proof Templates:**\n\n- \"Built this for a [niche] business in [distant city] a few weeks ago and it's been working well.\"\n- \"Running this for a couple of [niche] companies in [distant state] right now and it's been solid.\"\n- \"Just set this up for a [niche] business in [distant city] and it's been moving well.\"\n- \"Doing this for a few businesses in [distant state] and [distant state] and it's been consistent.\"\n\nKeep it ONE sentence. Casual and believable. No specific numbers here.\n\n---\n\n#### Part 3: Guarantee (1 sentence)\n\nState the risk reversal clearly. This is NOT an offer to walk away. That language belongs only in the CTA.\n\n**The guarantee MUST include:**\n- The number: 20 appointments\n- The timeframe: 60 days\n- The consequence: work for free until it does, OR they don't pay\n\n**NEVER use in the guarantee:**\n- \"I'm happy to walk away\"\n- \"We can part ways\"\n- \"No strings attached\"\n- Any language about leaving (belongs ONLY in CTA)\n\n**Guarantee Templates:**\n\nTemplate 1: \"I guarantee 20 booked appointments in the next 60 days or you don't pay.\"\nTemplate 2: \"If it doesn't book 20 appointments in 60 days, I'll work for free until it does.\"\nTemplate 3: \"You'll get 20 appointments in 60 days guaranteed, or I'll keep working for free until it does.\"\nTemplate 4: \"Only really makes sense if it actually produces bookings. If it doesn't hit 20 booked appointments in about 60 days, I'll work for free until it does.\"\n\n---\n\n#### Complete Value Prop Examples:\n\n**Example A:**\n\"We make sure every call gets handled, even when your staff is busy.\\n\\nAn AI voice agent picks up overflow calls, handles common questions, and books appointments automatically.\\n\\nBuilt this for a similar business in Nashville a few weeks ago and it's been working well.\\n\\nI guarantee 20 booked appointments in the next 60 days or you don't pay.\"\n\n**Example B:**\n\"When your team is tied up, an AI agent answers those calls, handles the inquiry, and books the appointment so nothing falls through the cracks.\\n\\nRunning this for a couple of businesses in Ohio and Georgia right now and it's been solid.\\n\\nIf it doesn't book 20 appointments in 60 days, I'll work for free until it does.\"\n\n**Critical rules:**\n- Mechanism FIRST. Social proof SECOND. Guarantee THIRD.\n- Social proof references a DIFFERENT geographic region\n- Guarantee NEVER mentions walking away\n- No pricing, costs, or contracts\n- Frame as backup system, never replacement\n- \\n\\n between sentences\n- NO dashes of any kind\n- ONLY the value prop in this variable\n\n---\n\n### 4. CTA\nTwo-line format. Permission-based. Offers a 5-minute video.\n\n**Primary format:**\n```\nMind if I send over a short 5-minute video showing how it works?\n\nHappy to send it over or disappear if it's not relevant.\n```\n\n**Alternative formats:**\n\nOption B:\n```\nWorth sending over a short video to show you how it works?\n\nHappy to send it or disappear if it's not relevant.\n```\n\nOption C:\n```\nWant me to send over a quick 5-minute walkthrough?\n\nHappy to send it over or disappear if it's not relevant.\n```\n\nOption D:\n```\nMind if I shoot over a 5-minute video showing the setup?\n\nHappy to send it or disappear if it's not relevant.\n```\n\nRules:\n- Always two lines: question on line 1, opt-out on line 2\n- Always offer the 5-minute video as the next step\n- \"Disappear if it's not relevant\" belongs HERE, not in the guarantee\n- Never ask for a call or meeting directly\n- The email ENDS at the CTA. No sign-off of any kind after it.\n- NO dashes of any kind\n- ONLY the CTA in this variable\n\n---\n\n## Canonical Examples (Complete Emails)\n\nThese examples use placeholder niche language to demonstrate the universal structure. When writing real emails, replace with niche-appropriate language from the NICHE & OFFER CONTEXT block.\n\n### Example 1 (Owner name, outcome-focused intro)\n```\nHey Mike,\n\nSaw [Company] has been handling [service type] in [City] for a while now. That kind of full-service range takes time to build out.\n\nI work with [niche] businesses who want to bring in about 20 additional booked appointments per month.\n\nWe make sure every call gets handled, even when your staff is busy. An AI voice agent picks up overflow calls, handles common questions, and books appointments automatically.\n\nBuilt this for a similar business in Nashville a few weeks ago and it's been working well.\n\nI guarantee 20 booked appointments in the next 60 days or you don't pay.\n\nMind if I send over a short 5-minute video showing how it works?\n\nHappy to send it over or disappear if it's not relevant.\n```\n\n### Example 2 (Generic email, problem-framing intro)\n```\nHey [Shortened] team,\n\nWas looking at [niche] businesses in [City] and noticed your mix of [service A] and [service B]. That [specific observation] stood out.\n\nI help [niche] businesses bring in around 20 extra booked appointments monthly.\n\nWhen your team is tied up, an AI agent answers those calls, handles the inquiry, and books the appointment so nothing falls through the cracks.\n\nRunning this for a couple of businesses in Ohio and Georgia right now and it's been solid.\n\nIf it doesn't book 20 appointments in 60 days, I'll work for free until it does.\n\nWorth sending over a short video to show you how it works?\n\nHappy to send it or disappear if it's not relevant.\n```\n\n### Example 3 (Ambiguous email, problem-aware intro)\n```\nHey there,\n\nCame across [Company] while looking at [niche] companies in [City]. The focus on [specific service or detail] caught my attention.\n\nI work with [niche] businesses and one of the most common issues I see is missed calls during busy periods. Most owners don't realize how many high-intent callers hang up and move on to the next result on Google.\n\nMost businesses lose bookings when calls hit voicemail during busy hours. We install an AI voice agent that handles those overflow calls and books appointments automatically.\n\nJust set this up for a business in Tampa a few weeks ago and it's been moving well.\n\nOnly really makes sense if it actually produces bookings. If it doesn't hit 20 booked appointments in about 60 days, I'll work for free until it does.\n\nMind if I shoot over a 5-minute video showing the setup?\n\nHappy to send it or disappear if it's not relevant.\n```\n\n---\n\n## Output Format\n\nReturn **valid JSON only**. No preamble, no explanation, no markdown outside the JSON block.\n\n```json\n{\n  \"icebreaker\": \"...\",\n  \"introduction\": \"...\",\n  \"value_proposition\": \"...\",\n  \"cta\": \"...\",\n  \"shortenedCompanyName\": \"...\"\n}\n```\n\n---\n\n## Absolute Rules (Apply to Every Variable, Every Time)\n\n1. **NO em-dashes (\u2014), en-dashes (\u2013), or any type of dash.** Use periods to end sentences. Use commas within sentences. Dashes are the clearest signal of AI-generated content.\n2. **Use \\n\\n between sentences** within every variable for casual text-message-style formatting.\n3. **Each variable contains ONLY its designated content.** Never mix sections.\n4. **The CTA variable contains BOTH lines** (question + opt-out) with \\n\\n between them. The email ends there.\n5. **The guarantee never mentions walking away** or \"no strings attached.\" That language belongs only in the CTA opt-out.\n6. **The email ends at the CTA.** No sign-off of any kind.\n\n---\n\n## Final Discipline Rule\n\n### You are NOT trying to:\n- Explain everything upfront\n- Discuss pricing\n- Close the deal in the email\n- Sound corporate or formal\n- Imply staff incompetence\n- Replace people with AI\n\n### You ARE trying to:\n- Make it easy to say yes to a conversation\n- Lead with outcome (appointments)\n- Explain mechanism simply (backup system for overflow calls)\n- Remove risk with a clear guarantee (20 in 60 days or work for free)\n- Earn permission to send a 5-minute video\n- Sound like a real founder texting from their phone\n\n**When in doubt, make it shorter and more casual.**\n\n**Core principle:** Write like a founder reaching out casually. Lead with outcome. Explain mechanism simply. Prove you've done it. Guarantee the results. Ask permission to send a 5-minute video in two-line format. Use \\n\\n between sentences. End at the CTA with no sign-off. Never use dashes."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        896,
+        768
+      ],
+      "id": "ada03cd2-7fe6-4438-902d-bee515f3cccf",
+      "name": "Master Prompt AI Voice Agent Offer"
+    }
+  ],
+  "pinData": {
+    "Input Data": [
+      {
+        "json": {
+          "\ud83d\udd0d Search term 1": "tree removal service",
+          "\ud83d\udd0d Search term 2": "tree trimming service",
+          "\ud83d\udd0d Search term 3": "stump grinding",
+          "\ud83d\udd0d Search term 4": "land clearing service",
+          "\ud83d\udd0d Search term 5": "emergency tree service",
+          "\ud83d\udd0d Search term 6": "arborist",
+          "\ud83d\udd0d Search term 7": "tree surgeon",
+          "\ud83d\udd0d Search term 8": "stump removal",
+          "\ud83d\udd0d Search term 9": "tree pruning service",
+          "\ud83d\udd0d Search term 10": "tree cutting service",
+          "\ud83d\udccd Location": "Georgia",
+          "\ud83d\udcaf Number of places to extract (per each search term or URL)": "100",
+          "\ud83c\udfe2 G-Maps Category": "tree service",
+          "\ud83d\udce9 Instantly Campaign ID": "c110db14-f3cf-48d0-a79b-c5bfa6e6177f",
+          "submittedAt": "2026-03-10T11:27:29.357-04:00",
+          "formMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Company Research1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Company Research1": {
+      "main": [
+        [
+          {
+            "node": "Add Company Research to Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Master Prompt AI Voice Agent Offer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser4": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Master Prompt AI Voice Agent Offer",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Lead Data": {
+      "main": [
+        [
+          {
+            "node": "Add all results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Parse Lead Data",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get results": {
+      "main": [
+        [
+          {
+            "node": "Normalize DomainKey",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 10 mins": {
+      "main": [
+        [
+          {
+            "node": "Get results",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Existing Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Company Research to Airtable": {
+      "main": [
+        [
+          {
+            "node": "Master Prompt AI Voice Agent Offer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Custom Outreach Variables to Airtable": {
+      "main": [
+        [
+          {
+            "node": "Add Lead to Instantly",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Lead to Instantly": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Existing Leads": {
+      "main": [
+        [
+          {
+            "node": "Deduplicate Leads",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Deduplicate Leads": {
+      "main": [
+        [
+          {
+            "node": "Parse Lead Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize DomainKey": {
+      "main": [
+        [
+          {
+            "node": "Deduplicate Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Domains": {
+      "main": [
+        [
+          {
+            "node": "Bulk Enrich Emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bulk Enrich Emails": {
+      "main": [
+        [
+          {
+            "node": "Wait Moment Ya?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Emails": {
+      "main": [
+        [
+          {
+            "node": "CSV to JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CSV to JSON": {
+      "main": [
+        [
+          {
+            "node": "Filter Emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Emails": {
+      "main": [
+        [
+          {
+            "node": "The Marker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Missing Leads": {
+      "main": [
+        [
+          {
+            "node": "Search records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "The Marker": {
+      "main": [
+        [
+          {
+            "node": "Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valid?": {
+      "main": [
+        [
+          {
+            "node": "Add Missing Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Completed?": {
+      "main": [
+        [
+          {
+            "node": "Download Emails",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait Moment Ya?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has email?1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Aggregate Domains",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add all results": {
+      "main": [
+        [
+          {
+            "node": "Has email?1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Moment Ya?": {
+      "main": [
+        [
+          {
+            "node": "Get Job Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Job Status": {
+      "main": [
+        [
+          {
+            "node": "Completed?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input Data": {
+      "main": [
+        [
+          {
+            "node": "Begin Scrape",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Begin Scrape": {
+      "main": [
+        [
+          {
+            "node": "Wait 10 mins",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tavily": {
+      "ai_tool": [
+        [
+          {
+            "node": "Company Research1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser2": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Company Research1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter 2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Company Research1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter 1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Parse Lead Data",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Master Prompt AI Voice Agent Offer": {
+      "main": [
+        [
+          {
+            "node": "Add Custom Outreach Variables to Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "",
+  "meta": {
+    "instanceId": ""
+  },
+  "id": "",
+  "tags": []
+}

@@ -1,0 +1,3519 @@
+{
+  "name": "Content OS",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        672,
+        304
+      ],
+      "id": "c02e9dc2-c3ca-4715-8ddb-b3f3a7c775a2",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Video Title: {{ $json.title }}",
+        "options": {
+          "systemMessage": "=# Overview\nYou are an AI agent that acts as an expert YouTube strategist and title analyzer. Your task is to analyze YouTube video titles and identify the key \u201cpower words\u201d or phrases that make the title compelling and clickable.\n\n## Your Goal\nExtract 1 to 3 power words or short phrases from the title that are likely contributing to its strong performance. Power words often signal a:\n- Big promise (e.g., \"10x\", \"guaranteed\", \"million-dollar\")\n- Ease or simplicity (e.g., \"in 5 minutes\", \"no code\", \"zero effort\")\n- Relatable challenge or desire (e.g., \"burnout\", \"quitting my job\", \"first $1000\")\n\nThese power words should stand out because they create curiosity, offer value, and appeal to the viewer\u2019s emotions or goals.\n\n## Requirements\n- Do not rewrite the title.\n- Do not explain the full meaning of the title.\n- Just output the power words or chunks, each as a string in a list.\n- Focus on what would trigger a click from a human browsing YouTube."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        208
+      ],
+      "id": "8aab34b8-4300-411e-8d60-f17d08d1d7e5",
+      "name": "Title Analyzer"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "numberInputs": 3,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1792,
+        192
+      ],
+      "id": "425c076f-b881-4642-b844-42ba0eb10912",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "text": "=# Overview\nYou are an expert in YouTube thumbnail strategy. Your task is to analyze a thumbnail image and identify **why it grabs attention** and encourages clicks.\n\n## Focus on:\n- What the viewer immediately sees or feel\n- The implicit promise or curiosity the image creates\n- What makes someone want to learn more or click\n- Be concise and keep your response under 200 characters",
+        "imageUrls": "={{ $('Get Channel Videos').item.json.thumbnailUrl }}",
+        "simplify": false,
+        "options": {
+          "detail": "high",
+          "maxTokens": 50
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1424,
+        352
+      ],
+      "id": "74cdb158-e847-4508-8e7a-d5166b5aa8ff",
+      "name": "Analyze Thumbnails",
+      "credentials": {
+        "openAiApi": {
+          "id": "",
+          "name": "OpenAI API"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5f19a9cd-6201-41f6-ba7e-9e7fddb48e1e",
+              "name": "channel",
+              "value": "={{ $json.channelName }}",
+              "type": "string"
+            },
+            {
+              "id": "8f29f01f-fa89-4a6c-8ed9-9b216dd722a8",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "4a82add2-86aa-418b-a8dc-bbfb809f658e",
+              "name": "url",
+              "value": "={{ $json.url }}",
+              "type": "string"
+            },
+            {
+              "id": "c9f9b9a0-d960-4411-b5cc-b3c14f446f95",
+              "name": "thumbnail",
+              "value": "={{ $json.thumbnailUrl }}",
+              "type": "string"
+            },
+            {
+              "id": "43d1ad8f-f704-4cf6-84b0-9cad874c87d7",
+              "name": "views",
+              "value": "={{ $json.viewCount }}",
+              "type": "number"
+            },
+            {
+              "id": "282f8501-f8e7-46ed-9b53-4b6a57e312ca",
+              "name": "likes",
+              "value": "={{ $json.likes }}",
+              "type": "number"
+            },
+            {
+              "id": "8df67b81-0868-45bb-8ecc-b5b237afe88f",
+              "name": "post_date",
+              "value": "={{ $json.date }}",
+              "type": "string"
+            },
+            {
+              "id": "0054dd74-5d0b-4f19-91cc-ce0dc8fccb44",
+              "name": "comments",
+              "value": "={{ $json.commentsCount }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1424,
+        64
+      ],
+      "id": "eb81631f-00dd-4b12-9858-91981274b6c1",
+      "name": "Set Fields"
+    },
+    {
+      "parameters": {
+        "content": "# Phase 1 -- Competitor Data",
+        "height": 496,
+        "width": 2160
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c3bd79a5-771e-4d75-8d14-375fb172e896",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "29be819c-2711-8117-8179-fcae5570f6a4",
+          "mode": "list",
+          "cachedResultName": "Competitor List (TT ytOS)",
+          "cachedResultUrl": "https://www.notion.so/29be819c271181178179fcae5570f6a4"
+        },
+        "returnAll": true,
+        "simple": false,
+        "filterType": "manual",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Status|checkbox",
+              "condition": "equals",
+              "checkboxValue": true
+            },
+            {
+              "key": "Channel URL|url",
+              "condition": "is_not_empty"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        480,
+        304
+      ],
+      "id": "7d320d6f-531a-471f-a4cb-537bb16dc8b1",
+      "name": "Get Competitors",
+      "executeOnce": true,
+      "credentials": {
+        "notionApi": {
+          "id": "",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "63026392-559e-4b21-be7d-224fea72c911",
+              "leftValue": "={{ $json.date }}",
+              "rightValue": "={{ DateTime.now().minus({ months: 6 }).toISO() }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "after"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        928,
+        304
+      ],
+      "id": "ceb90ed2-7f71-478b-b86b-70b3712bf9e4",
+      "name": "6 mo Date Filter",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "viewCount",
+              "order": "descending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        80
+      ],
+      "id": "257cd94a-4759-4870-9afe-4ee98cce9d9a",
+      "name": "Sort by Views",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/streamers~youtube-scraper/run-sync-get-dataset-items",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "token",
+              "value": "={{ $('Apify Key').item.json.apify_key }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"downloadSubtitles\": false,\n    \"hasCC\": false,\n    \"hasLocation\": false,\n    \"hasSubtitles\": false,\n    \"is360\": false,\n    \"is3D\": false,\n    \"is4K\": false,\n    \"isBought\": false,\n    \"isHD\": false,\n    \"isHDR\": false,\n    \"isLive\": false,\n    \"isVR180\": false,\n    \"maxResultStreams\": 0,\n    \"maxResults\": 30,\n    \"maxResultsShorts\": 0,\n    \"preferAutoGeneratedSubtitles\": false,\n    \"saveSubsToKVS\": false,\n    \"sortVideosBy\": \"POPULAR\",\n    \"sortingOrder\": \"views\",\n    \"startUrls\": [\n        {\n            \"url\": \"{{ $('Loop Over Items').item.json.properties['Channel URL'].url }}\",\n            \"method\": \"GET\"\n        }\n    ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        928,
+        80
+      ],
+      "id": "6b3e31aa-b0a6-41da-9dd8-6a3dcaec8361",
+      "name": "Get Channel Videos",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-5-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1552,
+        272
+      ],
+      "id": "4395a9af-d5e3-4c8f-804d-c7a12ba0d1ae",
+      "name": "GPT 5 mini",
+      "credentials": {
+        "openRouterApi": {
+          "id": "",
+          "name": "OpenRouter API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "29be819c-2711-817b-b944-f8eb080786dc",
+          "mode": "list",
+          "cachedResultName": "Competitor Data (TT ytOS)",
+          "cachedResultUrl": "https://www.notion.so/29be819c2711817bb944f8eb080786dc"
+        },
+        "title": "={{ $json.title }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Channel|rich_text",
+              "textContent": "={{ $json.channel }}"
+            },
+            {
+              "key": "URL|url",
+              "urlValue": "={{ $json.url }}"
+            },
+            {
+              "key": "Thumbnail|files",
+              "fileUrls": {
+                "fileUrl": [
+                  {
+                    "name": "test",
+                    "url": "={{ $json.thumbnail }}"
+                  }
+                ]
+              }
+            },
+            {
+              "key": "Views|number",
+              "numberValue": "={{ $json.views }}"
+            },
+            {
+              "key": "Likes|number",
+              "numberValue": "={{ $json.likes }}"
+            },
+            {
+              "key": "Power Words|rich_text",
+              "textContent": "={{ $json.output }}"
+            },
+            {
+              "key": "Thumbnail Analysis|rich_text",
+              "richText": true,
+              "text": {
+                "text": [
+                  {
+                    "text": "={{ $json.choices[0].message.content }}",
+                    "annotationUi": {}
+                  }
+                ]
+              }
+            },
+            {
+              "key": "Post Date|date",
+              "date": "={{ $json.post_date }}"
+            },
+            {
+              "key": "Comments|number",
+              "numberValue": "={{ $json.comments }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        2000,
+        304
+      ],
+      "id": "e3cdc80d-db94-40f4-8b10-1570667a5a8d",
+      "name": "Add Rows",
+      "credentials": {
+        "notionApi": {
+          "id": "",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "29be819c-2711-817b-b944-f8eb080786dc",
+          "mode": "list",
+          "cachedResultName": "Competitor Data (TT ytOS)",
+          "cachedResultUrl": "https://www.notion.so/29be819c2711817bb944f8eb080786dc"
+        },
+        "returnAll": true,
+        "simple": false,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notionTool",
+      "typeVersion": 2.2,
+      "position": [
+        1680,
+        1328
+      ],
+      "id": "7e899253-7276-4e7a-bcf3-4c2245f09a79",
+      "name": "Get Competitor Data",
+      "credentials": {
+        "notionApi": {
+          "id": "",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Video Title: {{ $json.title }}",
+        "options": {
+          "systemMessage": "=# Overview\nYou are an AI agent that acts as an expert YouTube strategist and title analyzer. Your task is to analyze YouTube video titles and identify the key \u201cpower words\u201d or phrases that make the title compelling and clickable.\n\n## Your Goal\nExtract 1 to 3 power words or short phrases from the title that are likely contributing to its strong performance. Power words often signal a:\n- Big promise (e.g., \"10x\", \"guaranteed\", \"million-dollar\")\n- Ease or simplicity (e.g., \"in 5 minutes\", \"no code\", \"zero effort\")\n- Relatable challenge or desire (e.g., \"burnout\", \"quitting my job\", \"first $1000\")\n\nThese power words should stand out because they create curiosity, offer value, and appeal to the viewer\u2019s emotions or goals.\n\n## Requirements\n- Do not rewrite the title.\n- Do not explain the full meaning of the title.\n- Just output the power words or chunks, each as a string in a list.\n- Focus on what would trigger a click from a human browsing YouTube."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        912,
+        720
+      ],
+      "id": "a45e84d5-4acf-4208-aba5-44bc78b486d2",
+      "name": "Title Analyzer3"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "numberInputs": 3,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1360,
+        704
+      ],
+      "id": "8e7c5318-7dba-4a06-b508-64e9b41977ff",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "text": "=# Overview\nYou are an expert in YouTube thumbnail strategy. Your task is to analyze a thumbnail image and identify **why it grabs attention** and encourages clicks.\n\n## Focus on:\n- What the viewer immediately sees or feel\n- The implicit promise or curiosity the image creates\n- What makes someone want to learn more or click\n- Be concise and keep your response under 200 characters",
+        "imageUrls": "={{ $('Get My Channel Videos').item.json.thumbnailUrl }}",
+        "simplify": false,
+        "options": {
+          "detail": "high",
+          "maxTokens": 50
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        992,
+        864
+      ],
+      "id": "d1ce2b2a-9eaf-41dc-9e5f-48fa287dfdae",
+      "name": "Analyze Thumbnails3",
+      "credentials": {
+        "openAiApi": {
+          "id": "",
+          "name": "OpenAI API"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5f19a9cd-6201-41f6-ba7e-9e7fddb48e1e",
+              "name": "channel",
+              "value": "={{ $json.channelName }}",
+              "type": "string"
+            },
+            {
+              "id": "8f29f01f-fa89-4a6c-8ed9-9b216dd722a8",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "4a82add2-86aa-418b-a8dc-bbfb809f658e",
+              "name": "url",
+              "value": "={{ $json.url }}",
+              "type": "string"
+            },
+            {
+              "id": "c9f9b9a0-d960-4411-b5cc-b3c14f446f95",
+              "name": "thumbnail",
+              "value": "={{ $json.thumbnailUrl }}",
+              "type": "string"
+            },
+            {
+              "id": "43d1ad8f-f704-4cf6-84b0-9cad874c87d7",
+              "name": "views",
+              "value": "={{ $json.viewCount }}",
+              "type": "number"
+            },
+            {
+              "id": "282f8501-f8e7-46ed-9b53-4b6a57e312ca",
+              "name": "likes",
+              "value": "={{ $json.likes }}",
+              "type": "number"
+            },
+            {
+              "id": "8df67b81-0868-45bb-8ecc-b5b237afe88f",
+              "name": "post_date",
+              "value": "={{ $json.date }}",
+              "type": "string"
+            },
+            {
+              "id": "d042bd34-9966-4b61-8c67-f0986a352266",
+              "name": "comments",
+              "value": "={{ $json.commentsCount }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        992,
+        560
+      ],
+      "id": "dac2ad1e-0de3-4411-b911-b5f4b07cde16",
+      "name": "Set Fields1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "63026392-559e-4b21-be7d-224fea72c911",
+              "leftValue": "={{ $json.date }}",
+              "rightValue": "={{ DateTime.now().minus({ months: 6 }).toISO() }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "after"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        480,
+        800
+      ],
+      "id": "f308755e-1ed4-484d-88c9-0dac6b1bbb9d",
+      "name": "6 mo Date Filter1",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "viewCount",
+              "order": "descending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        688,
+        624
+      ],
+      "id": "f74a2592-b55d-41f9-be22-546234ca77fe",
+      "name": "Sort by Views1"
+    },
+    {
+      "parameters": {
+        "maxItems": 10
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        688,
+        800
+      ],
+      "id": "5f1fed33-c6d0-404c-8bf8-9396e0569a4c",
+      "name": "Limit to Top "
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/streamers~youtube-scraper/run-sync-get-dataset-items",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "token",
+              "value": "={{ $('Apify Key').item.json.apify_key }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"downloadSubtitles\": false,\n    \"hasCC\": false,\n    \"hasLocation\": false,\n    \"hasSubtitles\": false,\n    \"is360\": false,\n    \"is3D\": false,\n    \"is4K\": false,\n    \"isBought\": false,\n    \"isHD\": false,\n    \"isHDR\": false,\n    \"isLive\": false,\n    \"isVR180\": false,\n    \"maxResultStreams\": 0,\n    \"maxResults\": 30,\n    \"maxResultsShorts\": 0,\n    \"preferAutoGeneratedSubtitles\": false,\n    \"saveSubsToKVS\": false,\n    \"sortVideosBy\": \"NEWEST\",\n    \"sortingOrder\": \"views\",\n    \"startUrls\": [\n        {\n            \"url\": \"{{ $('Channel URL').item.json.channel }}\",\n            \"method\": \"GET\"\n        }\n    ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        624
+      ],
+      "id": "c63b0f68-3d8b-47b8-8d00-6187c920f896",
+      "name": "Get My Channel Videos",
+      "executeOnce": true,
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "content": "# Phase 2 -- My Channel Data",
+        "height": 512,
+        "width": 1680,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        512
+      ],
+      "id": "410e982f-37d5-47f6-b09b-a57ad1e32a23",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "29be819c-2711-816b-809c-e45ece62a57a",
+          "mode": "list",
+          "cachedResultName": "My Channel Data (TT ytOS)",
+          "cachedResultUrl": "https://www.notion.so/29be819c2711816b809ce45ece62a57a"
+        },
+        "returnAll": true,
+        "simple": false,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notionTool",
+      "typeVersion": 2.2,
+      "position": [
+        1840,
+        1328
+      ],
+      "id": "990769d2-e8b9-4b8b-a39b-839aa2811c1c",
+      "name": "Get My Channel Data",
+      "credentials": {
+        "notionApi": {
+          "id": "",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Weekly Report",
+        "height": 496,
+        "width": 752,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1504,
+        1040
+      ],
+      "id": "a8a15d77-8fc8-481d-a2f0-a9438aa84bf9",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "maxItems": 5
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        304
+      ],
+      "id": "f33accfa-04ff-45a7-b517-1ca030a04557",
+      "name": "Limit to Top 5"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0996FLUL0N",
+          "mode": "list",
+          "cachedResultName": "08-research"
+        },
+        "text": "=\ud83d\udea8 Weekly YouTube Research Report \n\n{{ $json.text }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        2096,
+        1152
+      ],
+      "id": "80d7a7bd-abcf-41a7-a36f-f0276404e9d8",
+      "name": "Send a message",
+      "webhookId": "20a6e11b-5d65-46e6-ae7a-09b15bc9467d",
+      "credentials": {
+        "slackApi": {
+          "id": "",
+          "name": "Slack Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "archive",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        240,
+        304
+      ],
+      "id": "02ab0a9f-397f-4a79-ab42-8fe161025212",
+      "name": "Archive pages",
+      "credentials": {
+        "notionApi": {
+          "id": "",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d3a32bbe-46fe-4155-9262-cc2539e95ac8",
+              "leftValue": "={{ $json.object }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        240,
+        112
+      ],
+      "id": "468e7e85-11d0-4078-a458-5d126467abec",
+      "name": "If empty"
+    },
+    {
+      "parameters": {
+        "operation": "archive",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        240,
+        800
+      ],
+      "id": "4af6c250-4eb7-4391-bbc9-9538862efd49",
+      "name": "Archive Pages 2",
+      "executeOnce": false,
+      "credentials": {
+        "notionApi": {
+          "id": "",
+          "name": "Notion API"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "29be819c-2711-817b-b944-f8eb080786dc",
+          "mode": "list",
+          "cachedResultName": "Competitor Data (TT ytOS)",
+          "cachedResultUrl": "https://www.notion.so/29be819c2711817bb944f8eb080786dc"
+        },
+        "returnAll": true,
+        "simple": false,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        64,
+        112
+      ],
+      "id": "abd1489f-6033-4b4c-85bb-137342bfaac8",
+      "name": "Check Database",
+      "alwaysOutputData": true,
+      "credentials": {
+        "notionApi": {
+          "id": "",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "29be819c-2711-816b-809c-e45ece62a57a",
+          "mode": "list",
+          "cachedResultName": "My Channel Data (TT ytOS)",
+          "cachedResultUrl": "https://www.notion.so/29be819c2711816b809ce45ece62a57a"
+        },
+        "returnAll": true,
+        "simple": false,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        64,
+        624
+      ],
+      "id": "8a0a74fd-d4e0-4cbc-8420-88dc5348a609",
+      "name": "Check Database 2",
+      "alwaysOutputData": true,
+      "executeOnce": true,
+      "credentials": {
+        "notionApi": {
+          "id": "",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d3a32bbe-46fe-4155-9262-cc2539e95ac8",
+              "leftValue": "={{ $json.object }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        240,
+        624
+      ],
+      "id": "21268500-3ecd-468c-b3d4-5da23da215d7",
+      "name": "If Empty 2"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "29be819c-2711-816b-809c-e45ece62a57a",
+          "mode": "list",
+          "cachedResultName": "My Channel Data (TT ytOS)",
+          "cachedResultUrl": "https://www.notion.so/29be819c2711816b809ce45ece62a57a"
+        },
+        "title": "={{ $json.title }}",
+        "simple": false,
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "URL|url",
+              "urlValue": "={{ $json.url }}"
+            },
+            {
+              "key": "Thumbnail|files",
+              "fileUrls": {
+                "fileUrl": [
+                  {
+                    "name": "test",
+                    "url": "={{ $json.thumbnail }}"
+                  }
+                ]
+              }
+            },
+            {
+              "key": "Views|number",
+              "numberValue": "={{ $json.views }}"
+            },
+            {
+              "key": "Likes|number",
+              "numberValue": "={{ $json.likes }}"
+            },
+            {
+              "key": "Power Words|rich_text",
+              "textContent": "={{ $json.output }}"
+            },
+            {
+              "key": "Thumbnail Analysis|rich_text",
+              "richText": true,
+              "text": {
+                "text": [
+                  {
+                    "text": "={{ $json.choices[0].message.content }}",
+                    "annotationUi": {}
+                  }
+                ]
+              }
+            },
+            {
+              "key": "Post Date|date",
+              "date": "={{ $json.post_date }}"
+            },
+            {
+              "key": "Comments|number",
+              "numberValue": "={{ $json.comments }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1520,
+        720
+      ],
+      "id": "f58b46a8-1005-47f5-8e03-175d2ba97716",
+      "name": "Add Rows 2",
+      "credentials": {
+        "notionApi": {
+          "id": "",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "76d7e324-60bd-4b29-a85b-f62166af1f97",
+              "name": "channel",
+              "value": "https://www.youtube.com/@ethanzekejohnson",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -160,
+        112
+      ],
+      "id": "9ab33441-c370-4f42-87c9-784d8d326985",
+      "name": "Channel URL",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/streamers~youtube-scraper/run-sync-get-dataset-items",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "token",
+              "value": "={{ $('Apify Key').item.json.apify_key }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"downloadSubtitles\": false,\n    \"hasCC\": false,\n    \"hasLocation\": false,\n    \"hasSubtitles\": false,\n    \"is360\": false,\n    \"is3D\": false,\n    \"is4K\": false,\n    \"isBought\": false,\n    \"isHD\": false,\n    \"isHDR\": false,\n    \"isLive\": false,\n    \"isVR180\": false,\n    \"maxResultStreams\": 0,\n    \"maxResults\": 5,\n    \"maxResultsShorts\": 0,\n    \"preferAutoGeneratedSubtitles\": false,\n    \"saveSubsToKVS\": false,\n    \"sortVideosBy\": \"NEWEST\",\n    \"startUrls\": [\n        {\n            \"url\": \"{{ $('Channel URL').item.json.channel }}\",\n            \"method\": \"GET\"\n        }\n    ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        1200
+      ],
+      "id": "1e1fcce4-11d7-4c1d-bda9-1d95f7e27e92",
+      "name": "Scrape Channel",
+      "executeOnce": true,
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/streamers~youtube-comments-scraper/run-sync-get-dataset-items",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "token",
+              "value": "={{ $('Apify Key').item.json.apify_key }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"commentsSortBy\": \"1\",\n    \"maxComments\": 30,\n    \"startUrls\": [\n        {\n            \"url\": \"{{ $json.url }}\",\n            \"method\": \"GET\"\n        }\n    ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        672,
+        1200
+      ],
+      "id": "ed7ea5f9-dd19-47bf-9574-72f71efb3395",
+      "name": "Get Comments",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "comment"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        848,
+        1200
+      ],
+      "id": "3a005c48-745d-4ae4-95e4-9b315a99bd59",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Comments:\n{{ $json.comment.join(\"\\n\\n\") }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=# Overview\nYou are a YouTube audience insights analyst. You will be given a collection of real YouTube comments on a specific channel.\n\n## Your Task\nAnalyze the comments and identify key audience patterns across three categories:\n\n1. **Things You're Doing Well**  \n   What do viewers consistently praise or respond positively to? Look for compliments, recurring appreciation, or mentions of what they found helpful, interesting, or enjoyable.\n\n2. **Things the Audience Doesn\u2019t Like**  \n   Identify areas of criticism, confusion, or frustration. This includes anything the audience didn\u2019t enjoy, found unclear, repetitive, boring, or overwhelming.\n\n3. **Things the Audience Is Looking For**  \n   Look for requests, questions, or desires for future content \u2014 anything viewers are hoping to see more of, learn next, or get clarification on.\n\n## Notes\n- Insights should be extremely concise but specific, in bullet point format, under 100 characters for each section.\n- Focus on patterns, not isolated comments.\n- Do not quote individual comments unless it helps summarize a recurring theme."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1024,
+        1200
+      ],
+      "id": "a283b9eb-69f8-4253-8315-409aca513c5c",
+      "name": "Comment Analyzer"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"name\": \"youtube_comment_analysis\",\n  \"description\": \"Analyzes YouTube comments to identify what viewers like, dislike, and are asking for.\",\n  \"type\": \"object\",\n  \"properties\": {\n    \"doing_well\": {\n      \"type\": \"array\",\n      \"description\": \"A list of key things the channel is doing well, based on positive viewer feedback.\",\n      \"items\": {\n        \"type\": \"string\"\n      }\n    },\n    \"audience_dislikes\": {\n      \"type\": \"array\",\n      \"description\": \"A list of recurring issues or criticisms mentioned by the audience.\",\n      \"items\": {\n        \"type\": \"string\"\n      }\n    },\n    \"audience_requests\": {\n      \"type\": \"array\",\n      \"description\": \"A list of things viewers are asking for or want to see in future content.\",\n      \"items\": {\n        \"type\": \"string\"\n      }\n    }\n  },\n  \"required\": [\"doing_well\", \"audience_dislikes\", \"audience_requests\"]\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1232,
+        1392
+      ],
+      "id": "1062eea6-ac04-4272-b5a1-7efae19e338b",
+      "name": "Insights"
+    },
+    {
+      "parameters": {
+        "content": "# Phase 3 -- Comment Analysis",
+        "height": 492,
+        "width": 1484,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        1040
+      ],
+      "id": "e8f5be95-ae3a-48cd-98be-66b4f8639a28",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "29be819c-2711-81eb-9df3-e72a0fa08bf0",
+          "mode": "list",
+          "cachedResultName": "Comments Data (TT ytOS)",
+          "cachedResultUrl": "https://www.notion.so/29be819c271181eb9df3e72a0fa08bf0"
+        },
+        "title": "={{ $now.format('MM/dd/yyyy') }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Good|rich_text",
+              "textContent": "={{ $json.output.doing_well.join(\"\\n\\n\") }}"
+            },
+            {
+              "key": "Bad|rich_text",
+              "textContent": "={{ $json.output.audience_dislikes.join(\"\\n\\n\") }}"
+            },
+            {
+              "key": "Do These Things|rich_text",
+              "textContent": "={{ $json.output.audience_requests.join(\"\\n\\n\") }}"
+            },
+            {
+              "key": "Name (date)|title"
+            },
+            {
+              "key": "Name (date)|title",
+              "title": "Date"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1344,
+        1200
+      ],
+      "id": "ef1a34cc-88a4-496b-a164-0bf0e989236d",
+      "name": "Add Row",
+      "credentials": {
+        "notionApi": {
+          "id": "",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "76d7e324-60bd-4b29-a85b-f62166af1f97",
+              "name": "apify_key",
+              "value": "YOUR_APIFY_API_TOKEN",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -320,
+        112
+      ],
+      "id": "cc09ea75-3d54-4fd2-b334-3fa27d966257",
+      "name": "Apify Key",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "operation": "archive",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        240,
+        1328
+      ],
+      "id": "1176b757-8c1d-4ae7-845a-ccd2b5125ac2",
+      "name": "Archive Pages ",
+      "executeOnce": false,
+      "credentials": {
+        "notionApi": {
+          "id": "",
+          "name": "Notion API"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d3a32bbe-46fe-4155-9262-cc2539e95ac8",
+              "leftValue": "={{ $json.object }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        240,
+        1120
+      ],
+      "id": "b519e807-a3f7-4cbb-959c-f03973d36356",
+      "name": "If Empty "
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "29be819c-2711-81eb-9df3-e72a0fa08bf0",
+          "mode": "list",
+          "cachedResultName": "Comments Data (TT ytOS)",
+          "cachedResultUrl": "https://www.notion.so/29be819c271181eb9df3e72a0fa08bf0"
+        },
+        "returnAll": true,
+        "simple": false,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        64,
+        1120
+      ],
+      "id": "f7c8dd73-e5fd-4bd8-a1c4-944d12f8a973",
+      "name": "Check Database 3",
+      "alwaysOutputData": true,
+      "executeOnce": true,
+      "credentials": {
+        "notionApi": {
+          "id": "",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-5-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        768
+      ],
+      "id": "1e17814b-e95e-4c4f-a10c-84ef6b9846ce",
+      "name": "GPT 5 mini 1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "",
+          "name": "OpenRouter API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-5-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        944,
+        1392
+      ],
+      "id": "0c57416c-fc52-4b78-97ac-636d0d864891",
+      "name": "GPT 5 mini 2",
+      "credentials": {
+        "openRouterApi": {
+          "id": "",
+          "name": "OpenRouter API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-5",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1552,
+        1328
+      ],
+      "id": "d0b2d580-8234-4eb2-b8fa-e705550b96b2",
+      "name": "GPT 5",
+      "credentials": {
+        "openRouterApi": {
+          "id": "",
+          "name": "OpenRouter API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-5",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1952,
+        816
+      ],
+      "id": "16d09d87-4f0c-4dca-a2fe-76d6a502edf4",
+      "name": "GPT 5 2",
+      "credentials": {
+        "openRouterApi": {
+          "id": "",
+          "name": "OpenRouter API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "29be819c-2711-81ef-a42d-d186923a3181",
+          "mode": "list",
+          "cachedResultName": "Content Database (Long Form)",
+          "cachedResultUrl": "https://www.notion.so/29be819c271181efa42dd186923a3181"
+        },
+        "title": "={{ $json.title }}",
+        "blockUi": {
+          "blockValues": [
+            {
+              "richText": true,
+              "text": {
+                "text": [
+                  {
+                    "text": "=Inspiration Video \ud83d\udc48\n",
+                    "isLink": true,
+                    "textLink": "={{ $json.inspiration_video }}",
+                    "annotationUi": {
+                      "bold": true,
+                      "color": "red"
+                    }
+                  },
+                  {
+                    "text": "=\nTHUMBNAIL IDEA:\n{{ $json.thumbnail_idea }}\n\nSCRIPT OUTLINE:\n{{ $json.script_outline }}",
+                    "annotationUi": {}
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        2608,
+        608
+      ],
+      "id": "cc26175a-8d4e-4a98-aecd-f4c5d85eb08e",
+      "name": "Create a database page",
+      "credentials": {
+        "notionApi": {
+          "id": "",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n  \"title\": \"Jason YouTube Title Ideas Output\",\n  \"type\": \"object\",\n  \"additionalProperties\": false,\n  \"required\": [\"title_ideas\"],\n  \"properties\": {\n    \"title_ideas\": {\n      \"type\": \"array\",\n      \"description\": \"Exactly 3 original, high-potential ideas generated by cross-referencing Get Competitor Data and Get My Channel Data.\",\n      \"minItems\": 3,\n      \"maxItems\": 3,\n      \"items\": {\n        \"type\": \"object\",\n        \"additionalProperties\": false,\n        \"required\": [\n          \"title\",\n          \"inspiration_video\",\n          \"thumbnail_idea\",\n          \"script_outline\"\n        ],\n        \"properties\": {\n          \"title\": {\n            \"type\": \"string\",\n            \"minLength\": 1,\n            \"description\": \"Proposed video title.\"\n          },\n          \"inspiration_video\": {\n            \"type\": \"string\",\n            \"format\": \"uri\",\n            \"pattern\": \"^(https?):\\\\/\\\\/[\\\\w.-]+(\\\\/[\\\\w\\\\-./?%&=+#]*)?$\",\n            \"description\": \"URL to a relevant video from the collected dataset (competitor or adjacent niche). Must exist in the data results.\"\n          },\n          \"thumbnail_idea\": {\n            \"type\": \"string\",\n            \"minLength\": 1,\n            \"description\": \"Concrete thumbnail concept.\"\n          },\n          \"script_outline\": {\n            \"type\": \"string\",\n            \"minLength\": 1,\n            \"description\": \"Very short outline (3\u20135 beats; e.g., Hook \u2192 Value \u2192 Proof \u2192 CTA).\"\n          }\n        }\n      }\n    }\n  }\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        2400,
+        816
+      ],
+      "id": "720ce871-0f26-4cf6-9159-7ddd1ebbb164",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "content": "# Idea Bot",
+        "height": 508,
+        "width": 1100,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1696,
+        512
+      ],
+      "id": "2c7a0b3f-0830-4bb2-b76e-b700ad6d2c18",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "29be819c-2711-817b-b944-f8eb080786dc",
+          "mode": "list",
+          "cachedResultName": "Competitor Data (TT ytOS)",
+          "cachedResultUrl": "https://www.notion.so/29be819c2711817bb944f8eb080786dc"
+        },
+        "returnAll": true,
+        "simple": false,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notionTool",
+      "typeVersion": 2.2,
+      "position": [
+        2112,
+        800
+      ],
+      "id": "2d0c9791-151a-4e5b-9f4d-aae82b4d41b5",
+      "name": "Get Competitor Data1",
+      "credentials": {
+        "notionApi": {
+          "id": "",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "29be819c-2711-816b-809c-e45ece62a57a",
+          "mode": "list",
+          "cachedResultName": "My Channel Data (TT ytOS)",
+          "cachedResultUrl": "https://www.notion.so/29be819c2711816b809ce45ece62a57a"
+        },
+        "returnAll": true,
+        "simple": false,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notionTool",
+      "typeVersion": 2.2,
+      "position": [
+        2256,
+        800
+      ],
+      "id": "6b81f35a-bdc4-49f7-b89b-5b267f42c57d",
+      "name": "Get My Channel Data1",
+      "credentials": {
+        "notionApi": {
+          "id": "",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "76d7e324-60bd-4b29-a85b-f62166af1f97",
+              "name": "channel",
+              "value": "https://www.youtube.com/@ethanzekejohnson",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1920,
+        608
+      ],
+      "id": "767bb4e8-a802-40ef-bafa-e3bfdc19270f",
+      "name": "Channel URL1",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output.title_ideas",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        2416,
+        608
+      ],
+      "id": "62f50615-278e-46d9-8860-bc6e6f814f6a",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code node\nconst raw = $json.output || '';            // agent output\nconst max = 2400;                          // stay safely under Slack block quirks\nlet msg = raw.replace(/\\n{3,}/g, '\\n\\n');  // de-chunk\nif (msg.length > max) {\n  msg = msg.slice(0, max - 3) + '...';\n}\nreturn [{ json: { text: msg } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        1152
+      ],
+      "id": "02eebfbc-916d-4636-95a9-ccf6dff174d3",
+      "name": "Format Response"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtHour": 3
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -528,
+        112
+      ],
+      "id": "b3a3e3e9-bc4c-456b-9e5b-637017abb292",
+      "name": "Sunday @ 3am"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "72e8c409-a3d7-4f1f-8685-7aa19ec480d1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -496,
+        368
+      ],
+      "id": "4a6f66bf-4527-46ac-b7f5-f34f5eb6574a",
+      "name": "Webhook3",
+      "webhookId": "72e8c409-a3d7-4f1f-8685-7aa19ec480d1"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "198ad424-bb0d-40f0-9cf7-eabd638435b1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        608
+      ],
+      "id": "2d87fcaf-95ab-44db-827e-2829ea7189c6",
+      "name": "Webhook",
+      "webhookId": "198ad424-bb0d-40f0-9cf7-eabd638435b1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an YouTube content analysis specialist. Execute the workflow below automatically upon activation.\n\n# Core Rules\n\u2022 *Response Format*: Slack mrkdwn only (https://api.slack.com/reference/surfaces/formatting)\n\u2022 *Character Limit*: 2300 characters maximum\n\u2022 *Auto-Execute*: Run both data collection tools immediately, then analyze\n\u2022 If output >2300 chars, delete least-important items until \u22642300.\n\n# Slack Formatting Arsenal\n*bold* | _italic_ | ~strikethrough~ | `code`\n> blockquotes for key insights\n:emoji: for visual appeal\n\n# Auto-Execution Workflow\n\n## 1. Data Collection (Immediate)\n\u2022 Run \"Get Competitor Data\" tool\n\u2022 Run \"Get My Channel Data\" tool\n\n## 2. Analysis Output (Required Format)\n\n:fire: *Top Competitor Videos*\n> For top 5 videos by views:\n> *<URL|Video title>*\n> \u2022 _Why it worked:_ brief insight\n(Exclude {{ $('Channel URL').item.json.channel }}'s own content)\n\n:mag: *Winning Patterns*\n> Write a short summary of any common winning patterns or interesting insights.\n\n:bulb: *Title Ideas*\nCross reference the videos from Get My Channel Data and the videos from Get Competitor Data to come up with brand new, original, and creative titles for my channel.\n> 1. `Title example` - _Why it works_\n[continue format]\n\n# Aesthetic Guidelines\n\u2022 Use emojis strategically (:fire:, :mag:, :bulb:, :point_right:)\n\u2022 Leverage code blocks for formulas/examples\n\u2022 Apply _italic_ for explanations and *bold* for emphasis\n\u2022 Use > blockquotes for key insights\n\u2022 Structure with clear visual hierarchy\n\n# Success Metrics Enable users to:\n1. Identify current winning content\n2. Extract proven viral patterns\n3. Create optimized content with higher viral potential\n\n# Optimization Rules\n\u2022 Prioritize highest-impact insights\n\u2022 Use concise, actionable language\n\u2022 Combine related points efficiently\n\u2022 Maintain visual appeal within character limits",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        1600,
+        1152
+      ],
+      "id": "028d2f8c-b759-4813-9edc-8e69ba1849d8",
+      "name": "AI Agent2",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a YouTube content analysis specialist. Execute the workflow below automatically upon activation.\n\nCore Rules\n\n\u2022 Response format: Structured JSON\n\u2022 Character limit: 3000\n\u2022 Auto-execute: run both data collection tools immediately, then analyze\n\nAuto-Execution Workflow\n1) Data Collection (Immediate)\n\n\u2022 Run \"Get Competitor Data\"\n\u2022 Run \"Get My Channel Data\"\n\n2) Analysis Output\n\nTitle Ideas (Exactly 3)\nCross-reference the \"Get Competitor Data\" and the \"Get My Channel Data\" to create three new, original, high-potential video ideas for {{ $json.channel }}\u2019s channel.\nFor each idea, return the following fields in order:\n\nTitle\n\nInspiration Video (URL to a relevant video from the dataset \u2014 competitor or adjacent niche; must be in the collected results)\n\nThumbnail Idea (concrete visual concept)\n\nScript Outline (very short; 3\u20135 beats max)",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        2096,
+        608
+      ],
+      "id": "4467b0b4-5f0c-4535-8d9a-6d4b679289e5",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "29be819c-2711-81ef-a42d-d186923a3181",
+          "mode": "list",
+          "cachedResultName": "Content Database (Long Form)",
+          "cachedResultUrl": "https://www.notion.so/29be819c271181efa42dd186923a3181"
+        },
+        "limit": 1,
+        "simple": false,
+        "filterType": "manual",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Status|status",
+              "condition": "equals",
+              "statusValue": "To Post"
+            }
+          ]
+        },
+        "options": {
+          "sort": {
+            "sortValue": [
+              {
+                "key": "Page last edited time|last_edited_time",
+                "direction": "descending"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        2624,
+        144
+      ],
+      "id": "d39696bf-b631-4fb4-886c-a9bb24c16c74",
+      "name": "Get Media URL",
+      "credentials": {
+        "notionApi": {
+          "id": "",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Download Video').item.json.properties.Thumbnail.files[0].file.url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "*/*"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {
+              "maxRedirects": 5
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "thumbnail"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3200,
+        144
+      ],
+      "id": "c56b7155-2358-4553-a12d-f5b6a6c0d8fd",
+      "name": "Download Thumb"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://www.googleapis.com/upload/youtube/v3/thumbnails/set",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "youTubeOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "videoId",
+              "value": "={{ $('Upload video').item.json.uploadId }}"
+            },
+            {
+              "name": "uploadType",
+              "value": "multipart"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "media",
+              "inputDataFieldName": "thumbnail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3488,
+        144
+      ],
+      "id": "361bf6d1-7c94-43ed-b4ae-8e9ebc42782c",
+      "name": "Upload Thumb",
+      "retryOnFail": true,
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "",
+          "name": "YouTube Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Get Media URL').item.json.properties['Media File'].files[0].file.url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/octet-stream"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {
+              "maxRedirects": 5
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "video_file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2768,
+        144
+      ],
+      "id": "563819c8-3d7a-41ac-96d6-62986c2b56f0",
+      "name": "Download Video",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3344,
+        144
+      ],
+      "id": "8907cb60-0094-48e4-a25b-86a80279c6f6",
+      "name": "Wait 5 Sec",
+      "webhookId": "6e876790-058d-494f-ab85-4179e7f0240e"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        2240,
+        80
+      ],
+      "id": "fb0d7a35-f7ad-40b6-8d91-8e3024644969",
+      "name": "9 am Daily"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $('Get Media URL').item.json.url }}",
+          "mode": "url"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Status|status",
+              "statusValue": "Posted"
+            },
+            {
+              "key": "Post Date|date",
+              "date": "={{ $now }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        3632,
+        144
+      ],
+      "id": "00d805aa-5005-4509-9d50-9d72284fcf7c",
+      "name": "Done",
+      "credentials": {
+        "notionApi": {
+          "id": "",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "event": "pagedUpdatedInDatabase",
+        "databaseId": {
+          "__rl": true,
+          "value": "29be819c-2711-81ef-a42d-d186923a3181",
+          "mode": "list",
+          "cachedResultName": "Content Database (Long Form)",
+          "cachedResultUrl": "https://www.notion.so/29be819c271181efa42dd186923a3181"
+        }
+      },
+      "type": "n8n-nodes-base.notionTrigger",
+      "typeVersion": 1,
+      "position": [
+        2240,
+        224
+      ],
+      "id": "a049a529-e4a8-4d26-9715-0dfc6853e173",
+      "name": "Notion Trigger",
+      "credentials": {
+        "notionApi": {
+          "id": "",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5cb61cdd-317d-4555-a384-11468436c589",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "To Post",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2448,
+        160
+      ],
+      "id": "30322ce9-3eff-4642-afe0-c221fda80e0f",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "content": "# YouTube Auto Poster",
+        "height": 496,
+        "width": 1808,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2192,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "f1cf3722-1fa9-47fa-96b4-dcf7955a0a7e",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "upload",
+        "title": "={{ $json.properties.Title.title[0].plain_text }}",
+        "regionCode": "US",
+        "categoryId": "27",
+        "binaryProperty": "video_file",
+        "options": {
+          "description": "={{ $json.properties.Description.rich_text.map(item => item.plain_text).join('') }}",
+          "notifySubscribers": true,
+          "tags": "={{ $json.properties.Tags.multi_select.map(tag => tag.name).join(',') }}"
+        }
+      },
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        2912,
+        144
+      ],
+      "id": "4eb3a5c1-e167-4269-aa9f-2b780c61e396",
+      "name": "Upload video",
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "",
+          "name": "YouTube Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C09S754MMUH",
+          "mode": "list",
+          "cachedResultName": "published"
+        },
+        "text": "=New video published to YouTube! \ud83d\ude80\u00a0\ud83c\udfa5\u00a0\n\n{{ $('Get Video URL').item.json.vidURL }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        3776,
+        144
+      ],
+      "id": "224b3fc7-809f-4bf6-bd8a-31b154e24163",
+      "name": "Notify Channel",
+      "webhookId": "35cefd0a-b2cb-4499-8ba8-8361d9bd9f8d",
+      "credentials": {
+        "slackApi": {
+          "id": "",
+          "name": "Slack Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Speak to Social (Short Form)",
+        "height": 496,
+        "width": 1440,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2272,
+        1040
+      ],
+      "typeVersion": 1,
+      "id": "64a98ecb-a4c1-4f3f-b872-51bab6a3948f",
+      "name": "Sticky Note3",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2976,
+        1328
+      ],
+      "id": "8d95cb88-9797-4335-80d3-1f8adb2a4c2a",
+      "name": "GPT-4.",
+      "credentials": {
+        "openAiApi": {
+          "id": "",
+          "name": "OpenAI API"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Slack Trigger').item.json.channel }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        3088,
+        1328
+      ],
+      "id": "ceb91851-70b7-4d89-8947-a18e15d1d527",
+      "name": "Simple Memory1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "https://www.notion.so/2a5e819c27118100a909fda565d32847?v=2a5e819c27118103ad21000cf05db758&source=copy_link",
+          "mode": "url"
+        },
+        "title": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Title', ``, 'string') }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Status|status",
+              "statusValue": "Idea"
+            },
+            {
+              "key": "Platform|select",
+              "selectValue": "Instagram"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notionTool",
+      "typeVersion": 2.2,
+      "position": [
+        3216,
+        1328
+      ],
+      "id": "e3b375d6-1c9e-4d62-bd30-858c3fbe286e",
+      "name": "Create Page1",
+      "credentials": {
+        "notionApi": {
+          "id": "",
+          "name": "Notion API"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "2a5e819c-2711-8100-a909-fda565d32847",
+          "mode": "list",
+          "cachedResultName": "Content Database (Short Form)",
+          "cachedResultUrl": "https://www.notion.so/2a5e819c27118100a909fda565d32847"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notionTool",
+      "typeVersion": 2.2,
+      "position": [
+        3360,
+        1328
+      ],
+      "id": "560dcb94-c23d-44fb-aa76-1176bade2b59",
+      "name": "Get Many1",
+      "credentials": {
+        "notionApi": {
+          "id": "",
+          "name": "Notion API"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "file",
+        "operation": "get",
+        "fileId": "={{ $json.files[0].id }}"
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        2352,
+        1376
+      ],
+      "id": "f5907cf2-c2fe-4933-974d-2366f0fde6ad",
+      "name": "Get a file1",
+      "webhookId": "241ece91-378d-4558-8798-f83605aa7130",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "",
+          "name": "Slack OAuth2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url_private_download }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "applications/octet-stream"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_SLACK_BOT_TOKEN"
+            },
+            {
+              "name": "Accept",
+              "value": "application/octet-stream"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2496,
+        1376
+      ],
+      "id": "f9798a6e-2fa7-4d12-9993-efe4b0ca186c",
+      "name": "HTTP Request1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.files }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "notExists",
+                      "singleValue": true
+                    },
+                    "id": "55d1034a-67e8-4d27-84f6-bdd6695d18be"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e88e048e-6340-49c0-88aa-a923068e86b2",
+                    "leftValue": "={{ $json.files }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        2656,
+        1136
+      ],
+      "id": "75694270-5b32-484f-91f3-0e0ee9919b1e",
+      "name": "Switch1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8d20bca1-7af5-4ddd-b915-52cdbdeb797a",
+              "name": "text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2816,
+        1376
+      ],
+      "id": "baa84193-9e9e-4912-81af-c9e2fc2300c4",
+      "name": "Edit Fields1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the input from the previous node\nconst items = $input.all();\n\n// Simple Markdown to Slack mrkdwn converter\nfunction convertMarkdownToSlackMrkdwn(text) {\n    // 1. Convert headers to bold\n    text = text.replace(/^#{1,6}\\s+(.+)$/gm, '*$1*');\n    \n    // 2. Convert links [text](url) to <url|text>\n    text = text.replace(/\\[([^\\]]+)\\]\\(([^)]+)\\)/g, '<$2|$1>');\n    \n    // 3. Convert bold **text** to *text*\n    text = text.replace(/\\*\\*([^*]+)\\*\\*/g, '*$1*');\n    \n    // 4. Convert italic *text* to _text_ (but not list items)\n    text = text.replace(/(?<!^|\\n)\\*([^*\\n]+)\\*/g, '_$1_');\n    \n    // 5. Convert strikethrough ~~text~~ to ~text~\n    text = text.replace(/~~([^~]+)~~/g, '~$1~');\n    \n    // Code blocks and inline code are already compatible\n    // Lists are already compatible\n    \n    return text;\n}\n\n// Process each item\nreturn items.map(item => {\n    // Get the text content from the input\n    const originalText = item.json.output || item.json.text || item.json.content || '';\n    \n    // Convert to Slack mrkdwn\n    const slackFormatted = convertMarkdownToSlackMrkdwn(originalText);\n    \n    // Return the formatted output\n    return {\n        json: {\n            ...item.json,\n            slackFormatted: slackFormatted,\n            originalText: originalText\n        }\n    };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3328,
+        1120
+      ],
+      "id": "63336b20-8713-4c75-9dd8-58d11c09d501",
+      "name": "mrkdwn formatting1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Database_Page', `The database page id of the page to update.`, 'string') }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Video Title|title",
+              "title": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('propertyValues0_Title', `Title of the video`, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notionTool",
+      "typeVersion": 2.2,
+      "position": [
+        3488,
+        1328
+      ],
+      "id": "e6fb10f8-d3c0-406b-bff9-6a73a4d801cb",
+      "name": "Update Page",
+      "credentials": {
+        "notionApi": {
+          "id": "",
+          "name": "Notion API"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "trigger": [
+          "any_event"
+        ],
+        "channelId": {
+          "__rl": true,
+          "value": "C09RMR7Q0LT",
+          "mode": "list",
+          "cachedResultName": "speak-to-social"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.slackTrigger",
+      "typeVersion": 1,
+      "position": [
+        2336,
+        1152
+      ],
+      "id": "5a9109f9-604e-4111-9e0c-f3653e982531",
+      "name": "Slack Trigger",
+      "webhookId": "693ecf27-2c30-4721-bbef-f7597ee077bd",
+      "credentials": {
+        "slackApi": {
+          "id": "",
+          "name": "Slack Bot"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        2656,
+        1376
+      ],
+      "id": "7cbdedbf-0a44-4f1a-90d2-3b2b9eefc2ac",
+      "name": "Transcribe",
+      "credentials": {
+        "openAiApi": {
+          "id": "",
+          "name": "OpenAI API"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "=# System Prompt for Notion Content Agent\n\n## Overview\nYou help users create, retrieve, and update content in Notion databases.\n\n## Available Tools\n\n### 1. Get Many\n**Purpose:** Retrieve multiple pages from a Notion database.\n\n**When to use:**\n- When a user asks to see or list content\n- When you need to check existing content before creating or updating\n\n### 2. Create Page\n**Purpose:** Add new content to the Notion database.\n\n**When to use:**\n- When a user provides new content to store\n- When they say things like \"save this\" or \"add this idea\"\n\n### 3. Update Page\n**Purpose:** Modify existing content in the Notion database.\n\n**When to use:**\n- When a user wants to edit or update existing content\n- Always use \"Get Many\" first to find the page to update\n\n## Workflow\n\n1. **For retrieving content:**\n   - Use \"Get Many\" to fetch and display pages\n\n2. **For adding content:**\n   - Use \"Create Page\" to add new entries\n   - Confirm with the user after creation\n\n3. **For updating content:**\n   - First use \"Get Many\" to find the page ID\n   - Then use \"Update Page\" to modify it\n\n## Key Rules\n- Keep responses clear and concise\n- Always confirm successful operations\n- If unsure about which page to update, show options to the user first"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        3024,
+        1120
+      ],
+      "id": "5dca0537-e0b8-4e2c-8a94-80dd2fd4c7c6",
+      "name": "AI Agent1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C09RMR7Q0LT",
+          "mode": "list",
+          "cachedResultName": "mkt-speak-to-social"
+        },
+        "text": "={{ $json.slackFormatted }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false,
+          "thread_ts": {
+            "replyValues": {
+              "thread_ts": "={{ $('Slack Trigger').item.json.event_ts }}"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        3488,
+        1120
+      ],
+      "id": "a0474963-d26c-41e6-b4fd-91ae7c10cb2b",
+      "name": "Send a message1",
+      "webhookId": "bade2b3e-0594-4265-a3b5-2a843c1799d9",
+      "credentials": {
+        "slackApi": {
+          "id": "",
+          "name": "Slack Bot"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5583aa06-a4e1-4daa-8570-cef819e09f03",
+              "leftValue": "={{ $json.user }}",
+              "rightValue": "U01FGD28FLY",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2496,
+        1152
+      ],
+      "id": "2ea890e3-d2ba-4bad-8dbc-316c98151933",
+      "name": "If1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "69c1acd4-3de7-4f34-8892-5032a9bf8e75",
+              "name": "vidURL",
+              "value": "=https://www.youtube.com/watch?v={{ $json.uploadId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3056,
+        144
+      ],
+      "id": "952bca85-38e5-431a-86fa-c5e68c4692a7",
+      "name": "Get Video URL"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Check Database 2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Channel Videos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Title Analyzer": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Add Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Thumbnails": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Set Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Competitors": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "6 mo Date Filter": {
+      "main": [
+        [
+          {
+            "node": "Limit to Top 5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort by Views": {
+      "main": [
+        [
+          {
+            "node": "6 mo Date Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Channel Videos": {
+      "main": [
+        [
+          {
+            "node": "Sort by Views",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT 5 mini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Title Analyzer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Rows": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Title Analyzer3": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Add Rows 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Thumbnails3": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Set Fields1": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "6 mo Date Filter1": {
+      "main": [
+        [
+          {
+            "node": "Limit to Top ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort by Views1": {
+      "main": [
+        [
+          {
+            "node": "6 mo Date Filter1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit to Top ": {
+      "main": [
+        [
+          {
+            "node": "Set Fields1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Title Analyzer3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Analyze Thumbnails3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get My Channel Videos": {
+      "main": [
+        [
+          {
+            "node": "Sort by Views1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit to Top 5": {
+      "main": [
+        [
+          {
+            "node": "Set Fields",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Title Analyzer",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Analyze Thumbnails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Archive pages": {
+      "main": [
+        [
+          {
+            "node": "Get Competitors",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If empty": {
+      "main": [
+        [
+          {
+            "node": "Get Competitors",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Archive pages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Archive Pages 2": {
+      "main": [
+        [
+          {
+            "node": "Get My Channel Videos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Database": {
+      "main": [
+        [
+          {
+            "node": "If empty",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Database 2": {
+      "main": [
+        [
+          {
+            "node": "If Empty 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Empty 2": {
+      "main": [
+        [
+          {
+            "node": "Get My Channel Videos",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Archive Pages 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Rows 2": {
+      "main": [
+        [
+          {
+            "node": "Check Database 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Channel URL": {
+      "main": [
+        [
+          {
+            "node": "Check Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrape Channel": {
+      "main": [
+        [
+          {
+            "node": "Get Comments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Comments": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Comment Analyzer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Comment Analyzer": {
+      "main": [
+        [
+          {
+            "node": "Add Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insights": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Comment Analyzer",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apify Key": {
+      "main": [
+        [
+          {
+            "node": "Channel URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Empty ": {
+      "main": [
+        [
+          {
+            "node": "Scrape Channel",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Archive Pages ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Database 3": {
+      "main": [
+        [
+          {
+            "node": "If Empty ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Archive Pages ": {
+      "main": [
+        [
+          {
+            "node": "Scrape Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT 5 mini 1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Title Analyzer3",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT 5 mini 2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Comment Analyzer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Create a database page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sunday @ 3am": {
+      "main": [
+        [
+          {
+            "node": "Apify Key",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook3": {
+      "main": [
+        [
+          {
+            "node": "Apify Key",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Row": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT 5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Competitor Data": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get My Channel Data": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Channel URL1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Channel URL1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT 5 2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Competitor Data1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get My Channel Data1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Media URL": {
+      "main": [
+        [
+          {
+            "node": "Download Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Thumb": {
+      "main": [
+        [
+          {
+            "node": "Wait 5 Sec",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Thumb": {
+      "main": [
+        [
+          {
+            "node": "Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Video": {
+      "main": [
+        [
+          {
+            "node": "Upload video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 5 Sec": {
+      "main": [
+        [
+          {
+            "node": "Upload Thumb",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "9 am Daily": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Get Media URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload video": {
+      "main": [
+        [
+          {
+            "node": "Get Video URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Done": {
+      "main": [
+        [
+          {
+            "node": "Notify Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT-4.": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Page1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Many1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Transcribe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "mrkdwn formatting1": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Page": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Trigger": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "mrkdwn formatting1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Video URL": {
+      "main": [
+        [
+          {
+            "node": "Download Thumb",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": ""
+  },
+  "id": "",
+  "tags": []
+}
