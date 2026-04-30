@@ -1,0 +1,636 @@
+{
+  "name": "Instantly.ai Auto-Reply Bot",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "instantly-reply",
+        "options": {}
+      },
+      "name": "Instantly Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        832
+      ],
+      "id": "cc0c8caf-a725-478e-bd01-0361fc7b2319",
+      "webhookId": "00f4f063-2ec2-4a2d-8f43-59c6b70a483d"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        1024
+      ],
+      "id": "2c4c11f5-996e-4d61-82ce-92cdf9372bd6",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+              "name": "campaignId",
+              "value": "={{ $('Set Variables').item.json.body.campaign_name.split(\"|\")[0].trim()}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1360,
+        928
+      ],
+      "id": "4af0a994-2c40-47de-83c5-c9eb33bdea47",
+      "name": "Extract Campaign ID"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1QS7MYDm6RUTzzTWoMfX-0G9NzT5EoE2KiCE7iR1DBLM",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1QS7MYDm6RUTzzTWoMfX-0G9NzT5EoE2KiCE7iR1DBLM/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "ID",
+              "lookupValue": "={{ $json.campaignId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1584,
+        928
+      ],
+      "id": "9f7094e3-c696-48fc-b65d-ea1736bf27ec",
+      "name": "Lookup Knowledge Base",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EOibXIc4U8wcXyRR",
+          "name": "YouTube"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "kb-check-condition",
+              "leftValue": "={{ $('Lookup Knowledge Base').item.json['Knowledge Base'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1808,
+        928
+      ],
+      "id": "54eceffb-1e33-4546-9378-db0fdafa97f5",
+      "name": "Knowledge Base Found?"
+    },
+    {
+      "parameters": {
+        "url": "https://api.instantly.ai/api/v2/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "limit",
+              "value": "10"
+            },
+            {
+              "name": "search",
+              "value": "={{ $json.body.lead_email }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Get Conversation History1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        240,
+        928
+      ],
+      "id": "df483000-c11f-4050-a409-5d1193da0e40",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "7SswByTRBO7EzHnf",
+          "name": "Instantly"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.instantly.ai/api/v2/emails/reply",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"eaccount\": \"{{ $('Set Variables').item.json.body.email_account }}\",\n  \"reply_to_uuid\": \"{{ $('Set Variables').item.json.body.email_id }}\",\n  \"subject\": \"{{ $('Set Variables').item.json.body.reply_subject }}\",\n  \"body\": {\n     \"html\":\"{{ $json.output.replaceAll(\"\\n\", \"\") }}\"\n  }\n}",
+        "options": {}
+      },
+      "name": "Send Reply to Instantly1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        2720,
+        928
+      ],
+      "id": "9a814577-849b-4f0b-87c5-626db87d768d",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "7SswByTRBO7EzHnf",
+          "name": "Instantly"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=SYSTEM / INSTRUCTIONS\n\nYour job is to draft a succinct, tactful, commercially-minded next email to the email thread below, writing as {{ $('Get Conversation History1').item.json.items[0].eaccount }}.\n\n1.\tRole & tone\n\n• You are {{ $('Get Conversation History1').item.json.items[0].eaccount }}.\n• Write in first person ('I', 'we').\n• Tone: concise, confident, friendly, non-corporate, and outcome-focused. No em dashes (eliminate all —s)\n• No over-explaining, no hype, no filler.\n• If the email is a followup to a previous one we sent, be light but persistent & illustrate our value props.\n• Alternatively, if an additional email would be needless (say in the instance where someone has already confirmed that they're awaiting our call or we have already organized the logistics), reply with nothing, i.e leave the email empty, as we have a filter that will discard those emails and not send.\n• Finally, if the email is something explicitly negative, like \"DO NOT EMAIL ME AGAIN\" or \"UNSUBSCRIBE\" or \"remove me from mailing list\" or some variant thereof, leave it empty.\n\n2.\tDeep context + web lookup\n\nBefore drafting the reply, you must:\n1. Read the entire email thread carefully.\n2. Identify any missing but important context (e.g., who they are, what they do, location, services mentioned, tools/terms you don't recognize).\n3. Use web search tools to research:\n• The sender and their company/clinic. Go in-depth here—make sure you learn everything you can about them. 10,000 tokens is probably not enough!\n• Any products, tools, locations, or acronyms you don't recognize.\n4. Use this research to better tailor the reply (but do not explicitly mention that you used web search unless it's naturally helpful to the recipient).\n\nIf crucial information is still unknown and cannot be reliably inferred or researched, write a brief, tactful reply that:\n• Moves the conversation forward, and\n• Asks at most one or two precise clarifying questions.\n\n3.\tKNOWLEDGE BASE FOR THIS CAMPAIGN\n\nUse this information to ground your reply. This is specific to the industry/campaign you are replying to. Do not copy it verbatim unless context makes it natural.\n\n{{ $('Lookup Knowledge Base').item.json['Knowledge Base'] }}\n\n4.\tOutput format\n\n• Do not include any meta-commentary, analysis, bullets, or headings in the email body itself.\n• Keep it tight: generally 3–8 sentences, unless the thread clearly requires more detail.\n• Output only the final email reply body as HTML.\n• Use minimal HTML: plain text with <br> for line breaks and <br><br> between paragraphs.\n• Do not wrap the content in <html>, <body>, or <p> tags.\n• Make sure to sign off with your name at the end (it will be the first name in your email address).\n\n⸻\n\nREPLY EXAMPLES FOR THIS CAMPAIGN (use these to ground your tone of voice/messaging):\n\n{{ $('Lookup Knowledge Base').item.json['Reply Examples'] }}\n\n--\n\nHERE IS THE REAL EMAIL THREAD TO REPLY TO (STARTS BELOW)\n\nLead's email: {{ $('Get Conversation History1').item.json.items[0].to_address_email_list }}\n\n\nThread, starting from last message -> first:\n\n{{ $('Aggregate1').item.json.emailBody }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        2088,
+        928
+      ],
+      "id": "335a64a3-5aac-4b0d-8216-9db93c6542c9",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "items",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        688,
+        928
+      ],
+      "id": "5e48c335-2a23-48a9-9aff-b5b04579f2d7",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0b34e91f-107e-4bb2-aaef-eb110a7be5b7",
+              "name": "emailBody",
+              "value": "={{ $ifEmpty($json.body.html,$json.body.text).removeTags()  }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        912,
+        928
+      ],
+      "id": "6bfb2799-eb32-4dbf-aecc-d080b775bea0",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.1",
+          "mode": "list",
+          "cachedResultName": "gpt-5.1"
+        },
+        "options": {
+          "reasoningEffort": "high"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2032,
+        1152
+      ],
+      "id": "00fa148c-32e0-4702-9e1c-9135b285f7b7",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "oLLACDYfGm4C4ouV",
+          "name": "YouTube "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('URL', ``, 'string') }}",
+        "options": {},
+        "optimizeResponse": true,
+        "responseType": "html",
+        "onlyContent": true,
+        "truncateResponse": true,
+        "maxLength": 400000
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        2160,
+        1152
+      ],
+      "id": "0c5996ac-8c4b-4dab-8adc-bf770ea7b22b",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "emailBody"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1136,
+        928
+      ],
+      "id": "98458572-a002-49ba-b5f0-29b6897b074b",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        2288,
+        1152
+      ],
+      "id": "15f32bf3-89c7-4c6c-89e8-24b3a547e1e2",
+      "name": "SerpAPI1",
+      "credentials": {
+        "serpApi": {
+          "id": "45KS16tJMTQpN6yo",
+          "name": "SerpAPI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        464,
+        928
+      ],
+      "id": "529d9f23-d4c1-449c-9a49-ecf32ad04197",
+      "name": "Wait1",
+      "webhookId": "289dcbf7-fe94-4c13-891f-dc049b171dc0"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8df55d29-541e-4145-beb3-b5ae7e22f8e6",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        2496,
+        928
+      ],
+      "id": "0900eac1-cc22-4785-b500-7ee64b501ca2",
+      "name": "Filter1"
+    },
+    {
+      "parameters": {
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        16,
+        928
+      ],
+      "id": "e96de14b-ab58-4e83-b7af-cff0ca7379e4",
+      "name": "Set Variables"
+    }
+  ],
+  "pinData": {
+    "When clicking ‘Execute workflow’": [
+      {
+        "json": {
+          "headers": {
+            "host": "nicksaraev.app.n8n.cloud",
+            "user-agent": "axios/0.21.4",
+            "content-length": "4307",
+            "accept": "application/json, text/plain, */*",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "3.213.189.245",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "US",
+            "cf-ray": "9a3aa177b3b3e5f4-IAD",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "x-forwarded-for": "3.213.189.245, 172.71.190.100",
+            "x-forwarded-host": "nicksaraev.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-9-7bb7d4c57c-kbbb2",
+            "x-is-trusted": "yes",
+            "x-real-ip": "3.213.189.245"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "timestamp": "2025-11-24T17:29:48.721Z",
+            "event_type": "reply_received",
+            "workspace": "8faa73f6-4f2c-49e0-97ed-903ac2314844",
+            "campaign_id": "d183b8ff-9bef-42a1-aeb2-2485399c92bf",
+            "unibox_url": "https://app.instantly.ai/app/unibox?thread_search=thread:d1-kXkk4MfoSSGm5tZW4eBmxWX&selected_wks=8faa73f6-4f2c-49e0-97ed-903ac2314844",
+            "campaign_name": "DMC | US | O2 | L1",
+            "email_account": "taylor@semienigmatop.com",
+            "reply_text_snippet": "I am not a dentist. I've never been a dentist. Somehow I've been mistaken for a dentist with the same name. It's driving me crazy the number of emails I get. \nPlease remove me from you mailing list\n",
+            "is_first": true,
+            "lead_email": "keithm@eqallc.com",
+            "email": "keithm@eqallc.com",
+            "state": "Texas",
+            "jobTitle": "Dentist",
+            "lastName": "Metzger",
+            "linkedIn": "http://www.linkedin.com/in/keith-metzger-dds-99226070",
+            "firstName": "Keith",
+            "companyName": "Metzger Dentistry",
+            "step": 1,
+            "variant": 2,
+            "email_id": "019ab6ea-1bfa-788e-abef-f5bbaa9ee963",
+            "reply_subject": "Re: Keith, interested",
+            "reply_text": "I am not a dentist. I've never been a dentist. Somehow I've been mistaken\nfor a dentist with the same name. It's driving me crazy the number of\nemails I get.\n\nPlease remove me from you mailing list\n\nOn Mon, Nov 24, 2025 at 8:10 AM Taylor Allen <taylor@semienigmatop.com>\nwrote:\n\n> Hi Keith,\n>\n> I was at SmileCon earlier this year and heard great things about . Thought\n> I'd say hello.\n>\n> Long story short... I have a sort of crazy offer for you. I do patient\n> acquisition, and will guarantee you 10 new patients in 30 days for or I'll\n> send you $1,000.\n>\n> Variety of types—new patient exams, wisdom teeth, I am happy to send them\n> all to you. We can do deposits or not. I've generated something like ~$1.9M\n> in just the last month and am very confident in my service (around\n> $1.5-$2.0K in first year visits).\n>\n> About me: young, motivated, very familiar with current marketing\n> techniques, and work with a few great locations out in Canada at the\n> moment. You happen to sit around my ideal staff count/size so I figured\n> it'd be worth a try (call it serendipity!)\n>\n> Anyway, this is entirely genuine. I'd send you $1,000 if I didn't hit that\n> goal within 30 days, no strings attached. If interested just give me a\n> shout and we can get on a ~15-30min call. Am reaching out to a few others\n> today but I can do tomorrow or Wednesday at your convenience.\n>\n> Cheers,\n> Taylor\n>\n",
+            "reply_html": "<div dir=\"ltr\">I am not a dentist. I&#39;ve never been a dentist. Somehow I&#39;ve been mistaken for a dentist with the same name. It&#39;s driving me crazy the number of emails I get. <div><br></div><div>Please remove me from you mailing list</div></div><br><div class=\"gmail_quote gmail_quote_container\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, Nov 24, 2025 at 8:10 AM Taylor Allen &lt;<a href=\"mailto:taylor@semienigmatop.com\">taylor@semienigmatop.com</a>&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left-width:1px;border-left-style:solid;border-left-color:rgb(204,204,204);padding-left:1ex\">Hi Keith,<br>\n<br>\nI was at SmileCon earlier this year and heard great things about . Thought I&#39;d say hello.<br>\n<br>\nLong story short... I have a sort of crazy offer for you. I do patient acquisition, and will guarantee you 10 new patients in 30 days for or I&#39;ll send you $1,000. <br>\n<br>\nVariety of types—new patient exams, wisdom teeth, I am happy to send them all to you. We can do deposits or not. I&#39;ve generated something like ~$1.9M in just the last month and am very confident in my service (around $1.5-$2.0K in first year visits). <br>\n<br>\nAbout me: young, motivated, very familiar with current marketing techniques, and work with a few great locations out in Canada at the moment. You happen to sit around my ideal staff count/size so I figured it&#39;d be worth a try (call it serendipity!)<br>\n<br>\nAnyway, this is entirely genuine. I&#39;d send you $1,000 if I didn&#39;t hit that goal within 30 days, no strings attached. If interested just give me a shout and we can get on a ~15-30min call. Am reaching out to a few others today but I can do tomorrow or Wednesday at your convenience.<br>\n<br>\nCheers,<br>\nTaylor<br>\n</blockquote></div>\n"
+          },
+          "webhookUrl": "https://nicksaraev.app.n8n.cloud/webhook/instantly-reply",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Instantly Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Set Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Campaign ID": {
+      "main": [
+        [
+          {
+            "node": "Lookup Knowledge Base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lookup Knowledge Base": {
+      "main": [
+        [
+          {
+            "node": "Knowledge Base Found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Conversation History1": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Filter1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Extract Campaign ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter1": {
+      "main": [
+        [
+          {
+            "node": "Send Reply to Instantly1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Knowledge Base Found?": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Variables": {
+      "main": [
+        [
+          {
+            "node": "Get Conversation History1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e7a63e7c-a477-491e-9b7e-d5dae46ad665",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d7661a849ead114a9aa6d9ceaf4160465aeb79532a35bde62160c840ffba9fc8"
+  },
+  "id": "HZ5EuWUvHqL4Upse",
+  "tags": []
+}

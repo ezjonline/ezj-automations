@@ -1,0 +1,185 @@
+{
+  "name": "Bland.ai Call",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "11mQDmyfbpkWxF0ZeDMEu1nLZg2aDEBWUbzju_A4U8Mo",
+          "mode": "list",
+          "cachedResultName": "Bland AI test",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11mQDmyfbpkWxF0ZeDMEu1nLZg2aDEBWUbzju_A4U8Mo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 850502540,
+          "mode": "list",
+          "cachedResultName": "sheet 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11mQDmyfbpkWxF0ZeDMEu1nLZg2aDEBWUbzju_A4U8Mo/edit#gid=850502540"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [220, 0],
+      "id": "b9442954-0574-4cfe-b0af-9536b36473f4",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xqwkTMJv8ZrYhqaW",
+          "name": "santi@pulpsense.com (1 Mar 25)"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 0],
+      "id": "f7165baf-0280-4347-bcbd-7ad08782ad37",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [660, 0],
+      "id": "e5a49fad-d89e-404c-a9d1-ac288bf0fd27",
+      "name": "Wait",
+      "webhookId": "b930c5f0-53c3-4f27-81b0-864453f2e782"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.bland.ai/v1/calls/{{ $json.call_id }}/analyze",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "authorization",
+              "value": "org_68615887a5a1f4aee7c6af5dc599857db8c1af1be73a422670e6b78c25ad6ba7c4addd18bd35243dc80069"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"goal\": \"Identify if the appointment was rescheduled, and if so, what time it was rescheduled for. Write the time in military (24hr) format, i.e 13:00.\",\n  \"questions\": [\n    [\n      \"Was the appointment rescheduled?\",\n      \"true or false\"\n    ],\n    [\n      \"What time was the appointment rescheduled to?\",\n      \"string\"\n    ]\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 0],
+      "id": "79cb7821-da9d-4c2d-a047-65698e22ff99",
+      "name": "Analyze Call Contents"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.bland.ai/v1/calls",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "authorization",
+              "value": "org_68615887a5a1f4aee7c6af5dc599857db8c1af1be73a422670e6b78c25ad6ba7c4addd18bd35243dc80069"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"phone_number\": \"+{{ $json['Phone Numbers'] }}\",\n  \"task\": \"{{ $json.Instructions }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 0],
+      "id": "f20d3dbc-8d1d-4756-90ef-724c972dfc20",
+      "name": "Call Customer"
+    }
+  ],
+  "pinData": {
+    "Google Sheets1": [
+      {
+        "json": {
+          "row_number": 2,
+          "Phone Numbers": 1111111111,
+          "Instructions": "You are an appointment scheduler for LeftClick. Ask how the client is doing & confirm his appt tomorrow at 9:30am. If he is unable to make it, reschedule (available 11:00am- 12:00pm- 2:00pm- 3:00pm). Wish them a nice day."
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Call Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Analyze Call Contents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Customer": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f157fd05-c94c-47c8-9124-656956321e80",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b0dcdc2a61168afbc3bb8907befe60a34408308859f86b899e8ba57a64038046"
+  },
+  "id": "dnKfco5BiLmrkkDu",
+  "tags": [
+    {
+      "createdAt": "2025-02-25T16:53:08.138Z",
+      "updatedAt": "2025-02-25T16:53:08.138Z",
+      "id": "987WX9PvnYkGNzpl",
+      "name": "Nick n8n"
+    }
+  ]
+}

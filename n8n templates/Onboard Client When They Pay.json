@@ -1,0 +1,445 @@
+{
+  "name": "Payment Completed Stripe --> Update ClickUp & Onboard on Trello",
+  "nodes": [
+    {
+      "parameters": {
+        "events": [
+          "payment_intent.succeeded"
+        ]
+      },
+      "type": "n8n-nodes-base.stripeTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "79452246-b710-4209-813b-c067d799d8a7",
+      "name": "Payment Stripe",
+      "webhookId": "07491018-1d6d-49ff-b218-918187d13349",
+      "credentials": {
+        "stripeApi": {
+          "id": "lOy3YTWAEKPt0xM6",
+          "name": "Stripe account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "team": "9013328923",
+        "space": "90132837732",
+        "folderless": true,
+        "list": "901308423228",
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.clickUp",
+      "typeVersion": 1,
+      "position": [
+        220,
+        0
+      ],
+      "id": "c6c45aca-27c4-450d-91fb-4a3be81298ab",
+      "name": "Get Leads",
+      "credentials": {
+        "clickUpApi": {
+          "id": "K2rHYcpg6BiyrYWl",
+          "name": "santi@pulpsense.com (26 Jan 25)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "id": "={{ $json.id }}",
+        "updateFields": {
+          "status": "won"
+        }
+      },
+      "type": "n8n-nodes-base.clickUp",
+      "typeVersion": 1,
+      "position": [
+        660,
+        0
+      ],
+      "id": "c43908ae-43aa-44f4-93dd-5f2fec6ec4c3",
+      "name": "Mark as Won",
+      "credentials": {
+        "clickUpApi": {
+          "id": "K2rHYcpg6BiyrYWl",
+          "name": "santi@pulpsense.com (26 Jan 25)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7f42c914-e745-420a-ab29-0927c553274d",
+              "leftValue": "={{ $('Payment Stripe').item.json.data.object.receipt_email }}",
+              "rightValue": "={{ $json.custom_fields[19].value }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "76177263-79b8-453e-b9ac-6370dd99a0d4",
+      "name": "Match by Email"
+    },
+    {
+      "parameters": {
+        "resource": "board",
+        "name": "={{ $json.name }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        880,
+        0
+      ],
+      "id": "2cfdde60-c844-429c-92e2-a71ec1b8fb6d",
+      "name": "Create Client Board",
+      "credentials": {
+        "trelloApi": {
+          "id": "FrmajFAqbdk6EjJS",
+          "name": "santi@pulpsense.com (14 Mar 25)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "list",
+        "operation": "getAll",
+        "id": "={{ $json.id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        0
+      ],
+      "id": "d5db8677-0c10-42b7-b748-bbdc83e8a357",
+      "name": "Get Lists",
+      "credentials": {
+        "trelloApi": {
+          "id": "FrmajFAqbdk6EjJS",
+          "name": "santi@pulpsense.com (14 Mar 25)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "listId": "={{ $json.data[0].id }}",
+        "name": "Send them a swag box",
+        "description": "Log into swag.com, enter the client information, and ship their swag box (type A).",
+        "additionalFields": {
+          "due": "={{ $now.plus(2, 'days') }}",
+          "pos": "top"
+        }
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        1540,
+        0
+      ],
+      "id": "eb3f4355-2259-4366-9010-1e39c216e322",
+      "name": "Create Swag Task",
+      "credentials": {
+        "trelloApi": {
+          "id": "FrmajFAqbdk6EjJS",
+          "name": "santi@pulpsense.com (14 Mar 25)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "listId": "={{ $('Aggregate').item.json.data[0].id }}",
+        "name": "Record a video introduction",
+        "description": "Salesperson to record a brief, customized 3min Loom introduction to welcome them aboard and improve consolidation/reduce churn.",
+        "additionalFields": {
+          "due": "={{ $now.plus(2, 'days') }}",
+          "pos": "bottom"
+        }
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        1760,
+        0
+      ],
+      "id": "a7b58568-9678-4f5f-943d-791ab83a986e",
+      "name": "Create Intro Task",
+      "credentials": {
+        "trelloApi": {
+          "id": "FrmajFAqbdk6EjJS",
+          "name": "santi@pulpsense.com (14 Mar 25)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "team": "9013328923",
+        "space": "90132837732",
+        "folderless": true,
+        "list": "901308460860",
+        "name": "={{ $('Get Leads').item.json.name }}",
+        "additionalFields": {
+          "customFieldsJson": "=[\n    {\n        \"id\": \"b2d6c037-dcdc-4701-bc49-84077e026539\",\n        \"value\": \"{{ $now.toMillis() }}\"\n    },\n    {\n        \"id\": \"9d1bda8b-e628-4d89-ad53-9b7fbce5a0a7\",\n        \"value\": \"{{ $('Payment Stripe').item.json.data.object.amount / 100 }}\"\n    }\n]"
+        }
+      },
+      "type": "n8n-nodes-base.clickUp",
+      "typeVersion": 1,
+      "position": [
+        1980,
+        0
+      ],
+      "id": "43c99118-7f42-4327-835b-933acf0dde07",
+      "name": "ClickUp",
+      "credentials": {
+        "clickUpApi": {
+          "id": "K2rHYcpg6BiyrYWl",
+          "name": "santi@pulpsense.com (26 Jan 25)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        0
+      ],
+      "id": "9fadc2df-441b-4418-848a-2e67db0c8f1e",
+      "name": "Aggregate"
+    }
+  ],
+  "pinData": {
+    "Payment Stripe": [
+      {
+        "json": {
+          "id": "evt_3R2XZvP3n50zZQmM0NnESKNG",
+          "object": "event",
+          "api_version": "2024-04-10",
+          "created": 1741956228,
+          "data": {
+            "object": {
+              "id": "pi_3R2XZvP3n50zZQmM0sWbwU08",
+              "object": "payment_intent",
+              "amount": 50,
+              "amount_capturable": 0,
+              "amount_details": {
+                "tip": {}
+              },
+              "amount_received": 50,
+              "application": null,
+              "application_fee_amount": null,
+              "automatic_payment_methods": null,
+              "canceled_at": null,
+              "cancellation_reason": null,
+              "capture_method": "automatic",
+              "client_secret": "YOUR_STRIPE_CLIENT_SECRET",
+              "confirmation_method": "automatic",
+              "created": 1741956187,
+              "currency": "usd",
+              "customer": "cus_RD8hBwZ4iqGeem",
+              "description": "Payment for Invoice",
+              "invoice": "in_1R2XZnP3n50zZQmMzOAVVqUy",
+              "last_payment_error": null,
+              "latest_charge": "ch_3R2XZvP3n50zZQmM0emEsmMW",
+              "livemode": true,
+              "metadata": {},
+              "next_action": null,
+              "on_behalf_of": null,
+              "payment_method": "pm_1R2XaXP3n50zZQmMShSYtgfN",
+              "payment_method_configuration_details": null,
+              "payment_method_options": {
+                "card": {
+                  "installments": null,
+                  "mandate_options": null,
+                  "network": null,
+                  "request_three_d_secure": "automatic",
+                  "setup_future_usage": "on_session"
+                },
+                "link": {
+                  "persistent_token": null
+                }
+              },
+              "payment_method_types": [
+                "card",
+                "link"
+              ],
+              "processing": null,
+              "receipt_email": "santileoni@me.com",
+              "review": null,
+              "setup_future_usage": null,
+              "shipping": null,
+              "source": null,
+              "statement_descriptor": null,
+              "statement_descriptor_suffix": null,
+              "status": "succeeded",
+              "transfer_data": null,
+              "transfer_group": null
+            }
+          },
+          "livemode": true,
+          "pending_webhooks": 3,
+          "request": {
+            "id": null,
+            "idempotency_key": "600ae8d6-cf1c-4948-9be8-8fb438cea104"
+          },
+          "type": "payment_intent.succeeded"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Payment Stripe": {
+      "main": [
+        [
+          {
+            "node": "Get Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Leads": {
+      "main": [
+        [
+          {
+            "node": "Match by Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match by Email": {
+      "main": [
+        [
+          {
+            "node": "Mark as Won",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark as Won": {
+      "main": [
+        [
+          {
+            "node": "Create Client Board",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Client Board": {
+      "main": [
+        [
+          {
+            "node": "Get Lists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Lists": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Swag Task": {
+      "main": [
+        [
+          {
+            "node": "Create Intro Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Intro Task": {
+      "main": [
+        [
+          {
+            "node": "ClickUp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Create Swag Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8f707bfc-b443-437a-b6eb-bf80114d43e1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b0dcdc2a61168afbc3bb8907befe60a34408308859f86b899e8ba57a64038046"
+  },
+  "id": "NXrHfkxEdWqWWFdd",
+  "tags": [
+    {
+      "createdAt": "2025-02-25T16:53:08.138Z",
+      "updatedAt": "2025-02-25T16:53:08.138Z",
+      "id": "987WX9PvnYkGNzpl",
+      "name": "Nick n8n"
+    },
+    {
+      "createdAt": "2025-03-06T15:22:58.476Z",
+      "updatedAt": "2025-03-06T15:22:58.476Z",
+      "id": "tM4tmSUqbko3bXXP",
+      "name": "archive"
+    }
+  ]
+}

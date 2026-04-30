@@ -1,0 +1,734 @@
+{
+  "name": "CRM Lead Won ClickUp --> Send Invoice Stripe",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "170df7e5-777a-4065-a6ff-42c558cf16f4",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "bf05d9c8-4a6f-45a5-a56e-a69b04158e48",
+      "name": "Webhook",
+      "webhookId": "170df7e5-777a-4065-a6ff-42c558cf16f4"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "id": "={{ $json.body.payload.id }}"
+      },
+      "type": "n8n-nodes-base.clickUp",
+      "typeVersion": 1,
+      "position": [
+        220,
+        0
+      ],
+      "id": "7c27f4ba-5de5-4eac-a6ea-b6b3b9b0249f",
+      "name": "ClickUp",
+      "credentials": {
+        "clickUpApi": {
+          "id": "K2rHYcpg6BiyrYWl",
+          "name": "santi@pulpsense.com (26 Jan 25)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "customer",
+        "operation": "create",
+        "name": "={{ $json.name }}",
+        "additionalFields": {
+          "email": "={{ $json.custom_fields[19].value }}"
+        }
+      },
+      "type": "n8n-nodes-base.stripe",
+      "typeVersion": 1,
+      "position": [
+        440,
+        0
+      ],
+      "id": "b9b23ea7-de4a-42e0-b780-482ffc7e6f52",
+      "name": "Stripe",
+      "credentials": {
+        "stripeApi": {
+          "id": "lOy3YTWAEKPt0xM6",
+          "name": "Stripe account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.stripe.com/v1/invoiceitems",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "stripeApi",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "customer",
+              "value": "={{ $json.id }}"
+            },
+            {
+              "name": "amount",
+              "value": "={{ $('ClickUp').item.json.custom_fields[5].value * 100 }}"
+            },
+            {
+              "name": "currency",
+              "value": "usd"
+            },
+            {
+              "name": "description",
+              "value": "1st Deposit"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        0
+      ],
+      "id": "29ee285b-3bfe-479b-b39a-e46d6c6de047",
+      "name": "Create Invoice Item Stripe",
+      "credentials": {
+        "stripeApi": {
+          "id": "lOy3YTWAEKPt0xM6",
+          "name": "Stripe account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.stripe.com/v1/invoices",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "stripeApi",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "customer",
+              "value": "={{ $('Stripe').item.json.id }}"
+            },
+            {
+              "name": "auto_advance",
+              "value": "=true"
+            },
+            {
+              "name": "collection_method",
+              "value": "send_invoice"
+            },
+            {
+              "name": "days_until_due",
+              "value": "2"
+            },
+            {
+              "name": "pending_invoice_items_behavior",
+              "value": "include"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        860,
+        0
+      ],
+      "id": "ef5cb34d-42fa-4d9d-84eb-734c981d0ea1",
+      "name": "Create Invoice Stripe",
+      "credentials": {
+        "stripeApi": {
+          "id": "lOy3YTWAEKPt0xM6",
+          "name": "Stripe account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.stripe.com/v1/invoices/{{ $json.id }}/finalize",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "stripeApi",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1060,
+        0
+      ],
+      "id": "469ab8ee-7d22-45dc-8787-97a0a85b1613",
+      "name": "Finalize Invoice Stripe",
+      "credentials": {
+        "stripeApi": {
+          "id": "lOy3YTWAEKPt0xM6",
+          "name": "Stripe account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.pulpsense.com",
+            "user-agent": "axios/0.24.0",
+            "content-length": "9178",
+            "accept": "application/json, text/plain, */*",
+            "accept-encoding": "gzip, br",
+            "b3": "67d33559000000000b0c763a8575382a-315cac4e27841f52-0-0b0c763a8575382a",
+            "cdn-loop": "cloudflare; loops=1",
+            "cf-connecting-ip": "3.17.107.235",
+            "cf-ipcountry": "US",
+            "cf-ray": "91fe050fecd2f5fb-ORD",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "content-type": "application/json",
+            "traceparent": "00-67d33559000000000b0c763a8575382a-315cac4e27841f52-00",
+            "tracestate": "dd=t.tid:67d3355900000000;t.dm:-3;s:-1;p:315cac4e27841f52",
+            "x-b3-parentspanid": "0b0c763a8575382a",
+            "x-b3-sampled": "0",
+            "x-b3-spanid": "315cac4e27841f52",
+            "x-b3-traceid": "67d33559000000000b0c763a8575382a",
+            "x-datadog-parent-id": "3556907257386245970",
+            "x-datadog-sampling-priority": "-1",
+            "x-datadog-tags": "_dd.p.tid=67d3355900000000",
+            "x-datadog-trace-id": "796141227856967722",
+            "x-forwarded-for": "172.70.131.75",
+            "x-forwarded-host": "n8n.pulpsense.com",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "7ba1fcbf2052",
+            "x-real-ip": "172.70.131.75"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "id": "3cf1a60e-bee3-4f40-be75-d7d19f651dec:main",
+            "trigger_id": "bf130953-7bc9-4a8e-928b-faafc4bc7d23",
+            "date": "2025-03-13T19:43:21.552Z",
+            "payload": {
+              "id": "86a78dz9j",
+              "custom_id": null,
+              "custom_item_id": 1002,
+              "name": "Harry Potter - Griffindor",
+              "text_content": "Tiene 10 ecommerce, que no me quizo decir de que\nVende ebooks\nQuiere alguien para tener de referente de automatizaciones internamente\nQuiere que sea costo-eficiente\nQuiere automatizar la creacion de videos\nQuiere llevar Notion a Clockify\n\nhttps://www.esenciaherbolaria.com/\nhttp://www.welovemacrame.com/\nhttps://macramewondersbundle.com/\nhttps://thepreppersguidetoresilience.com/\nhttps://theindependenthomesteader.com/\nhttps://esenciaherbolaria.com/\nhttps://theartofherbalism.com/\nhttps://thepreppersguidetoresilience.com/",
+              "description": "Tiene 10 ecommerce, que no me quizo decir de que\nVende ebooks\nQuiere alguien para tener de referente de automatizaciones internamente\nQuiere que sea costo-eficiente\nQuiere automatizar la creacion de videos\nQuiere llevar Notion a Clockify\n\nhttps://www.esenciaherbolaria.com/\nhttp://www.welovemacrame.com/\nhttps://macramewondersbundle.com/\nhttps://thepreppersguidetoresilience.com/\nhttps://theindependenthomesteader.com/\nhttps://esenciaherbolaria.com/\nhttps://theartofherbalism.com/\nhttps://thepreppersguidetoresilience.com/",
+              "status": {
+                "id": "sc901308423228_Bi96P3yI",
+                "status": "won",
+                "color": "#008844",
+                "orderindex": 4,
+                "type": "closed"
+              },
+              "orderindex": "39921497.00000000000000000000000000000000",
+              "date_created": "1741892326848",
+              "date_updated": "1741894999495",
+              "date_closed": "1741894999495",
+              "date_done": "1741894999495",
+              "archived": false,
+              "creator": {
+                "id": 96740125,
+                "username": "Santi",
+                "color": "",
+                "email": "santi@pulpsense.com",
+                "profilePicture": "https://attachments.clickup.com/profilePictures/96740125_jht.jpg"
+              },
+              "assignees": [],
+              "group_assignees": [],
+              "watchers": [
+                {
+                  "id": 96740125,
+                  "username": "Santi",
+                  "color": "",
+                  "initials": "S",
+                  "email": "santi@pulpsense.com",
+                  "profilePicture": "https://attachments.clickup.com/profilePictures/96740125_jht.jpg"
+                }
+              ],
+              "checklists": [],
+              "tags": [],
+              "parent": null,
+              "top_level_parent": null,
+              "priority": null,
+              "due_date": null,
+              "start_date": null,
+              "points": null,
+              "time_estimate": null,
+              "time_spent": 0,
+              "custom_fields": [
+                {
+                  "id": "1e2126ef-dd53-486d-a5cd-15b075b807a4",
+                  "name": "🖍️ Company Description",
+                  "type": "short_text",
+                  "type_config": {},
+                  "date_created": "1732044229950",
+                  "hide_from_guests": false,
+                  "required": false
+                },
+                {
+                  "id": "9fbece01-45d9-4b20-9511-1145a815bc43",
+                  "name": "🆘 Their Problem",
+                  "type": "text",
+                  "type_config": {},
+                  "date_created": "1732044267542",
+                  "hide_from_guests": false,
+                  "required": false
+                },
+                {
+                  "id": "6ffb0c04-68e7-4a0a-b284-83a1ad694aad",
+                  "name": "🚀 Proposed Solution",
+                  "type": "text",
+                  "type_config": {},
+                  "date_created": "1732044295452",
+                  "hide_from_guests": false,
+                  "required": false
+                },
+                {
+                  "id": "884cc539-8d3b-476c-9fe2-9d5d47f55191",
+                  "name": "⚙️ Platforms/services",
+                  "type": "text",
+                  "type_config": {},
+                  "date_created": "1732044443156",
+                  "hide_from_guests": false,
+                  "required": false
+                },
+                {
+                  "id": "e2a5e51f-8fa2-4dba-939b-38395126e122",
+                  "name": "🗓️ Project Length",
+                  "type": "short_text",
+                  "type_config": {},
+                  "date_created": "1732044461481",
+                  "hide_from_guests": false,
+                  "required": false
+                },
+                {
+                  "id": "e330a15c-191b-4ad2-8ce2-bd89abfd7cbe",
+                  "name": "💰 Project Rate",
+                  "type": "currency",
+                  "type_config": {
+                    "precision": 2,
+                    "currency_type": "USD"
+                  },
+                  "date_created": "1732044484331",
+                  "hide_from_guests": false,
+                  "required": false
+                },
+                {
+                  "id": "a7181993-cd3e-4d86-84d4-0cd67d409adc",
+                  "name": "💵 Hourly Rate",
+                  "type": "currency",
+                  "type_config": {
+                    "precision": 2,
+                    "currency_type": "USD"
+                  },
+                  "date_created": "1732044516220",
+                  "hide_from_guests": false,
+                  "required": false
+                },
+                {
+                  "id": "608cd7ea-6143-45c0-85e2-5c1bc3d6eb00",
+                  "name": "☑️ Enrich for proposal (Manual)",
+                  "type": "checkbox",
+                  "type_config": {},
+                  "date_created": "1735246376102",
+                  "hide_from_guests": false,
+                  "required": false
+                },
+                {
+                  "id": "aa08feb6-e5ba-4d5d-9c48-ee49863b0380",
+                  "name": "☑️ Refresh Form Link",
+                  "type": "checkbox",
+                  "type_config": {},
+                  "date_created": "1735313665017",
+                  "hide_from_guests": false,
+                  "required": false
+                },
+                {
+                  "id": "36133bd2-e00f-4555-9b3f-965de94a2cc9",
+                  "name": "📍 Location",
+                  "type": "short_text",
+                  "type_config": {},
+                  "date_created": "1736612350953",
+                  "hide_from_guests": false,
+                  "required": false
+                },
+                {
+                  "id": "444fcf3e-a6e9-4f14-91d7-bf5f734f76ff",
+                  "name": "☎️ Phone",
+                  "type": "short_text",
+                  "type_config": {},
+                  "date_created": "1720709941062",
+                  "hide_from_guests": false,
+                  "required": false
+                },
+                {
+                  "id": "b550c441-04a8-446b-831b-de41b7ca9b77",
+                  "name": "🌐 Company URL",
+                  "type": "url",
+                  "type_config": {},
+                  "date_created": "1720704273665",
+                  "hide_from_guests": false,
+                  "required": false
+                },
+                {
+                  "id": "3d306bb8-7360-4a9c-b7b2-303bb519e0fe",
+                  "name": "🏢 Company Name",
+                  "type": "short_text",
+                  "type_config": {},
+                  "date_created": "1724950634989",
+                  "hide_from_guests": false,
+                  "value": "FyroAdv",
+                  "value_richtext": null,
+                  "required": false
+                },
+                {
+                  "id": "9d1bda8b-e628-4d89-ad53-9b7fbce5a0a7",
+                  "name": "🤝 Paid",
+                  "type": "currency",
+                  "type_config": {
+                    "precision": 2,
+                    "currency_type": "USD"
+                  },
+                  "date_created": "1736685770204",
+                  "hide_from_guests": false,
+                  "required": false
+                },
+                {
+                  "id": "fe5174bd-b013-4f9e-86ca-a770660bd095",
+                  "name": "💸 Retainer Value",
+                  "type": "formula",
+                  "type_config": {
+                    "simple": true,
+                    "formula": "CUSTOM_FIELD_a7181993_cd3e_4d86_84d4_0cd67d409adc * CUSTOM_FIELD_450010f7_5963_44d8_8963_ea09d7244724",
+                    "version": "1.11",
+                    "reset_at": 1739229671102,
+                    "is_dynamic": false,
+                    "return_types": [
+                      "null",
+                      "number"
+                    ],
+                    "calculation_state": "ready"
+                  },
+                  "date_created": "1737043657234",
+                  "hide_from_guests": false,
+                  "required": false
+                },
+                {
+                  "id": "450010f7-5963-44d8-8963-ea09d7244724",
+                  "name": "🕒 Retainer Hours per Month",
+                  "type": "number",
+                  "type_config": {},
+                  "date_created": "1737043788426",
+                  "hide_from_guests": false,
+                  "required": false
+                },
+                {
+                  "id": "d11c7a2e-8cc3-40da-9277-819f247c6ef5",
+                  "name": "👥 CC Emails",
+                  "type": "short_text",
+                  "type_config": {},
+                  "date_created": "1739306727036",
+                  "hide_from_guests": false,
+                  "required": false
+                },
+                {
+                  "id": "a460a310-1b98-4359-b7fb-1779f5570714",
+                  "name": "🗺️ Timezone",
+                  "type": "short_text",
+                  "type_config": {},
+                  "date_created": "1734816090603",
+                  "hide_from_guests": false,
+                  "required": false
+                },
+                {
+                  "id": "de9337d2-fe0c-415b-bb4d-f79692a84dad",
+                  "name": "🤝 Contract Type",
+                  "type": "drop_down",
+                  "type_config": {
+                    "sorting": "manual",
+                    "new_drop_down": true,
+                    "options": [
+                      {
+                        "id": "50be03e7-64c9-46e9-8ae9-337f72de9157",
+                        "name": "Retainer",
+                        "color": "#E65100",
+                        "orderindex": 0
+                      },
+                      {
+                        "id": "ae14930f-5937-4136-ba59-321be8a9c002",
+                        "name": "Project",
+                        "color": "#3082B7",
+                        "orderindex": 1
+                      },
+                      {
+                        "id": "e13e6e14-321f-4bdf-a23a-98be5d7c367d",
+                        "name": "Upwork - Project",
+                        "color": "#15705e",
+                        "orderindex": 2
+                      },
+                      {
+                        "id": "0d3685c6-e72a-4119-aebc-4b3ecbd24d8c",
+                        "name": "Consultation",
+                        "color": "#9b59b6",
+                        "orderindex": 3
+                      },
+                      {
+                        "id": "0b0b1e57-460f-4d9c-828c-e6b8124f47cd",
+                        "name": "Upwork - Hourly",
+                        "color": "#1bbc9c",
+                        "orderindex": 4
+                      }
+                    ]
+                  },
+                  "date_created": "1734816221090",
+                  "hide_from_guests": false,
+                  "value": 2,
+                  "value_richtext": null,
+                  "required": false
+                },
+                {
+                  "id": "9f1e4a22-3aa4-4a1d-896c-377321dc4d4f",
+                  "name": "✉️ Contact Email",
+                  "type": "email",
+                  "type_config": {},
+                  "date_created": "1720623320720",
+                  "hide_from_guests": false,
+                  "value": "santileoni@me.com",
+                  "value_richtext": null,
+                  "required": false
+                },
+                {
+                  "id": "982093e0-8422-42a8-bdbb-4ba6dad058fe",
+                  "name": "🔎 Lead Origin",
+                  "type": "drop_down",
+                  "type_config": {
+                    "sorting": "manual",
+                    "new_drop_down": true,
+                    "options": [
+                      {
+                        "id": "adb9b696-9cdd-49d8-9428-251944d8764d",
+                        "name": "Upwork",
+                        "color": "#0a9543",
+                        "orderindex": 0
+                      },
+                      {
+                        "id": "435773a5-8abf-4a20-af74-54d205edaa64",
+                        "name": "Cold Email",
+                        "color": "#3abaa9",
+                        "orderindex": 1
+                      },
+                      {
+                        "id": "40bd7d0a-15db-4a0b-b616-aa950cae322d",
+                        "name": "Linkedin Outbound",
+                        "color": "#3397dd",
+                        "orderindex": 2
+                      },
+                      {
+                        "id": "04539b98-3a15-45b1-8ef6-81176a3cd3e7",
+                        "name": "Referral",
+                        "color": "#6c00f9",
+                        "orderindex": 3
+                      },
+                      {
+                        "id": "17c2b0fa-145c-4fb6-8547-24cfa38c953b",
+                        "name": "Nick",
+                        "color": "#f56aba",
+                        "orderindex": 4
+                      },
+                      {
+                        "id": "7ce4f1f0-35d4-452f-a23f-049beef93a5c",
+                        "name": "Inbound",
+                        "color": "#ff4f6d",
+                        "orderindex": 5
+                      }
+                    ]
+                  },
+                  "date_created": "1720624759898",
+                  "hide_from_guests": false,
+                  "value": 0,
+                  "value_richtext": null,
+                  "required": false
+                },
+                {
+                  "id": "8bae2993-0097-47c0-8660-9b2afed9bb65",
+                  "name": "📤 Generate Proposal",
+                  "type": "url",
+                  "type_config": {},
+                  "date_created": "1722280787669",
+                  "hide_from_guests": false,
+                  "required": false
+                },
+                {
+                  "id": "5d1c1e73-1a16-4da8-86a1-c1bdecca042b",
+                  "name": "🅰️ First Name",
+                  "type": "short_text",
+                  "type_config": {},
+                  "date_created": "1724950509880",
+                  "hide_from_guests": false,
+                  "value": "Zeffiro",
+                  "value_richtext": null,
+                  "required": false
+                },
+                {
+                  "id": "9e1fccbd-12cc-4898-9ac5-e678fa125fc5",
+                  "name": "🅱️ Last Name",
+                  "type": "short_text",
+                  "type_config": {},
+                  "date_created": "1724950615198",
+                  "hide_from_guests": false,
+                  "value": "Varga",
+                  "value_richtext": null,
+                  "required": false
+                },
+                {
+                  "id": "612dc370-515d-4445-83a8-9dcb789aee71",
+                  "name": "🔗 Proposal URL",
+                  "type": "url",
+                  "type_config": {},
+                  "date_created": "1725907116937",
+                  "hide_from_guests": false,
+                  "required": false
+                }
+              ],
+              "dependencies": [],
+              "linked_tasks": [],
+              "locations": [],
+              "team_id": "9013328923",
+              "url": "https://app.clickup.com/t/86a78dz9j",
+              "sharing": {
+                "public": false,
+                "public_share_expires_on": null,
+                "public_fields": [
+                  "assignees",
+                  "priority",
+                  "due_date",
+                  "content",
+                  "comments",
+                  "attachments",
+                  "customFields",
+                  "subtasks",
+                  "tags",
+                  "checklists",
+                  "coverimage"
+                ],
+                "token": null,
+                "seo_optimized": false
+              },
+              "list": {
+                "id": "901308423228",
+                "name": "CRM Demo",
+                "access": true
+              },
+              "project": {
+                "id": "90134751156",
+                "name": "hidden",
+                "hidden": true,
+                "access": true
+              },
+              "folder": {
+                "id": "90134751156",
+                "name": "hidden",
+                "hidden": true,
+                "access": true
+              },
+              "space": {
+                "id": "90132837732"
+              },
+              "attachments": []
+            }
+          },
+          "webhookUrl": "https://n8n.pulpsense.com/webhook-test/170df7e5-777a-4065-a6ff-42c558cf16f4",
+          "executionMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "ClickUp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ClickUp": {
+      "main": [
+        [
+          {
+            "node": "Stripe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Stripe": {
+      "main": [
+        [
+          {
+            "node": "Create Invoice Item Stripe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Invoice Item Stripe": {
+      "main": [
+        [
+          {
+            "node": "Create Invoice Stripe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Invoice Stripe": {
+      "main": [
+        [
+          {
+            "node": "Finalize Invoice Stripe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "eed8a167-c9b4-4706-8438-ef29efb5d55d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b0dcdc2a61168afbc3bb8907befe60a34408308859f86b899e8ba57a64038046"
+  },
+  "id": "5RlTLsPHDThcYXoX",
+  "tags": [
+    {
+      "createdAt": "2025-02-25T16:53:08.138Z",
+      "updatedAt": "2025-02-25T16:53:08.138Z",
+      "id": "987WX9PvnYkGNzpl",
+      "name": "Nick n8n"
+    }
+  ]
+}

@@ -1,0 +1,1346 @@
+{
+  "name": "Instagram Scraping with PhantomBuster",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "text": "=The following is an Instagram image. I've included a caption below as well.\n\nCaption: {{ $json.caption }}\n\nUse the image and the caption to write a customized one-line introduction. Use a no-frills tone of voice.\n\nExamples: \"I really liked your last pic—looks like you demolished that sandwich!\",\"Last pic looks like a lovely walk in the park.\"",
+        "imageUrls": "={{ $json.imgUrl }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1360,
+        400
+      ],
+      "id": "55bb01f9-a326-4004-aec2-d672488d3229",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "a2xwb5PX9qEfwIVL",
+          "name": "santi@pulpsense.com (26 Jan 25)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "32cb8a22-daae-4a7a-8728-d2e904a75f5e",
+              "leftValue": "={{ $json.postUrl }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "4a2bf828-6b58-48ee-97cc-16bc971c8e68",
+              "leftValue": "={{ $json.type }}",
+              "rightValue": "Photo",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        1140,
+        400
+      ],
+      "id": "b65bf7c5-9cc5-4e39-8d1a-f97f073fb169",
+      "name": "Filter Posts Founded"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1v1a4v0y2AKDVMQU6qRfBYJoUeo9YMAs5k3IytZASPbM",
+          "mode": "list",
+          "cachedResultName": "Phantombuster (Nick)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v1a4v0y2AKDVMQU6qRfBYJoUeo9YMAs5k3IytZASPbM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2067561248,
+          "mode": "list",
+          "cachedResultName": "Scraped Posts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v1a4v0y2AKDVMQU6qRfBYJoUeo9YMAs5k3IytZASPbM/edit#gid=2067561248"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "profileUrl": "={{ $('Filter Posts Founded').item.json.profileUrl }}",
+            "username": "={{ $('Filter Posts Founded').item.json.username }}",
+            "fullName": "={{ $('Filter Posts Founded').item.json.fullName }}",
+            "imgUrl": "={{ $('Filter Posts Founded').item.json.imgUrl }}",
+            "query": "={{ $('Filter Posts Founded').item.json.query }}",
+            "timestamp": "={{ $('Filter Posts Founded').item.json.timestamp }}",
+            "postUrl": "={{ $('Filter Posts Founded').item.json.postUrl }}",
+            "description": "={{ $('Filter Posts Founded').item.json.description }}",
+            "commentCount": "={{ $('Filter Posts Founded').item.json.commentCount }}",
+            "likeCount": "={{ $('Filter Posts Founded').item.json.likeCount }}",
+            "location": "={{ $('Filter Posts Founded').item.json.location }}",
+            "locationId": "={{ $('Filter Posts Founded').item.json.pubDate }}",
+            "pubDate": "={{ $('Filter Posts Founded').item.json.pubDate }}",
+            "likedByViewer": "={{ $('Filter Posts Founded').item.json.likedByViewer }}",
+            "isSidecar": "={{ $('Filter Posts Founded').item.json.isSidecar }}",
+            "type": "={{ $('Filter Posts Founded').item.json.type }}",
+            "caption": "={{ $('Filter Posts Founded').item.json.caption }}",
+            "postId": "={{ $('Filter Posts Founded').item.json.postId }}",
+            "DM": "={{ $json.content }}"
+          },
+          "matchingColumns": [
+            "postUrl"
+          ],
+          "schema": [
+            {
+              "id": "postUrl",
+              "displayName": "postUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "commentCount",
+              "displayName": "commentCount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "likeCount",
+              "displayName": "likeCount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "location",
+              "displayName": "location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "locationId",
+              "displayName": "locationId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "pubDate",
+              "displayName": "pubDate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "likedByViewer",
+              "displayName": "likedByViewer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "isSidecar",
+              "displayName": "isSidecar",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "caption",
+              "displayName": "caption",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "profileUrl",
+              "displayName": "profileUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "username",
+              "displayName": "username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fullName",
+              "displayName": "fullName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "imgUrl",
+              "displayName": "imgUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "postId",
+              "displayName": "postId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DM",
+              "displayName": "DM",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1580,
+        400
+      ],
+      "id": "b7e14a20-fa13-43b0-8abf-b11ad43e4d32",
+      "name": "Add Posts",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xqwkTMJv8ZrYhqaW",
+          "name": "santi@pulpsense.com (1 Mar 25)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        20,
+        400
+      ],
+      "id": "8b0d9eff-7580-4226-a4e1-4c695c751586",
+      "name": "Schedule Trigger1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1v1a4v0y2AKDVMQU6qRfBYJoUeo9YMAs5k3IytZASPbM",
+          "mode": "list",
+          "cachedResultName": "Phantombuster (Nick)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v1a4v0y2AKDVMQU6qRfBYJoUeo9YMAs5k3IytZASPbM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1958537780,
+          "mode": "list",
+          "cachedResultName": "Authentication",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v1a4v0y2AKDVMQU6qRfBYJoUeo9YMAs5k3IytZASPbM/edit#gid=1958537780"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        240,
+        400
+      ],
+      "id": "a22801f2-a952-46fc-b442-fb6bdcea0006",
+      "name": "Get Authorization1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xqwkTMJv8ZrYhqaW",
+          "name": "santi@pulpsense.com (1 Mar 25)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        680,
+        400
+      ],
+      "id": "3af4ffef-7dc5-4dad-9486-084ff91032f6",
+      "name": "Wait 1min1",
+      "webhookId": "902cd338-d8eb-4700-8d9b-651cba1a994c"
+    },
+    {
+      "parameters": {
+        "operation": "getOutput",
+        "agentId": "2444478534304565",
+        "additionalFields": {
+          "prevContainerId": "={{ $('Launch Phantombuster1').item.json.containerId }}"
+        }
+      },
+      "type": "n8n-nodes-base.phantombuster",
+      "typeVersion": 1,
+      "position": [
+        900,
+        400
+      ],
+      "id": "104aefd1-9f50-4e95-aa50-ed66388fcbdb",
+      "name": "Get Phantombuster Output1",
+      "credentials": {
+        "phantombusterApi": {
+          "id": "vNCyj62slVOxGQ9U",
+          "name": "Phantombuster account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.phantombuster.com/api/v2/agents/launch",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "phantombusterApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"id\": \"2444478534304565\",\n    \"argument\": \"{\\\"csvName\\\":\\\"111\\\",\\\"sessionCookie\\\":\\\"{{ $json.sessionCookie }}\\\",\\\"spreadsheetUrl\\\":\\\"https://docs.google.com/spreadsheets/d/1v1a4v0y2AKDVMQU6qRfBYJoUeo9YMAs5k3IytZASPbM/edit?gid=1458026136#gid=1458026136\\\",\\\"numberOfPostsPerProfile\\\":1}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        460,
+        400
+      ],
+      "id": "4b7d0094-03c1-474b-92e3-f6e8662bf497",
+      "name": "Launch Phantombuster1",
+      "credentials": {
+        "phantombusterApi": {
+          "id": "vNCyj62slVOxGQ9U",
+          "name": "Phantombuster account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1v1a4v0y2AKDVMQU6qRfBYJoUeo9YMAs5k3IytZASPbM",
+          "mode": "list",
+          "cachedResultName": "Phantombuster (Nick)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v1a4v0y2AKDVMQU6qRfBYJoUeo9YMAs5k3IytZASPbM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1458026136,
+          "mode": "list",
+          "cachedResultName": "To Scrape",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v1a4v0y2AKDVMQU6qRfBYJoUeo9YMAs5k3IytZASPbM/edit#gid=1458026136"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "profileUrl": "={{ $json.profileUrl }}",
+            "username": "={{ $json.username }}",
+            "fullName": "={{ $json.fullName }}",
+            "imgUrl": "={{ $json.imgUrl }}",
+            "Private": "={{ $json.isPrivate }}",
+            "isVerified": "={{ $json.isVerified }}",
+            "query": "={{ $json.query }}",
+            "timestamp": "={{ $json.timestamp }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "profileUrl",
+              "displayName": "profileUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "username",
+              "displayName": "username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fullName",
+              "displayName": "fullName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "imgUrl",
+              "displayName": "imgUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Private",
+              "displayName": "Private",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "isVerified",
+              "displayName": "isVerified",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1340,
+        0
+      ],
+      "id": "fea8c6c0-cbaa-4a46-878f-71614e9f7765",
+      "name": "Add profiles1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xqwkTMJv8ZrYhqaW",
+          "name": "santi@pulpsense.com (1 Mar 25)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.phantombuster.com/api/v2/agents/launch",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "phantombusterApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"id\": \"6921544902794409\",\n    \"argument\": \"{\\\"sessionCookie\\\":\\\"{{ $json.sessionCookie }}\\\",\\\"spreadsheetUrl\\\":\\\"https://www.instagram.com/mkbhd/\\\",\\\"numberMaxOfFollowers\\\":100,\\\"numberofProfilesperLaunch\\\":100}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        460,
+        0
+      ],
+      "id": "c1cb8d2f-46dc-438c-8efd-42e6165b74eb",
+      "name": "Launch Phantombuster2",
+      "credentials": {
+        "phantombusterApi": {
+          "id": "vNCyj62slVOxGQ9U",
+          "name": "Phantombuster account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1v1a4v0y2AKDVMQU6qRfBYJoUeo9YMAs5k3IytZASPbM",
+          "mode": "list",
+          "cachedResultName": "Phantombuster (Nick)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v1a4v0y2AKDVMQU6qRfBYJoUeo9YMAs5k3IytZASPbM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1958537780,
+          "mode": "list",
+          "cachedResultName": "Authentication",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v1a4v0y2AKDVMQU6qRfBYJoUeo9YMAs5k3IytZASPbM/edit#gid=1958537780"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        240,
+        0
+      ],
+      "id": "f6a5c10f-601b-4e73-8dae-0ad10fbaf663",
+      "name": "Get Authorization2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xqwkTMJv8ZrYhqaW",
+          "name": "santi@pulpsense.com (1 Mar 25)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        680,
+        0
+      ],
+      "id": "4706a5e3-32bf-4d8f-b677-6e8bdc7d9764",
+      "name": "Wait 1min2",
+      "webhookId": "902cd338-d8eb-4700-8d9b-651cba1a994c"
+    },
+    {
+      "parameters": {
+        "operation": "getOutput",
+        "agentId": "2444478534304565",
+        "additionalFields": {
+          "prevContainerId": "={{ $('Launch Phantombuster2').item.json.containerId }}"
+        }
+      },
+      "type": "n8n-nodes-base.phantombuster",
+      "typeVersion": 1,
+      "position": [
+        900,
+        0
+      ],
+      "id": "9a93324c-a9b9-4015-b2fe-8f628616be23",
+      "name": "Get Phantombuster Output2",
+      "credentials": {
+        "phantombusterApi": {
+          "id": "vNCyj62slVOxGQ9U",
+          "name": "Phantombuster account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4f8584a3-6e3f-415a-9133-57a1dacfe7ff",
+              "leftValue": "={{ $json.profileUrl }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        0
+      ],
+      "id": "7c8e0143-cfe5-4c8f-bb7d-465a91a824a0",
+      "name": "Filter1"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        20,
+        0
+      ],
+      "id": "a6f813fe-15d9-4cfb-b41a-47c655c904be",
+      "name": "Schedule Trigger2"
+    }
+  ],
+  "pinData": {
+    "Schedule Trigger1": [
+      {
+        "json": {
+          "timestamp": "2025-03-17T22:33:39.988+01:00",
+          "Readable date": "March 17th 2025, 10:33:39 pm",
+          "Readable time": "10:33:39 pm",
+          "Day of week": "Monday",
+          "Year": "2025",
+          "Month": "March",
+          "Day of month": "17",
+          "Hour": "22",
+          "Minute": "33",
+          "Second": "39",
+          "Timezone": "Europe/Berlin (UTC+01:00)"
+        }
+      }
+    ],
+    "Get Authorization1": [
+      {
+        "json": {
+          "row_number": 2,
+          "profileName": "santsleo",
+          "sessionCookie": "1442131862%3AmOL7fqtvYeNOFj%3A25%3AAYcmAb25irKX2__8fzbLdQawDoQ5MuOZEUF8fcSsKg",
+          "lastAccessed": "2025-03-17T21:44:03.532Z"
+        }
+      }
+    ],
+    "Wait 1min1": [
+      {
+        "json": {
+          "containerId": "5504834298189080"
+        }
+      }
+    ],
+    "Get Phantombuster Output1": [
+      {
+        "json": {
+          "query": "profileUrl",
+          "timestamp": "2025-03-18T12:39:57.300Z",
+          "error": "No posts found"
+        }
+      },
+      {
+        "json": {
+          "postUrl": "https://www.instagram.com/p/DHTqmmmz5Yo/",
+          "description": "Ibex Goat😱#facts #science #goat #ibex #trending",
+          "commentCount": 3,
+          "likeCount": 3,
+          "location": "",
+          "locationId": "",
+          "pubDate": "2025-03-17T16:38:51.000Z",
+          "likedByViewer": false,
+          "isSidecar": false,
+          "type": "Video",
+          "videoUrl": "https://scontent-ams4-1.cdninstagram.com/o1/v/t2/f2/m86/AQOMKvDT-BxVNL6ospYT7qmJHrXgrCL0HE0osZXG84gdqo6RO_gUbeyqXxcMSXwnYhLuAs0FrcNSaddCuJWvXIomYqQCezDjM4SsSso.mp4?_nc_cat=103&_nc_sid=5e9851&_nc_ht=scontent-ams4-1.cdninstagram.com&_nc_ohc=9Nf7lnHrddsQ7kNvgHqCok5&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6OTcxODkxNDE1MTM4MzY1LCJ2aV91c2VjYXNlX2lkIjoxMDA5OSwiZHVyYXRpb25fcyI6NTQsInVybGdlbl9zb3VyY2UiOiJ3d3cifQ%3D%3D&ccb=17-1&vs=7888a52d0512d0b9&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC9FQjRBQkNBNTJEOTgzOTc2RkIwNjkzMUZFQzJDOTQ4Rl92aWRlb19kYXNoaW5pdC5tcDQVAALIAQAVAhg6cGFzc3Rocm91Z2hfZXZlcnN0b3JlL0dKUlc2eHlTWEg2eUwxUURBREE2X25yVHdfUXFicV9FQUFBRhUCAsgBACgAGAAbAogHdXNlX29pbAExEnByb2dyZXNzaXZlX3JlY2lwZQExFQAAJvqA-qjD-7kDFQIoAkMzLBdAS3dsi0OVgRgSZGFzaF9iYXNlbGluZV8xX3YxEQB1_gcA&_nc_zt=28&oh=00_AYHKAL0MHGdNLamk_RMXewP0oguxa774jSOg5YZAkZeqEw&oe=67DB40E8",
+          "videoDuration": 54.933,
+          "playCount": 1775,
+          "caption": "",
+          "profileUrl": "https://www.instagram.com/jac_facts_story",
+          "username": "jac_facts_story",
+          "fullName": "JAC Facts Story",
+          "imgUrl": "https://scontent-ams4-1.cdninstagram.com/v/t51.2885-15/485158281_17845065600440929_5414136826229443565_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xMTcweDIwODAuc2RyLmY3NTc2MS5kZWZhdWx0X2NvdmVyX2ZyYW1lIn0&_nc_ht=scontent-ams4-1.cdninstagram.com&_nc_cat=101&_nc_oc=Q6cZ2AG97bRLDTftGm5V8vfE5x7KXfok1YczTZ14rMCItf5Q6v2slKE1pghNyQNyNXW4404&_nc_ohc=m2o0D2edTCUQ7kNvgFLx6v3&_nc_gid=DoM8xIG2TCID7KCSraadwg&edm=ACWDqb8BAAAA&ccb=7-5&ig_cache_key=MzU5MDQwMDY5ODY5MTMyNzUyOA%3D%3D.3-ccb7-5&oh=00_AYHip3-vyZioBh-zJwA3hl13P3riAqvLgcndAK_aCA95jA&oe=67DF4D21&_nc_sid=ee9879",
+          "postId": "3590400698691327528",
+          "query": "https://instagram.com/jac_facts_story",
+          "timestamp": "2025-03-18T12:40:03.345Z"
+        }
+      },
+      {
+        "json": {
+          "query": "https://instagram.com/baghri550",
+          "timestamp": "2025-03-18T12:40:10.919Z",
+          "error": "No post"
+        }
+      },
+      {
+        "json": {
+          "postUrl": "https://www.instagram.com/p/DHUShLII5OD/",
+          "description": "Single 💫👽\n\n#single #video #lifestyle",
+          "commentCount": 1,
+          "likeCount": 2,
+          "location": "DOHA - Qatar",
+          "locationId": "211556535551834",
+          "pubDate": "2025-03-17T22:25:14.000Z",
+          "likedByViewer": false,
+          "isSidecar": false,
+          "type": "Video",
+          "videoUrl": "https://scontent-ams4-1.cdninstagram.com/o1/v/t2/f2/m86/AQNziQcN021RSeZMUOKNvaeB_zOPTBOnbXRXEfdnDIoMIWpN0IkqwzOSw6PdMA8kjOGQEtVZ09CUqxpnkF0FRNTKUSaRR1ouyUpzrSo.mp4?_nc_cat=103&_nc_sid=5e9851&_nc_ht=scontent-ams4-1.cdninstagram.com&_nc_ohc=RMtsx7TH4AQQ7kNvgFDdolX&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6OTk4MTI3MDk1MTIzNDU2LCJ2aV91c2VjYXNlX2lkIjoxMDA5OSwiZHVyYXRpb25fcyI6MTcsInVybGdlbl9zb3VyY2UiOiJ3d3cifQ%3D%3D&ccb=17-1&vs=ca129a68da9d3e24&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC9BQjQwMjQzMDIyOTIzQjcyOThCRDFBNzY4QTQyNTQ5Ml92aWRlb19kYXNoaW5pdC5tcDQVAALIAQAVAhg6cGFzc3Rocm91Z2hfZXZlcnN0b3JlL0dNRUE0UndrZk5CVGExNERBTGxzelB4M2Jtd29icV9FQUFBRhUCAsgBACgAGAAbAogHdXNlX29pbAExEnByb2dyZXNzaXZlX3JlY2lwZQExFQAAJoC4kK_S8sUDFQIoAkMzLBdAMOuFHrhR7BgSZGFzaF9iYXNlbGluZV8xX3YxEQB1_gcA&_nc_zt=28&oh=00_AYEfLxarPRdJS-29Pf9gighy9eb9jeWmHLJe3eilM8xBvQ&oe=67DB3B88",
+          "videoDuration": 17.089,
+          "playCount": 20,
+          "caption": "",
+          "profileUrl": "https://www.instagram.com/sojibdas115",
+          "username": "sojibdas115",
+          "fullName": "Sojib Das",
+          "imgUrl": "https://scontent-ams4-1.cdninstagram.com/v/t51.2885-15/485580462_1805738623487509_7441236938650409862_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi42NDB4MTEzNi5zZHIuZjcxODc4LmRlZmF1bHRfY292ZXJfZnJhbWUifQ&_nc_ht=scontent-ams4-1.cdninstagram.com&_nc_cat=101&_nc_oc=Q6cZ2AHsXW-EipbSifilQzzZ7uoCMW9qe24HClokZfPE7qVH3kBkTWPix883Skc3ikL_SIU&_nc_ohc=gHKnDlM5nx4Q7kNvgEvHFWH&_nc_gid=Yr85RfVi_bnfr1vsVtrNRw&edm=ACWDqb8BAAAA&ccb=7-5&ig_cache_key=MzU5MDU3NjI0NzQ0ODc2OTQxMQ%3D%3D.3-ccb7-5&oh=00_AYEUg11oXctQptmfoN4Uxyct2eTwHZIp4uSGlg85nGr9qA&oe=67DF4428&_nc_sid=ee9879",
+          "postId": "3590576247448769411",
+          "query": "https://instagram.com/sojibdas115",
+          "timestamp": "2025-03-18T12:40:15.609Z"
+        }
+      },
+      {
+        "json": {
+          "query": "https://instagram.com/kenaloty",
+          "timestamp": "2025-03-18T12:40:23.130Z",
+          "error": "No post"
+        }
+      },
+      {
+        "json": {
+          "postUrl": "https://www.instagram.com/p/DHN4z8cIjr6/",
+          "description": "",
+          "commentCount": 0,
+          "likeCount": 1,
+          "location": "",
+          "locationId": "",
+          "pubDate": "2025-03-15T10:41:00.000Z",
+          "likedByViewer": false,
+          "isSidecar": false,
+          "type": "Photo",
+          "caption": "Photo by Txoboy Astro on March 15, 2025. Kan een afbeelding zijn van 1 persoon, glimlachen, bril en tekst.",
+          "profileUrl": "https://www.instagram.com/astrotxoboy",
+          "username": "astrotxoboy",
+          "fullName": "Txoboy Astro",
+          "imgUrl": "https://scontent-ams2-1.cdninstagram.com/v/t51.2885-15/483725198_17847536688429068_8733647998954924103_n.jpg?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi43MjB4NzIwLnNkci5mNzU3NjEuZGVmYXVsdF9pbWFnZSJ9&_nc_ht=scontent-ams2-1.cdninstagram.com&_nc_cat=108&_nc_oc=Q6cZ2AG9iUAXgP5KLTob1eZNbTKserwo3JeCc-MGDSWKWxQNI46xBRmMAb8DDlGrV9zIqTM&_nc_ohc=GgniIei2nokQ7kNvgGxNzW6&_nc_gid=R88r2VJtZjqzvk_j_c67aw&edm=ACWDqb8BAAAA&ccb=7-5&ig_cache_key=MzU4ODc3NDMzODI3ODYwMzUxNA%3D%3D.3-ccb7-5&oh=00_AYHAy0nuhy6qonzDhFXEEVWjWFl-7XchqEfey485ebJMvw&oe=67DF57B9&_nc_sid=ee9879",
+          "postId": "3588774338278603514",
+          "query": "https://instagram.com/astrotxoboy",
+          "timestamp": "2025-03-18T12:40:27.638Z"
+        }
+      },
+      {
+        "json": {
+          "query": "https://instagram.com/ashkan_p83",
+          "timestamp": "2025-03-18T12:40:35.163Z",
+          "error": "No post"
+        }
+      },
+      {
+        "json": {
+          "postUrl": "https://www.instagram.com/p/DHUYSaixKII/",
+          "description": "Messi Messi caracará Messi♥️💙😈",
+          "commentCount": 0,
+          "likeCount": 1,
+          "location": "",
+          "locationId": "",
+          "pubDate": "2025-03-17T23:12:17.000Z",
+          "likedByViewer": false,
+          "isSidecar": false,
+          "type": "Video",
+          "videoUrl": "https://scontent-ams2-1.cdninstagram.com/o1/v/t16/f2/m84/AQN-mkI9rW70hEKGpXOAcvk2EILdN1YqKNw081Xu09zGUdMtTMl1nyCTw5bMwtc-aOK1KRY0yqnCXu7se7fDCpTHdvpv98OtLkp8BUc.mp4?_nc_cat=100&_nc_sid=5e9851&_nc_ht=scontent-ams2-1.cdninstagram.com&_nc_ohc=B2ovpKScLVIQ7kNvgGIHWd8&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uRkVFRC5DMy41NzYuZGFzaF9iYXNlbGluZV8xX3YxIiwieHB2X2Fzc2V0X2lkIjo2NTQxMDMwNzczOTcyNTQsInZpX3VzZWNhc2VfaWQiOjEwMTQ2LCJkdXJhdGlvbl9zIjoxNCwidXJsZ2VuX3NvdXJjZSI6Ind3dyJ9&ccb=17-1&vs=8aed4718618dbdc6&_nc_vs=HBksFQIYTGlnX2JhY2tmaWxsX3RpbWVsaW5lX3ZvZC9GQzQyMjVFNEExNjg0QzQ3Q0ZBOUFFMzIwREVDRUE4Ql92aWRlb19kYXNoaW5pdC5tcDQVAALIAQAVAhg6cGFzc3Rocm91Z2hfZXZlcnN0b3JlL0dCWEQ1eHhuMDY3aGtPY2hBQ3RLcFhCVDZ5OVBia1lMQUFBRhUCAsgBACgAGAAbAogHdXNlX29pbAExEnByb2dyZXNzaXZlX3JlY2lwZQExFQAAJoyMmdnnuakCFQIoAkMzLBdALAAAAAAAABgSZGFzaF9iYXNlbGluZV8xX3YxEQB16gcA&_nc_zt=28&oh=00_AYH_kGorjJ8S3puVggmQU0yOrTCV96jeZZMjTxthFaCGMw&oe=67DB37F4",
+          "videoDuration": 14,
+          "viewCount": 2,
+          "caption": "",
+          "profileUrl": "https://www.instagram.com/txu_benga",
+          "username": "txu_benga",
+          "fullName": "Drip Orochi",
+          "imgUrl": "https://scontent-ams4-1.cdninstagram.com/v/t51.2885-15/483705164_1689168301998511_1117012555363991038_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi42NDB4NjQwLnNkci5mNzE4NzguZGVmYXVsdF9jb3Zlcl9mcmFtZSJ9&_nc_ht=scontent-ams4-1.cdninstagram.com&_nc_cat=107&_nc_oc=Q6cZ2AFJ5F1dJ_ubhRy-CdXVzsMuJL0d_oEdn_tRul-iX1moClc6cpSKPrDDVEOL64VZJ9Q&_nc_ohc=ho4BfC-nwT0Q7kNvgFbIfoS&_nc_gid=PS8VmLdEwgdUKPDR_2z8eg&edm=ACWDqb8BAAAA&ccb=7-5&ig_cache_key=MzU5MDYwMTYyMTQ4ODU3NDk4NA%3D%3D.3-ccb7-5&oh=00_AYFCSiVsb5-uBZ2Uy1IYHG68k__NjlcUV3LV8PsmDuttVg&oe=67DF3D79&_nc_sid=ee9879",
+          "postId": "3590601621488574984",
+          "query": "https://instagram.com/txu_benga",
+          "timestamp": "2025-03-18T12:40:42.496Z"
+        }
+      },
+      {
+        "json": {
+          "error": "Page isn't available",
+          "query": "https://instagram.com/wisdomedikan",
+          "timestamp": "2025-03-18T12:40:57.572Z"
+        }
+      },
+      {
+        "json": {
+          "query": "https://instagram.com/elmaaa__06",
+          "timestamp": "2025-03-18T12:41:00.739Z",
+          "error": "Can't access posts"
+        }
+      }
+    ],
+    "Launch Phantombuster1": [
+      {
+        "json": {
+          "containerId": "5504834298189080"
+        }
+      }
+    ],
+    "OpenAI": [
+      {
+        "json": {
+          "content": "Nice pic! That red jacket really stands out."
+        }
+      }
+    ],
+    "Filter Posts Founded": [
+      {
+        "json": {
+          "postUrl": "https://www.instagram.com/p/DHN4z8cIjr6/",
+          "description": "",
+          "commentCount": 0,
+          "likeCount": 1,
+          "location": "",
+          "locationId": "",
+          "pubDate": "2025-03-15T10:41:00.000Z",
+          "likedByViewer": false,
+          "isSidecar": false,
+          "type": "Photo",
+          "caption": "Photo by Txoboy Astro on March 15, 2025. Kan een afbeelding zijn van 1 persoon, glimlachen, bril en tekst.",
+          "profileUrl": "https://www.instagram.com/astrotxoboy",
+          "username": "astrotxoboy",
+          "fullName": "Txoboy Astro",
+          "imgUrl": "https://scontent-ams2-1.cdninstagram.com/v/t51.2885-15/483725198_17847536688429068_8733647998954924103_n.jpg?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi43MjB4NzIwLnNkci5mNzU3NjEuZGVmYXVsdF9pbWFnZSJ9&_nc_ht=scontent-ams2-1.cdninstagram.com&_nc_cat=108&_nc_oc=Q6cZ2AG9iUAXgP5KLTob1eZNbTKserwo3JeCc-MGDSWKWxQNI46xBRmMAb8DDlGrV9zIqTM&_nc_ohc=GgniIei2nokQ7kNvgGxNzW6&_nc_gid=R88r2VJtZjqzvk_j_c67aw&edm=ACWDqb8BAAAA&ccb=7-5&ig_cache_key=MzU4ODc3NDMzODI3ODYwMzUxNA%3D%3D.3-ccb7-5&oh=00_AYHAy0nuhy6qonzDhFXEEVWjWFl-7XchqEfey485ebJMvw&oe=67DF57B9&_nc_sid=ee9879",
+          "postId": "3588774338278603514",
+          "query": "https://instagram.com/astrotxoboy",
+          "timestamp": "2025-03-18T12:40:27.638Z"
+        }
+      }
+    ],
+    "Add Posts": [
+      {
+        "json": {
+          "profileUrl": "https://www.instagram.com/astrotxoboy",
+          "username": "astrotxoboy",
+          "fullName": "Txoboy Astro",
+          "imgUrl": "https://scontent-ams2-1.cdninstagram.com/v/t51.2885-15/483725198_17847536688429068_8733647998954924103_n.jpg?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi43MjB4NzIwLnNkci5mNzU3NjEuZGVmYXVsdF9pbWFnZSJ9&_nc_ht=scontent-ams2-1.cdninstagram.com&_nc_cat=108&_nc_oc=Q6cZ2AG9iUAXgP5KLTob1eZNbTKserwo3JeCc-MGDSWKWxQNI46xBRmMAb8DDlGrV9zIqTM&_nc_ohc=GgniIei2nokQ7kNvgGxNzW6&_nc_gid=R88r2VJtZjqzvk_j_c67aw&edm=ACWDqb8BAAAA&ccb=7-5&ig_cache_key=MzU4ODc3NDMzODI3ODYwMzUxNA%3D%3D.3-ccb7-5&oh=00_AYHAy0nuhy6qonzDhFXEEVWjWFl-7XchqEfey485ebJMvw&oe=67DF57B9&_nc_sid=ee9879",
+          "query": "https://instagram.com/astrotxoboy",
+          "timestamp": "2025-03-18T12:40:27.638Z",
+          "postUrl": "https://www.instagram.com/p/DHN4z8cIjr6/",
+          "description": "",
+          "commentCount": 0,
+          "likeCount": 1,
+          "location": "",
+          "locationId": "2025-03-15T10:41:00.000Z",
+          "pubDate": "2025-03-15T10:41:00.000Z",
+          "likedByViewer": false,
+          "isSidecar": false,
+          "type": "Photo",
+          "caption": "Photo by Txoboy Astro on March 15, 2025. Kan een afbeelding zijn van 1 persoon, glimlachen, bril en tekst.",
+          "postId": "3588774338278603514",
+          "DM": "Nice pic! That red jacket really stands out."
+        }
+      }
+    ],
+    "Schedule Trigger2": [
+      {
+        "json": {
+          "timestamp": "2025-03-17T22:33:39.988+01:00",
+          "Readable date": "March 17th 2025, 10:33:39 pm",
+          "Readable time": "10:33:39 pm",
+          "Day of week": "Monday",
+          "Year": "2025",
+          "Month": "March",
+          "Day of month": "17",
+          "Hour": "22",
+          "Minute": "33",
+          "Second": "39",
+          "Timezone": "Europe/Berlin (UTC+01:00)"
+        }
+      }
+    ],
+    "Get Authorization2": [
+      {
+        "json": {
+          "row_number": 2,
+          "profileName": "santsleo",
+          "sessionCookie": "1442131862%3AmOL7fqtvYeNOFj%3A25%3AAYcmAb25irKX2__8fzbLdQawDoQ5MuOZEUF8fcSsKg",
+          "lastAccessed": "2025-03-17T21:44:03.532Z"
+        }
+      }
+    ],
+    "Wait 1min2": [
+      {
+        "json": {
+          "containerId": "5504834298189080"
+        }
+      }
+    ],
+    "Get Phantombuster Output2": [
+      {
+        "json": {
+          "query": "profileUrl",
+          "timestamp": "2025-03-18T12:39:57.300Z",
+          "error": "No posts found"
+        }
+      },
+      {
+        "json": {
+          "postUrl": "https://www.instagram.com/p/DHTqmmmz5Yo/",
+          "description": "Ibex Goat😱#facts #science #goat #ibex #trending",
+          "commentCount": 3,
+          "likeCount": 3,
+          "location": "",
+          "locationId": "",
+          "pubDate": "2025-03-17T16:38:51.000Z",
+          "likedByViewer": false,
+          "isSidecar": false,
+          "type": "Video",
+          "videoUrl": "https://scontent-ams4-1.cdninstagram.com/o1/v/t2/f2/m86/AQOMKvDT-BxVNL6ospYT7qmJHrXgrCL0HE0osZXG84gdqo6RO_gUbeyqXxcMSXwnYhLuAs0FrcNSaddCuJWvXIomYqQCezDjM4SsSso.mp4?_nc_cat=103&_nc_sid=5e9851&_nc_ht=scontent-ams4-1.cdninstagram.com&_nc_ohc=9Nf7lnHrddsQ7kNvgHqCok5&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6OTcxODkxNDE1MTM4MzY1LCJ2aV91c2VjYXNlX2lkIjoxMDA5OSwiZHVyYXRpb25fcyI6NTQsInVybGdlbl9zb3VyY2UiOiJ3d3cifQ%3D%3D&ccb=17-1&vs=7888a52d0512d0b9&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC9FQjRBQkNBNTJEOTgzOTc2RkIwNjkzMUZFQzJDOTQ4Rl92aWRlb19kYXNoaW5pdC5tcDQVAALIAQAVAhg6cGFzc3Rocm91Z2hfZXZlcnN0b3JlL0dKUlc2eHlTWEg2eUwxUURBREE2X25yVHdfUXFicV9FQUFBRhUCAsgBACgAGAAbAogHdXNlX29pbAExEnByb2dyZXNzaXZlX3JlY2lwZQExFQAAJvqA-qjD-7kDFQIoAkMzLBdAS3dsi0OVgRgSZGFzaF9iYXNlbGluZV8xX3YxEQB1_gcA&_nc_zt=28&oh=00_AYHKAL0MHGdNLamk_RMXewP0oguxa774jSOg5YZAkZeqEw&oe=67DB40E8",
+          "videoDuration": 54.933,
+          "playCount": 1775,
+          "caption": "",
+          "profileUrl": "https://www.instagram.com/jac_facts_story",
+          "username": "jac_facts_story",
+          "fullName": "JAC Facts Story",
+          "imgUrl": "https://scontent-ams4-1.cdninstagram.com/v/t51.2885-15/485158281_17845065600440929_5414136826229443565_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi4xMTcweDIwODAuc2RyLmY3NTc2MS5kZWZhdWx0X2NvdmVyX2ZyYW1lIn0&_nc_ht=scontent-ams4-1.cdninstagram.com&_nc_cat=101&_nc_oc=Q6cZ2AG97bRLDTftGm5V8vfE5x7KXfok1YczTZ14rMCItf5Q6v2slKE1pghNyQNyNXW4404&_nc_ohc=m2o0D2edTCUQ7kNvgFLx6v3&_nc_gid=DoM8xIG2TCID7KCSraadwg&edm=ACWDqb8BAAAA&ccb=7-5&ig_cache_key=MzU5MDQwMDY5ODY5MTMyNzUyOA%3D%3D.3-ccb7-5&oh=00_AYHip3-vyZioBh-zJwA3hl13P3riAqvLgcndAK_aCA95jA&oe=67DF4D21&_nc_sid=ee9879",
+          "postId": "3590400698691327528",
+          "query": "https://instagram.com/jac_facts_story",
+          "timestamp": "2025-03-18T12:40:03.345Z"
+        }
+      },
+      {
+        "json": {
+          "query": "https://instagram.com/baghri550",
+          "timestamp": "2025-03-18T12:40:10.919Z",
+          "error": "No post"
+        }
+      },
+      {
+        "json": {
+          "postUrl": "https://www.instagram.com/p/DHUShLII5OD/",
+          "description": "Single 💫👽\n\n#single #video #lifestyle",
+          "commentCount": 1,
+          "likeCount": 2,
+          "location": "DOHA - Qatar",
+          "locationId": "211556535551834",
+          "pubDate": "2025-03-17T22:25:14.000Z",
+          "likedByViewer": false,
+          "isSidecar": false,
+          "type": "Video",
+          "videoUrl": "https://scontent-ams4-1.cdninstagram.com/o1/v/t2/f2/m86/AQNziQcN021RSeZMUOKNvaeB_zOPTBOnbXRXEfdnDIoMIWpN0IkqwzOSw6PdMA8kjOGQEtVZ09CUqxpnkF0FRNTKUSaRR1ouyUpzrSo.mp4?_nc_cat=103&_nc_sid=5e9851&_nc_ht=scontent-ams4-1.cdninstagram.com&_nc_ohc=RMtsx7TH4AQQ7kNvgFDdolX&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uQ0xJUFMuQzMuNzIwLmRhc2hfYmFzZWxpbmVfMV92MSIsInhwdl9hc3NldF9pZCI6OTk4MTI3MDk1MTIzNDU2LCJ2aV91c2VjYXNlX2lkIjoxMDA5OSwiZHVyYXRpb25fcyI6MTcsInVybGdlbl9zb3VyY2UiOiJ3d3cifQ%3D%3D&ccb=17-1&vs=ca129a68da9d3e24&_nc_vs=HBksFQIYUmlnX3hwdl9yZWVsc19wZXJtYW5lbnRfc3JfcHJvZC9BQjQwMjQzMDIyOTIzQjcyOThCRDFBNzY4QTQyNTQ5Ml92aWRlb19kYXNoaW5pdC5tcDQVAALIAQAVAhg6cGFzc3Rocm91Z2hfZXZlcnN0b3JlL0dNRUE0UndrZk5CVGExNERBTGxzelB4M2Jtd29icV9FQUFBRhUCAsgBACgAGAAbAogHdXNlX29pbAExEnByb2dyZXNzaXZlX3JlY2lwZQExFQAAJoC4kK_S8sUDFQIoAkMzLBdAMOuFHrhR7BgSZGFzaF9iYXNlbGluZV8xX3YxEQB1_gcA&_nc_zt=28&oh=00_AYEfLxarPRdJS-29Pf9gighy9eb9jeWmHLJe3eilM8xBvQ&oe=67DB3B88",
+          "videoDuration": 17.089,
+          "playCount": 20,
+          "caption": "",
+          "profileUrl": "https://www.instagram.com/sojibdas115",
+          "username": "sojibdas115",
+          "fullName": "Sojib Das",
+          "imgUrl": "https://scontent-ams4-1.cdninstagram.com/v/t51.2885-15/485580462_1805738623487509_7441236938650409862_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi42NDB4MTEzNi5zZHIuZjcxODc4LmRlZmF1bHRfY292ZXJfZnJhbWUifQ&_nc_ht=scontent-ams4-1.cdninstagram.com&_nc_cat=101&_nc_oc=Q6cZ2AHsXW-EipbSifilQzzZ7uoCMW9qe24HClokZfPE7qVH3kBkTWPix883Skc3ikL_SIU&_nc_ohc=gHKnDlM5nx4Q7kNvgEvHFWH&_nc_gid=Yr85RfVi_bnfr1vsVtrNRw&edm=ACWDqb8BAAAA&ccb=7-5&ig_cache_key=MzU5MDU3NjI0NzQ0ODc2OTQxMQ%3D%3D.3-ccb7-5&oh=00_AYEUg11oXctQptmfoN4Uxyct2eTwHZIp4uSGlg85nGr9qA&oe=67DF4428&_nc_sid=ee9879",
+          "postId": "3590576247448769411",
+          "query": "https://instagram.com/sojibdas115",
+          "timestamp": "2025-03-18T12:40:15.609Z"
+        }
+      },
+      {
+        "json": {
+          "query": "https://instagram.com/kenaloty",
+          "timestamp": "2025-03-18T12:40:23.130Z",
+          "error": "No post"
+        }
+      },
+      {
+        "json": {
+          "postUrl": "https://www.instagram.com/p/DHN4z8cIjr6/",
+          "description": "",
+          "commentCount": 0,
+          "likeCount": 1,
+          "location": "",
+          "locationId": "",
+          "pubDate": "2025-03-15T10:41:00.000Z",
+          "likedByViewer": false,
+          "isSidecar": false,
+          "type": "Photo",
+          "caption": "Photo by Txoboy Astro on March 15, 2025. Kan een afbeelding zijn van 1 persoon, glimlachen, bril en tekst.",
+          "profileUrl": "https://www.instagram.com/astrotxoboy",
+          "username": "astrotxoboy",
+          "fullName": "Txoboy Astro",
+          "imgUrl": "https://scontent-ams2-1.cdninstagram.com/v/t51.2885-15/483725198_17847536688429068_8733647998954924103_n.jpg?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi43MjB4NzIwLnNkci5mNzU3NjEuZGVmYXVsdF9pbWFnZSJ9&_nc_ht=scontent-ams2-1.cdninstagram.com&_nc_cat=108&_nc_oc=Q6cZ2AG9iUAXgP5KLTob1eZNbTKserwo3JeCc-MGDSWKWxQNI46xBRmMAb8DDlGrV9zIqTM&_nc_ohc=GgniIei2nokQ7kNvgGxNzW6&_nc_gid=R88r2VJtZjqzvk_j_c67aw&edm=ACWDqb8BAAAA&ccb=7-5&ig_cache_key=MzU4ODc3NDMzODI3ODYwMzUxNA%3D%3D.3-ccb7-5&oh=00_AYHAy0nuhy6qonzDhFXEEVWjWFl-7XchqEfey485ebJMvw&oe=67DF57B9&_nc_sid=ee9879",
+          "postId": "3588774338278603514",
+          "query": "https://instagram.com/astrotxoboy",
+          "timestamp": "2025-03-18T12:40:27.638Z"
+        }
+      },
+      {
+        "json": {
+          "query": "https://instagram.com/ashkan_p83",
+          "timestamp": "2025-03-18T12:40:35.163Z",
+          "error": "No post"
+        }
+      },
+      {
+        "json": {
+          "postUrl": "https://www.instagram.com/p/DHUYSaixKII/",
+          "description": "Messi Messi caracará Messi♥️💙😈",
+          "commentCount": 0,
+          "likeCount": 1,
+          "location": "",
+          "locationId": "",
+          "pubDate": "2025-03-17T23:12:17.000Z",
+          "likedByViewer": false,
+          "isSidecar": false,
+          "type": "Video",
+          "videoUrl": "https://scontent-ams2-1.cdninstagram.com/o1/v/t16/f2/m84/AQN-mkI9rW70hEKGpXOAcvk2EILdN1YqKNw081Xu09zGUdMtTMl1nyCTw5bMwtc-aOK1KRY0yqnCXu7se7fDCpTHdvpv98OtLkp8BUc.mp4?_nc_cat=100&_nc_sid=5e9851&_nc_ht=scontent-ams2-1.cdninstagram.com&_nc_ohc=B2ovpKScLVIQ7kNvgGIHWd8&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5JTlNUQUdSQU0uRkVFRC5DMy41NzYuZGFzaF9iYXNlbGluZV8xX3YxIiwieHB2X2Fzc2V0X2lkIjo2NTQxMDMwNzczOTcyNTQsInZpX3VzZWNhc2VfaWQiOjEwMTQ2LCJkdXJhdGlvbl9zIjoxNCwidXJsZ2VuX3NvdXJjZSI6Ind3dyJ9&ccb=17-1&vs=8aed4718618dbdc6&_nc_vs=HBksFQIYTGlnX2JhY2tmaWxsX3RpbWVsaW5lX3ZvZC9GQzQyMjVFNEExNjg0QzQ3Q0ZBOUFFMzIwREVDRUE4Ql92aWRlb19kYXNoaW5pdC5tcDQVAALIAQAVAhg6cGFzc3Rocm91Z2hfZXZlcnN0b3JlL0dCWEQ1eHhuMDY3aGtPY2hBQ3RLcFhCVDZ5OVBia1lMQUFBRhUCAsgBACgAGAAbAogHdXNlX29pbAExEnByb2dyZXNzaXZlX3JlY2lwZQExFQAAJoyMmdnnuakCFQIoAkMzLBdALAAAAAAAABgSZGFzaF9iYXNlbGluZV8xX3YxEQB16gcA&_nc_zt=28&oh=00_AYH_kGorjJ8S3puVggmQU0yOrTCV96jeZZMjTxthFaCGMw&oe=67DB37F4",
+          "videoDuration": 14,
+          "viewCount": 2,
+          "caption": "",
+          "profileUrl": "https://www.instagram.com/txu_benga",
+          "username": "txu_benga",
+          "fullName": "Drip Orochi",
+          "imgUrl": "https://scontent-ams4-1.cdninstagram.com/v/t51.2885-15/483705164_1689168301998511_1117012555363991038_n.jpg?stp=dst-jpg_e15_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi42NDB4NjQwLnNkci5mNzE4NzguZGVmYXVsdF9jb3Zlcl9mcmFtZSJ9&_nc_ht=scontent-ams4-1.cdninstagram.com&_nc_cat=107&_nc_oc=Q6cZ2AFJ5F1dJ_ubhRy-CdXVzsMuJL0d_oEdn_tRul-iX1moClc6cpSKPrDDVEOL64VZJ9Q&_nc_ohc=ho4BfC-nwT0Q7kNvgFbIfoS&_nc_gid=PS8VmLdEwgdUKPDR_2z8eg&edm=ACWDqb8BAAAA&ccb=7-5&ig_cache_key=MzU5MDYwMTYyMTQ4ODU3NDk4NA%3D%3D.3-ccb7-5&oh=00_AYFCSiVsb5-uBZ2Uy1IYHG68k__NjlcUV3LV8PsmDuttVg&oe=67DF3D79&_nc_sid=ee9879",
+          "postId": "3590601621488574984",
+          "query": "https://instagram.com/txu_benga",
+          "timestamp": "2025-03-18T12:40:42.496Z"
+        }
+      },
+      {
+        "json": {
+          "error": "Page isn't available",
+          "query": "https://instagram.com/wisdomedikan",
+          "timestamp": "2025-03-18T12:40:57.572Z"
+        }
+      },
+      {
+        "json": {
+          "query": "https://instagram.com/elmaaa__06",
+          "timestamp": "2025-03-18T12:41:00.739Z",
+          "error": "Can't access posts"
+        }
+      }
+    ],
+    "Launch Phantombuster2": [
+      {
+        "json": {
+          "containerId": "5504834298189080"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Add Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Posts Founded": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Get Authorization1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Authorization1": {
+      "main": [
+        [
+          {
+            "node": "Launch Phantombuster1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 1min1": {
+      "main": [
+        [
+          {
+            "node": "Get Phantombuster Output1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Phantombuster Output1": {
+      "main": [
+        [
+          {
+            "node": "Filter Posts Founded",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Launch Phantombuster1": {
+      "main": [
+        [
+          {
+            "node": "Wait 1min1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Launch Phantombuster2": {
+      "main": [
+        [
+          {
+            "node": "Wait 1min2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Authorization2": {
+      "main": [
+        [
+          {
+            "node": "Launch Phantombuster2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 1min2": {
+      "main": [
+        [
+          {
+            "node": "Get Phantombuster Output2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Phantombuster Output2": {
+      "main": [
+        [
+          {
+            "node": "Filter1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter1": {
+      "main": [
+        [
+          {
+            "node": "Add profiles1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger2": {
+      "main": [
+        [
+          {
+            "node": "Get Authorization2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "89623c8a-5ced-4f78-918b-69acfafeec28",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b0dcdc2a61168afbc3bb8907befe60a34408308859f86b899e8ba57a64038046"
+  },
+  "id": "mxKzjpFAw6lnCkOs",
+  "tags": [
+    {
+      "createdAt": "2025-02-25T16:53:08.138Z",
+      "updatedAt": "2025-02-25T16:53:08.138Z",
+      "id": "987WX9PvnYkGNzpl",
+      "name": "Nick n8n"
+    }
+  ]
+}

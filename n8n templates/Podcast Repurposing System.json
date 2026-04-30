@@ -1,0 +1,846 @@
+{
+  "name": "AI PODCAST REPURPOSING ENGINE (1)",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/dB9f4B02ocpTICIEY/run-sync-get-dataset-items",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_APIFY_API_TOKEN"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"includeTimestamps\": \"No\",\n    \"startUrls\": [\n        \"{{ $json['YouTube URL'] }}\"\n    ]\n}",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        180,
+        200
+      ],
+      "id": "94adcda6-6cce-4d81-89eb-f517aa29cbb4",
+      "name": "Get Transcript via Apify"
+    },
+    {
+      "parameters": {
+        "authentication": "basicAuth",
+        "formTitle": "Insert a Podcast, Get Content",
+        "formDescription": "Hey—this is an AI podcast repurposing engine. If you insert a YouTube link to a podcast, we'll generate a bunch of formatted content for you & post to relevant social media platforms.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "YouTube URL",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -20,
+        200
+      ],
+      "id": "49bd5df1-c9e4-4a69-95f2-17eada0e7d47",
+      "name": "On form submission",
+      "webhookId": "e459eaef-5470-4c8f-be46-899930508777",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "G9fv9EzHaTdmtYXb",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are a helpful, intelligent content writing assistant that works with transcripts.",
+              "role": "system"
+            },
+            {
+              "content": "You take as input a long, meandering transcript, and you identify the 10 most interesting, engaging points. \n\nYou then generate JSON containing those interesting, engaging points in this structure:\n\n{\n  \"sections\": [\n    {\n      \"number\": 1,\n      \"paragraphTranscript\": \"paragraph of the relevant part of the transcript goes here.\",\n      \"contextAndFeedback\": \"a description of why this point is interesting, and some ways to make it even better.\",\n      \"deepExplanation\": \"a one-paragraph writeup based on the transcript section that expands upon its points, clarifies any ambiguities, and generally fills in any blanks.\",\n      \"shortImageDescription\": \"a one-sentence description of an image that illustrates the concept. description must have one, simple character (like a bunny or an animal) and be catered to a younger audience. Image description should never talk about text.\"\n    }\n  ]\n}\n\nRules:\n- Write in a spartan, laconic tone of voice.\n- Copy any transcript sections exactly as they are.\n- Look for unorthodox, or interesting ways to make the content better in the contextAndFeedback string.\n- Make sure your paragraphTranscript string is longer than just one sentence. Try and capture at least one whole paragraph of the transcript.\n\nGenerate 10 points. The transcript is below:"
+            },
+            {
+              "content": "={{ $json.videoTitle }}\n\n{{ $json.transcript }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        380,
+        200
+      ],
+      "id": "d9de8e06-288a-4f42-9659-9e10c5d0aa06",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "kRhXLl2JwVGc05AE",
+          "name": "YouTube_Feb 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are a helpful, intelligent content writing assistant that generates Instagram posts.",
+              "role": "system"
+            },
+            {
+              "content": "You take as input a section of a transcript, along with some observations about that section and some points of feedback, and use it to generate a clean, beautifully-formatted Instagram post in this format:\n\n{\n  \"instagramPostCopy\": \"copyGoesHere\"\n}\n\nRules:\n- Write in a spartan, laconic tone of voice. No explanation points. No leading questions or emojis. Write like a business professor talking bluntly to his students, except simpler (favor words with fewer syllables wherever possible).\n- Instagram posts truncate after a paragraph. So write an engaging first paragraph, and then context around the rest of the point underneath that paragraph.\n- At the end of the post, add 5 relevant hashtags (#).\n- Generate your newlines as \\n characters instead of full linebreaks. There should be no actual linebreaks (only \\n characters). "
+            },
+            {
+              "content": "=transcript: {{ $json.paragraphTranscript }}\n\ncontextAndFeedback: {{ $json.contextAndFeedback }}\n\ndeepExplanations: {{ $json.deepExplanation }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        1140,
+        40
+      ],
+      "id": "dc8d3f8c-3e35-4ec4-a39a-12183e64ad19",
+      "name": "Instagram Post Generator",
+      "credentials": {
+        "openAiApi": {
+          "id": "kRhXLl2JwVGc05AE",
+          "name": "YouTube_Feb 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        940,
+        200
+      ],
+      "id": "aef51154-7ed8-4a49-a7d9-fd79c9c9c869",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "message.content.sections",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        740,
+        200
+      ],
+      "id": "3ce52bd4-5a74-4b9d-b875-a842a9a1cb76",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are a helpful, intelligent content writing assistant that generates Facebook posts.",
+              "role": "system"
+            },
+            {
+              "content": "You take as input a section of a transcript, along with some observations about that section and some points of feedback, and use it to generate a clean, beautifully-formatted Facebook post in this format:\n\n{\n  \"facebookPostCopy\": \"copyGoesHere\",\n}\n\nRules:\n- Write in a spartan, laconic tone of voice. No explanation points. No leading questions or emojis. Write like a business professor talking bluntly to his students, except simpler (favor words with fewer syllables wherever possible).\n- Facebook posts truncate after a paragraph. So write an engaging first paragraph, and then context around the rest of the point underneath that paragraph.\n- At the end of the post, add 5 relevant hashtags (#).\n- Generate your newlines as \\n characters instead of full linebreaks. There should be no actual linebreaks (only \\n characters). "
+            },
+            {
+              "content": "=transcript: {{ $json.paragraphTranscript }}\n\ncontextAndFeedback: {{ $json.contextAndFeedback }}\n\ndeepExplanations: {{ $json.deepExplanation }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        1140,
+        400
+      ],
+      "id": "8b9ecde4-7d1c-4395-a7ef-e58131923efd",
+      "name": "Facebook Post Generator",
+      "credentials": {
+        "openAiApi": {
+          "id": "kRhXLl2JwVGc05AE",
+          "name": "YouTube_Feb 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are a helpful, intelligent content writing assistant that generates LinkedIn posts.",
+              "role": "system"
+            },
+            {
+              "content": "You take as input a section of a transcript, along with some observations about that section and some points of feedback, and use it to generate a clean, beautifully-formatted LinkedIn post in this format:\n\n{\n  \"linkedInPostCopy\": \"copyGoesHere\"\n}\n\nRules:\n- Write in a spartan, laconic tone of voice. No explanation points. No leading questions or emojis. Write like a business professor talking bluntly to his students, except simpler (favor words with fewer syllables wherever possible).\n- LinkedIn posts truncate after a paragraph. So write an engaging first paragraph, and then context around the rest of the point underneath that paragraph.\n- Generate your newlines as \\n characters instead of full linebreaks. There should be no actual linebreaks (only \\n characters). "
+            },
+            {
+              "content": "=transcript: {{ $json.paragraphTranscript }}\n\ncontextAndFeedback: {{ $json.contextAndFeedback }}\n\ndeepExplanations: {{ $json.deepExplanation }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        1140,
+        220
+      ],
+      "id": "a1406c3e-3be2-4cfe-896b-2b78c5caa832",
+      "name": "LinkedIn Post Generator",
+      "credentials": {
+        "openAiApi": {
+          "id": "kRhXLl2JwVGc05AE",
+          "name": "YouTube_Feb 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "=Colorful, soft watercolor of {{ $('Loop Over Items').item.json.shortImageDescription }}",
+        "options": {
+          "size": "1024x1024",
+          "style": "natural",
+          "returnImageUrls": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        1500,
+        220
+      ],
+      "id": "a53538f3-6381-4397-9d71-5f5450090294",
+      "name": "Generate LI Image",
+      "credentials": {
+        "openAiApi": {
+          "id": "kRhXLl2JwVGc05AE",
+          "name": "YouTube_Feb 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "=Colorful, soft watercolor of {{ $('Loop Over Items').item.json.shortImageDescription }}",
+        "options": {
+          "size": "1024x1024",
+          "style": "natural",
+          "returnImageUrls": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        1500,
+        40
+      ],
+      "id": "b1b8b521-a9c0-40fe-8c1a-c7aa4d5f3c96",
+      "name": "Generate IG Image",
+      "credentials": {
+        "openAiApi": {
+          "id": "kRhXLl2JwVGc05AE",
+          "name": "YouTube_Feb 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "=Colorful, soft watercolor of {{ $('Loop Over Items').item.json.shortImageDescription }}",
+        "options": {
+          "size": "1792x1024",
+          "style": "natural",
+          "returnImageUrls": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        1500,
+        400
+      ],
+      "id": "396eb14a-2da2-41b9-8f71-1d072459405c",
+      "name": "Generate FB Image",
+      "credentials": {
+        "openAiApi": {
+          "id": "kRhXLl2JwVGc05AE",
+          "name": "YouTube_Feb 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"imageUrl\": \"{{ $json.url }}\",\n  \"postBody\": \"{{ $('Facebook Post Generator').item.json.message.content.facebookPostCopy.replaceAll(/\\n/g,' ') }}\",\n  \"platform\": \"Facebook\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1720,
+        400
+      ],
+      "id": "4c972d86-f6b7-4dea-92a9-0f3fdc4d7746",
+      "name": "Set FB JSON"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"imageUrl\": \"{{ $json.url }}\",\n  \"postBody\": \"{{ $('LinkedIn Post Generator').item.json.message.content.linkedInPostCopy.replaceAll(/\\n/g,' ') }}\",\n  \"platform\": \"LinkedIn\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1720,
+        220
+      ],
+      "id": "420731d2-3c8d-4601-9066-c66ea5dfce0f",
+      "name": "Set LI JSON"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"imageUrl\": \"{{ $json.url }}\",\n  \"postBody\": \"{{ $('Instagram Post Generator').item.json.message.content.instagramPostCopy.replaceAll(/\\n/g,' ')}}\",\n  \"platform\": \"Instagram\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1720,
+        40
+      ],
+      "id": "7a6b48e6-0d5c-44b5-9815-a063c61a242f",
+      "name": "Set IG JSON"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1nygJkUJJCotBuqSzVnShPhFzROZW9Po_wGzC9ftt0Aw",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "=Instagram",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "postBody": "={{ $json.postBody }}",
+            "postImage": "={{ $json.imageUrl }}",
+            "dateAdded": "={{ $now.format('DD') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "dateAdded",
+              "displayName": "dateAdded",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "postBody",
+              "displayName": "postBody",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "postImage",
+              "displayName": "postImage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1920,
+        40
+      ],
+      "id": "570b64ab-05e4-4ae0-8225-eb3d3af41e05",
+      "name": "Add to IG Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "06fihJgQOwWsguVO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1nygJkUJJCotBuqSzVnShPhFzROZW9Po_wGzC9ftt0Aw",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "=LinkedIn",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "postBody": "={{ $json.postBody }}",
+            "postImage": "={{ $json.imageUrl }}",
+            "dateAdded": "={{ $now.format('DD') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "dateAdded",
+              "displayName": "dateAdded",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "postBody",
+              "displayName": "postBody",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "postImage",
+              "displayName": "postImage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1920,
+        220
+      ],
+      "id": "f6aee6a6-c3b2-4e27-b182-7b85dcbc8b9a",
+      "name": "Add to LI Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "06fihJgQOwWsguVO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1nygJkUJJCotBuqSzVnShPhFzROZW9Po_wGzC9ftt0Aw",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "=Facebook",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "postBody": "={{ $json.postBody }}",
+            "postImage": "={{ $json.imageUrl }}",
+            "dateAdded": "={{ $now.format('DD') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "dateAdded",
+              "displayName": "dateAdded",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "postBody",
+              "displayName": "postBody",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "postImage",
+              "displayName": "postImage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1920,
+        400
+      ],
+      "id": "a07492ac-3638-4eda-8df2-1901fe93fe96",
+      "name": "Add to FB Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "06fihJgQOwWsguVO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        2200,
+        220
+      ],
+      "id": "e49ce53d-f82f-4953-9bb0-beb7097f1565",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Congratulations! Your content has been produced.",
+        "completionMessage": "Check your content calendar for the specific posts. Link for convenience: https://docs.google.com/spreadsheets/d/1nygJkUJJCotBuqSzVnShPhFzROZW9Po_wGzC9ftt0Aw/edit?gid=496654498#gid=496654498",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        -140
+      ],
+      "id": "784b6795-26cf-4b98-beae-516a6e56a91b",
+      "name": "Form",
+      "webhookId": "c6973afe-e6d9-43dc-ba72-2d7ff528089e"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Get Transcript via Apify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Transcript via Apify": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Form",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Instagram Post Generator",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "LinkedIn Post Generator",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Facebook Post Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Instagram Post Generator": {
+      "main": [
+        [
+          {
+            "node": "Generate IG Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Facebook Post Generator": {
+      "main": [
+        [
+          {
+            "node": "Generate FB Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LinkedIn Post Generator": {
+      "main": [
+        [
+          {
+            "node": "Generate LI Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate LI Image": {
+      "main": [
+        [
+          {
+            "node": "Set LI JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate IG Image": {
+      "main": [
+        [
+          {
+            "node": "Set IG JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate FB Image": {
+      "main": [
+        [
+          {
+            "node": "Set FB JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set FB JSON": {
+      "main": [
+        [
+          {
+            "node": "Add to FB Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set LI JSON": {
+      "main": [
+        [
+          {
+            "node": "Add to LI Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set IG JSON": {
+      "main": [
+        [
+          {
+            "node": "Add to IG Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add to IG Sheet": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add to LI Sheet": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Add to FB Sheet": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7c9bc131-b64c-446e-966b-5235a2782929",
+  "meta": {
+    "instanceId": "d7661a849ead114a9aa6d9ceaf4160465aeb79532a35bde62160c840ffba9fc8"
+  },
+  "id": "c7G8DAzoqQIPrS66",
+  "tags": [
+    {
+      "createdAt": "2025-01-23T18:12:52.273Z",
+      "updatedAt": "2025-01-23T18:12:52.273Z",
+      "id": "l8MPK4ZirgwFWMno",
+      "name": "N8N Course"
+    }
+  ]
+}

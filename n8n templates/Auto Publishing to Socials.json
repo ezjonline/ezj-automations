@@ -1,0 +1,557 @@
+{
+  "name": "Content Syndication onto Twitter, Facebook, Instagram, LinkedIn, and Medium",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appN8A07XUrSf5bW9",
+          "mode": "list",
+          "cachedResultName": "Content Syndication (Test)",
+          "cachedResultUrl": "https://airtable.com/appN8A07XUrSf5bW9"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblYKQJDi2CFgJClx",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/appN8A07XUrSf5bW9/tblYKQJDi2CFgJClx"
+        },
+        "filterByFormula": "=IS_SAME({Date}, '{{ $now.format('MM-dd-y') }}', 'day')",
+        "returnAll": false,
+        "limit": 1,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        200,
+        240
+      ],
+      "id": "0abe8547-0bdb-44fc-b27d-03964cee648c",
+      "name": "Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "Vjy8qfKJLFnmDUKH",
+          "name": "santi@pulpsense.com (13 Mar 25)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -20,
+        240
+      ],
+      "id": "bef5732f-b128-4c21-a17a-0cc3806258b6",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are a helpful, intelligent writing assistant.",
+              "role": "system"
+            },
+            {
+              "content": "Convert the following post copy into formats for the specified social media platforms. Output in JSON. Each platform is different so make sure you conform to the following specifications. Don't include any backticks (```). Use \\n in place of newlines.\n\nIf Twitter, make it short and punchy (under 280 chars).\n\nIf Instagram, make it short and punchy (under 400 chars).\n\nIf Facebook, leave it medium sized.\n\nIf LinkedIn, make it corporate, longer, and dress it up a bit."
+            },
+            {
+              "content": "Post copy: Small actions, big impact! Recycling isn't just a chore—it's a simple way to make a huge difference. From plastic bottles to cardboard boxes, every item recycled is a step toward a cleaner planet. Let's do our part. Recycle today for a better tomorrow! \n\nPlatforms: Facebook, Instagram, LinkedIn, Twitter"
+            },
+            {
+              "content": "={\"facebook\":\"🌍♻️ Did you know that recycling can significantly reduce waste and conserve natural resources?\\nEvery time we recycle, we're helping to cut down on pollution, save energy, and protect our environment. It's not just about tossing items into the correct bin—it's about making a conscious effort to create a more sustainable future for ourselves and generations to come. Imagine the impact if everyone recycled just one plastic bottle or cardboard box today. These small actions add up to massive change.\\nSo, let's take that extra moment to sort our recyclables, educate others, and lead by example. Together, we can make our planet a cleaner, greener place to live. Let's commit to recycling and make a difference every day!\", \"instagram\":\"Recycling is a game-changer! 🌿 Every item you recycle helps cut pollution, save energy, and protect our planet. It’s not just sorting bins—it’s a conscious step towards a sustainable future for us and future generations. Let’s make it count!\", \"linkedin\":\"Did you know that recycling can significantly reduce waste and conserve natural resources? Every time we recycle, we’re not just disposing of waste correctly; we’re actively contributing to a more sustainable and efficient use of our planet’s resources.\\nIn today’s corporate landscape, sustainability is not just a buzzword—it’s a crucial component of responsible business practices. By integrating recycling into our daily operations, we help cut down on pollution, save energy, and mitigate the impact on our environment.\\nThis is about more than just compliance; it’s about leadership and setting an example for others. Recycling is a tangible way to demonstrate our commitment to corporate social responsibility. It involves making a conscious effort to sort our recyclables, educate our teams, and implement sustainable practices across all levels of our organization.\\nEvery recycled item, whether it’s a plastic bottle, cardboard box, or electronic waste, is a step towards a greener future. Imagine the collective impact if every company made recycling a priority. The benefits extend beyond the environment, fostering a culture of sustainability that resonates with employees, customers, and stakeholders alike. As we strive for innovation and growth, let’s also commit to sustainable practices that ensure a healthier planet for future generations.\\nTogether, we can lead the charge towards a more sustainable, responsible, and prosperous future.\", \"twitter\":\"Recycling cuts waste, saves energy, and reduces pollution. It’s more than just sorting bins—it's about building a sustainable future for all. Every effort counts. 🌍♻️\"}",
+              "role": "assistant"
+            },
+            {
+              "content": "=Post copy: {{ $json['Post Copy'] }}\n\nPlatforms: {{ $json.Platforms }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "maxTokens": 4096,
+          "temperature": 0.5
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        420,
+        240
+      ],
+      "id": "d91370b5-0167-4ebe-a2fb-731ac91b9bdf",
+      "name": "Write Platform-Specific Posts",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "openAiApi": {
+          "id": "a2xwb5PX9qEfwIVL",
+          "name": "santi@pulpsense.com (26 Jan 25)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Airtable').item.json.Platforms }}",
+                    "rightValue": "Instagram",
+                    "operator": {
+                      "type": "array",
+                      "operation": "contains",
+                      "rightType": "any"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Instagram"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b89b9ffe-29dc-47f2-bf1a-297026ae8403",
+                    "leftValue": "={{ $('Airtable').item.json.Platforms }}",
+                    "rightValue": "Facebook",
+                    "operator": {
+                      "type": "array",
+                      "operation": "contains",
+                      "rightType": "any"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Facebook"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d9619c29-e68f-47d4-8174-dc3b27c18215",
+                    "leftValue": "={{ $('Airtable').item.json.Platforms }}",
+                    "rightValue": "Linkedin",
+                    "operator": {
+                      "type": "array",
+                      "operation": "contains",
+                      "rightType": "any"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Linkedin"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "8a36a1f0-db29-4dc7-abf5-5ccee47b4d02",
+                    "leftValue": "={{ $('Airtable').item.json.Platforms }}",
+                    "rightValue": "Twitter",
+                    "operator": {
+                      "type": "array",
+                      "operation": "contains",
+                      "rightType": "any"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Twitter"
+            }
+          ]
+        },
+        "options": {
+          "allMatchingOutputs": true
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1020,
+        220
+      ],
+      "id": "20e27c3b-6b4c-4525-9018-d2bb77889ff1",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "person": "G09gz59I97",
+        "text": "={{ $json.message.content.linkedin }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        280
+      ],
+      "id": "dfe58247-ecfe-4c44-bb27-11d0cb27422c",
+      "name": "LinkedIn",
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "vTNqRvAimD946aep",
+          "name": "santi@pulpsense.com (15 Mar 25)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.twitter",
+      "typeVersion": 2,
+      "position": [
+        1340,
+        480
+      ],
+      "id": "bc6d3a3e-2f94-4717-a83d-124c2bcf8158",
+      "name": "X"
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v17.0",
+        "edge": "media",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "image_url"
+              },
+              {
+                "name": "caption"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        -80
+      ],
+      "id": "f1c384b3-031d-49d4-b857-b78623787f8e",
+      "name": "Create IG Container"
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v17.0",
+        "edge": "media_publish",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "creation_id"
+              },
+              {
+                "name": "image_url"
+              },
+              {
+                "name": "caption"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        -80
+      ],
+      "id": "cefbf7ff-a21c-4606-b9b1-c7f0d0114384",
+      "name": "Post to IG",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "0kU1PKHTFvu59WOl",
+          "name": "Facebook Graph account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v17.0",
+        "edge": "photos",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "message"
+              },
+              {
+                "name": "url"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        80
+      ],
+      "id": "7bcbbd34-2028-49ba-8191-4ba275192dab",
+      "name": "Post to Facebook"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Airtable').item.json['Image URL'] }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "media.image"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        800,
+        240
+      ],
+      "id": "cf88bc4f-b92e-4bf4-8120-2793dabbf27e",
+      "name": "Download Image"
+    }
+  ],
+  "pinData": {
+    "Write Platform-Specific Posts": [
+      {
+        "json": {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": {
+              "facebook": "🕒✨ Feeling distracted at work? The Pomodoro Technique might be your solution! Work for 25 minutes, then take a 5-minute break. This method prevents burnout, keeps your brain engaged, and boosts productivity. Consistency is key—set clear goals and track your progress. Small, focused efforts lead to big results. Give it a try and see how it transforms your workflow! #Productivity #Focus #PomodoroTechnique",
+              "instagram": "Struggling to focus? Try the Pomodoro Technique! 🍅\n\nWork 25 mins, break 5 mins, repeat. Prevent burnout, stay engaged, and boost productivity. Set clear goals, track progress, and watch those small efforts add up to big results! 💪\n\n#PomodoroTechnique #Productivity #Focus",
+              "linkedin": "In the fast-paced world of work, maintaining focus can be challenging. The Pomodoro Technique offers a structured approach to enhance productivity and prevent burnout. By working in 25-minute intervals followed by 5-minute breaks, this method keeps your brain engaged and helps manage distractions effectively.\n\nThe key to success with the Pomodoro Technique is consistency. Setting clear goals for each session and tracking progress can lead to significant improvements in productivity over time. Small, concentrated efforts can accumulate into substantial results, making this technique a valuable tool for professionals seeking to optimize their workflow.\n\nConsider integrating the Pomodoro Technique into your daily routine to experience its benefits firsthand. It’s a simple yet powerful way to enhance focus and efficiency in the workplace. Let's embrace this method to achieve our goals more effectively. #Productivity #Focus #PomodoroTechnique",
+              "twitter": "Stay focused with the Pomodoro Technique! 🍅 Work 25 mins, break 5 mins. Prevent burnout, stay engaged, and boost productivity. Set clear goals and track progress. Small efforts, big results! 💪 #Productivity #Focus"
+            },
+            "refusal": null,
+            "annotations": []
+          },
+          "logprobs": null,
+          "finish_reason": "stop"
+        }
+      }
+    ],
+    "Airtable": [
+      {
+        "json": {
+          "id": "rectjfHY4kDa4agTA",
+          "createdTime": "2025-03-13T19:52:07.000Z",
+          "Date": "2025-03-13",
+          "Post Copy": "Struggling to stay focused? Try the Pomodoro Technique: Work for 25 minutes, take a 5-minute break, and repeat. This method helps prevent burnout, keeps your brain engaged, and improves productivity over time. The key is to stay consistent and avoid distractions during work intervals. If you find yourself losing focus easily, set a clear goal for each session and track your progress. Small, focused efforts add up to big results!",
+          "Image URL": "https://www.activtrak.com/wp-content/uploads/2024/08/blog-header-how-to-measure-team-productivity-q3-24.jpg",
+          "Platforms": [
+            "Linkedin"
+          ]
+        }
+      }
+    ],
+    "Schedule Trigger": [
+      {
+        "json": {
+          "timestamp": "2025-03-13T21:53:19.041+01:00",
+          "Readable date": "March 13th 2025, 9:53:19 pm",
+          "Readable time": "9:53:19 pm",
+          "Day of week": "Thursday",
+          "Year": "2025",
+          "Month": "March",
+          "Day of month": "13",
+          "Hour": "21",
+          "Minute": "53",
+          "Second": "19",
+          "Timezone": "Europe/Berlin (UTC+01:00)"
+        }
+      }
+    ],
+    "Download Image": [
+      {
+        "json": {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": {
+              "facebook": "🕒✨ Feeling distracted at work? The Pomodoro Technique might be your solution! Work for 25 minutes, then take a 5-minute break. This method prevents burnout, keeps your brain engaged, and boosts productivity. Consistency is key—set clear goals and track your progress. Small, focused efforts lead to big results. Give it a try and see how it transforms your workflow! #Productivity #Focus #PomodoroTechnique",
+              "instagram": "Struggling to focus? Try the Pomodoro Technique! 🍅\n\nWork 25 mins, break 5 mins, repeat. Prevent burnout, stay engaged, and boost productivity. Set clear goals, track progress, and watch those small efforts add up to big results! 💪\n\n#PomodoroTechnique #Productivity #Focus",
+              "linkedin": "In the fast-paced world of work, maintaining focus can be challenging. The Pomodoro Technique offers a structured approach to enhance productivity and prevent burnout. By working in 25-minute intervals followed by 5-minute breaks, this method keeps your brain engaged and helps manage distractions effectively.\n\nThe key to success with the Pomodoro Technique is consistency. Setting clear goals for each session and tracking progress can lead to significant improvements in productivity over time. Small, concentrated efforts can accumulate into substantial results, making this technique a valuable tool for professionals seeking to optimize their workflow.\n\nConsider integrating the Pomodoro Technique into your daily routine to experience its benefits firsthand. It’s a simple yet powerful way to enhance focus and efficiency in the workplace. Let's embrace this method to achieve our goals more effectively. #Productivity #Focus #PomodoroTechnique",
+              "twitter": "Stay focused with the Pomodoro Technique! 🍅 Work 25 mins, break 5 mins. Prevent burnout, stay engaged, and boost productivity. Set clear goals and track progress. Small efforts, big results! 💪 #Productivity #Focus"
+            },
+            "refusal": null,
+            "annotations": []
+          },
+          "logprobs": null,
+          "finish_reason": "stop"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable": {
+      "main": [
+        [
+          {
+            "node": "Write Platform-Specific Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Platform-Specific Posts": {
+      "main": [
+        [
+          {
+            "node": "Download Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Create IG Container",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Post to Facebook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "X",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create IG Container": {
+      "main": [
+        [
+          {
+            "node": "Post to IG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Image": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6e2d00af-9dee-4fc4-9704-6c0e55b59002",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b0dcdc2a61168afbc3bb8907befe60a34408308859f86b899e8ba57a64038046"
+  },
+  "id": "Kf9ByhEyT8iZ6uvI",
+  "tags": [
+    {
+      "createdAt": "2025-02-25T16:53:08.138Z",
+      "updatedAt": "2025-02-25T16:53:08.138Z",
+      "id": "987WX9PvnYkGNzpl",
+      "name": "Nick n8n"
+    }
+  ]
+}

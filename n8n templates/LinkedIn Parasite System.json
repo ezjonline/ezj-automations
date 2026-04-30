@@ -1,0 +1,1612 @@
+{
+  "name": "LinkedIn Parasite System in n8n",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        -140
+      ],
+      "id": "739949f9-c1b8-4cc3-9126-29fbd42d8d67",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/buIWk2uOUzTmcLsuB/run-sync-get-dataset-items",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer <yourApiToken>"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"maxComments\": 5,\n  \"maxPosts\": 200,\n  \"maxReactions\": 5,\n  \"scrapeComments\": false,\n  \"scrapeReactions\": false,\n  \"searchQueries\": [\n    \"coding\"\n  ],\n  \"sortBy\": \"relevance\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        -140
+      ],
+      "id": "fcffd6ae-ae0e-4f82-834f-75472cf00bcd",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b5685bd9-4c03-4426-a684-91016011d546",
+              "leftValue": "={{ $json.engagement.likes }}",
+              "rightValue": 100,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        440,
+        -140
+      ],
+      "id": "b80c726a-371b-4a7b-b4c6-4846826b3a14",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1kyAmkPEr3FOmkUzsOQuiN-SnL5O31ecXL7kFHVL6unM",
+          "mode": "list",
+          "cachedResultName": "LinkedIn Parasite System",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kyAmkPEr3FOmkUzsOQuiN-SnL5O31ecXL7kFHVL6unM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kyAmkPEr3FOmkUzsOQuiN-SnL5O31ecXL7kFHVL6unM/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "linkedinUrl": "={{ $json.author.linkedinUrl }}",
+            "name": "={{ $json.author.name }}",
+            "headline": "={{ $json.author.info }}",
+            "postedAt": "={{ $json.postedAt.date }}",
+            "likesOnPost": "={{ $json.engagement.likes }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "linkedinUrl",
+              "displayName": "linkedinUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "headline",
+              "displayName": "headline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "postedAt",
+              "displayName": "postedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "likesOnPost",
+              "displayName": "likesOnPost",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        660,
+        -140
+      ],
+      "id": "584b9e54-a3a6-40b4-a930-4159ee190bb2",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EOibXIc4U8wcXyRR",
+          "name": "YouTube"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 1. Initialization\n\nFirst, run the top flow to find a list of creators who make posts that regularly get 100 likes or more.\n\nThings to modify: \"searchQueries\" in the JSON body of the HTTP request to change your target audience, and <yourApiToken> with your actual API token from Apify.",
+        "height": 220,
+        "width": 360
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        -400
+      ],
+      "id": "134bb17b-b829-4073-8f32-c53d2304f33a",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## 2. Scheduled Scraping of Source Posts\n\nNow a scheduler will run once (per however long you'd like—just modify the Schedule Trigger) and add source posts from these creators to a \"Source Posts\" table in Sheets. Make sure to modify <yourApiToken> in the HTTP request module.\n\n",
+        "height": 220,
+        "width": 360
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        80
+      ],
+      "id": "76dc3f4b-909a-486a-b1a3-200c8245d72c",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "daysInterval": 7
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -20,
+        360
+      ],
+      "id": "451c6dd4-8357-4390-b701-726bd55574da",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/A3cAPGpwBEG8RJwse/run-sync-get-dataset-items",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer <yourApiToken>"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"maxComments\": 5,\n  \"maxPosts\": 10,\n  \"maxReactions\": 5,\n  \"postedLimit\": \"week\",\n  \"scrapeComments\": false,\n  \"scrapeReactions\": false,\n  \"targetUrls\": {{ $json.targetUrls.toJsonString() }}\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        360
+      ],
+      "id": "08579543-8f1d-4404-b484-a0cfd04dae20",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1kyAmkPEr3FOmkUzsOQuiN-SnL5O31ecXL7kFHVL6unM",
+          "mode": "list",
+          "cachedResultName": "LinkedIn Parasite System",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kyAmkPEr3FOmkUzsOQuiN-SnL5O31ecXL7kFHVL6unM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Creators",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kyAmkPEr3FOmkUzsOQuiN-SnL5O31ecXL7kFHVL6unM/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        220,
+        360
+      ],
+      "id": "43187bc5-53c8-4a6c-9915-990da6d3fc4b",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EOibXIc4U8wcXyRR",
+          "name": "YouTube"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "include": "specifiedFields",
+        "fieldsToInclude": "linkedinUrl",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        440,
+        360
+      ],
+      "id": "fbe73664-e1d3-4eb4-aa27-9eba37763b7d",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d8742962-9e21-43ac-8720-181e823af507",
+              "name": "targetUrls",
+              "value": "={{ $json.data.map(item => item.linkedinUrl) }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        660,
+        360
+      ],
+      "id": "b4b4743d-f1ba-47a4-84a6-faa4f0ed3615",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1kyAmkPEr3FOmkUzsOQuiN-SnL5O31ecXL7kFHVL6unM",
+          "mode": "list",
+          "cachedResultName": "LinkedIn Parasite System",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kyAmkPEr3FOmkUzsOQuiN-SnL5O31ecXL7kFHVL6unM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 464831493,
+          "mode": "list",
+          "cachedResultName": "Source Posts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kyAmkPEr3FOmkUzsOQuiN-SnL5O31ecXL7kFHVL6unM/edit#gid=464831493"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "postUrl": "={{ $json.linkedinUrl }}",
+            "content": "={{ $json.content }}",
+            "linkedinUrl": "={{ $json.author.linkedinUrl }}",
+            "postedAt": "={{ $json.postedAt.date }}",
+            "postImageUrlOne": "={{ $json.postImages[0].url }}",
+            "postImageUrlTwo": "={{ $json.postImages[1].url }}",
+            "postImageUrlThree": "={{ $json.postImages[3].url }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "postUrl",
+              "displayName": "postUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "content",
+              "displayName": "content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "linkedinUrl",
+              "displayName": "linkedinUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "postedAt",
+              "displayName": "postedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "postImageUrlOne",
+              "displayName": "postImageUrlOne",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "postImageUrlTwo",
+              "displayName": "postImageUrlTwo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "postImageUrlThree",
+              "displayName": "postImageUrlThree",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "useAppend": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1100,
+        360
+      ],
+      "id": "e950e683-d5db-4c2a-a3c4-6d98ef427d30",
+      "name": "Google Sheets2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EOibXIc4U8wcXyRR",
+          "name": "YouTube"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -20,
+        1380
+      ],
+      "id": "29defb05-2fa8-4a6b-acf2-f567e7876704",
+      "name": "Schedule Trigger1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1kyAmkPEr3FOmkUzsOQuiN-SnL5O31ecXL7kFHVL6unM",
+          "mode": "list",
+          "cachedResultName": "LinkedIn Parasite System",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kyAmkPEr3FOmkUzsOQuiN-SnL5O31ecXL7kFHVL6unM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 464831493,
+          "mode": "list",
+          "cachedResultName": "Source Posts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kyAmkPEr3FOmkUzsOQuiN-SnL5O31ecXL7kFHVL6unM/edit#gid=464831493"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        200,
+        880
+      ],
+      "id": "6a518127-5f3a-4e55-875f-60a1ae174614",
+      "name": "Google Sheets3",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EOibXIc4U8wcXyRR",
+          "name": "YouTube"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 3. Scheduled Parasite Flow\n\nNow a scheduler will run once (per however long you'd like—just modify the Schedule Trigger) and feed the post content & images into AI to have it rewrite things in your tone of voice.\n\nTo modify your context prompt, adjust the \"Context\" section of the LLM call.",
+        "height": 220,
+        "width": 360
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        540
+      ],
+      "id": "846daae5-3f86-4b03-8dac-a96f003844ed",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        420,
+        880
+      ],
+      "id": "9cd863a4-7e16-4304-9db4-4ca1dbcf4687",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-search-preview",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-SEARCH-PREVIEW"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You're a helpful, intelligent research assistant that searches online for things related to the content of a social media post.",
+              "role": "system"
+            },
+            {
+              "content": "Your task is to take as input a social media post, and find three sources that discuss similar things to that social media post. You then return brief summaries of each source in JSON using this format:\n\n{\"sourceOneSummary\":\"\",\"sourceTwoSummary\":\"\",\"sourceThreeSummary\":\"\"}\n\nRules:\n- Lean towards detailed summaries.\n- If you can find new information (not present in the source content) make sure to include it.\n- Ensure your summaries are at least one paragraph long."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        640,
+        800
+      ],
+      "id": "fcd804f6-5982-477b-8c8a-fea175845c37",
+      "name": "Find Web Data",
+      "credentials": {
+        "openAiApi": {
+          "id": "kRhXLl2JwVGc05AE",
+          "name": "AI Facebook Ad Analyzer"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "text": "What's in this image? Describe this extremely comprehensively.",
+        "imageUrls": "=https://media.licdn.com/dms/image/v2/D4D22AQHYm-Y-ielDUQ/feedshare-shrink_2048_1536/B4DZdUcON8GkAs-/0/1749468374804?e=1752710400&v=beta&t=gCYYiWzXCsjhEMH2CbJyYTmhHlkAt53AUdgIovJqO0A",
+        "options": {
+          "detail": "high"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1240,
+        700
+      ],
+      "id": "83531861-642e-455e-af28-1f00c7087995",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "kRhXLl2JwVGc05AE",
+          "name": "AI Facebook Ad Analyzer"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Loop Over Items').item.json.postImageUrlOne }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    },
+                    "id": "244b1162-4d40-49cc-ac64-965d09ae2cd4"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Image?"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "89aa2234-8b4c-4d4b-bc9f-46078c187f0f",
+                    "leftValue": "={{ $('Loop Over Items').item.json.postImageUrlOne }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "empty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "No Image"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1020,
+        800
+      ],
+      "id": "889133a0-b039-45db-8dd5-3226dc7d2ff1",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You're a helpful, intelligent writing assistant that takes content & some additional research and adds unique twists and more information to it (so that it reads differently).",
+              "role": "system"
+            },
+            {
+              "content": "Your task is to take as input a social media post and a bunch of supplied research and generate a detailed, comprehensive outline of that content. \n\nYou must also do one additional thing: make that outline unique by incorporating elements from the research, as well as your own knowledge.\n\nOutput your unique outlines in JSON using this format:\n\n{\"outline\":\"\"}\n\nRules:\n- Keep all of the elements from the source content, but make it better, more comprehensive, more interesting, and/or add a twist.\n- Do not repeat the content verbatim—we are not copying the source, we are improving it. Make your outline different (while ensuring you maintain the same informational content).\n- Output your outline in Markdown (atx) format. Be comprehensive."
+            },
+            {
+              "content": "=Content: \n\n{{ $('Loop Over Items').item.json.content }}\n\nDescription of supplied image:\n\n{{ $json.content }}\n\nResearch:\n\n{{ $json.message.content }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1460,
+        700
+      ],
+      "id": "c8922b77-4e58-4a61-89c8-3a2a67167b43",
+      "name": "Generate Outline (w img description)",
+      "credentials": {
+        "openAiApi": {
+          "id": "kRhXLl2JwVGc05AE",
+          "name": "AI Facebook Ad Analyzer"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You're a helpful, intelligent writing assistant that takes content & some additional research and adds unique twists and more information to it (so that it reads differently).",
+              "role": "system"
+            },
+            {
+              "content": "Your task is to take as input a social media post and a bunch of supplied research and generate a detailed, comprehensive outline of that content. \n\nYou must also do one additional thing: make that outline unique by incorporating elements from the research, as well as your own knowledge.\n\nOutput your unique outlines in JSON using this format:\n\n{\"outline\":\"\"}\n\nRules:\n- Keep all of the elements from the source content, but make it better, more comprehensive, more interesting, and/or add a twist.\n- Do not repeat the content verbatim—we are not copying the source, we are improving it. Make your outline different (while ensuring you maintain the same informational content).\n- Output your outline in Markdown (atx) format. Be comprehensive."
+            },
+            {
+              "content": "=Content: \n\n{{ $('Loop Over Items').item.json.content }}\n\nResearch:\n\n{{ $json.message.content }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1460,
+        900
+      ],
+      "id": "903fe220-01cc-4958-b4c3-c36093ba9703",
+      "name": "Generate Outline (no description)",
+      "credentials": {
+        "openAiApi": {
+          "id": "kRhXLl2JwVGc05AE",
+          "name": "AI Facebook Ad Analyzer"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1kyAmkPEr3FOmkUzsOQuiN-SnL5O31ecXL7kFHVL6unM",
+          "mode": "list",
+          "cachedResultName": "LinkedIn Parasite System",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kyAmkPEr3FOmkUzsOQuiN-SnL5O31ecXL7kFHVL6unM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 31994825,
+          "mode": "list",
+          "cachedResultName": "Destination Posts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kyAmkPEr3FOmkUzsOQuiN-SnL5O31ecXL7kFHVL6unM/edit#gid=31994825"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "originalPostId": "={{ $('Loop Over Items').item.json.id }}",
+            "originalPostUrl": "={{ $('Loop Over Items').item.json.postUrl}}",
+            "generatedContent": "={{ $json.message.content.postBody }}",
+            "originalLinkedinUrl": "={{ $('Loop Over Items').item.json.linkedinUrl }}",
+            "generatedAt": "={{ $now }}",
+            "postStatus": "draft"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "originalPostId",
+              "displayName": "originalPostId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "originalPostUrl",
+              "displayName": "originalPostUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "generatedContent",
+              "displayName": "generatedContent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "originalLinkedinUrl",
+              "displayName": "originalLinkedinUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "generatedAt",
+              "displayName": "generatedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "postStatus",
+              "displayName": "postStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "useAppend": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        2220,
+        700
+      ],
+      "id": "6d88e876-e548-4c58-bdf6-022f66065c8b",
+      "name": "Google Sheets5",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EOibXIc4U8wcXyRR",
+          "name": "YouTube"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1kyAmkPEr3FOmkUzsOQuiN-SnL5O31ecXL7kFHVL6unM",
+          "mode": "list",
+          "cachedResultName": "LinkedIn Parasite System",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kyAmkPEr3FOmkUzsOQuiN-SnL5O31ecXL7kFHVL6unM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 31994825,
+          "mode": "list",
+          "cachedResultName": "Destination Posts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kyAmkPEr3FOmkUzsOQuiN-SnL5O31ecXL7kFHVL6unM/edit#gid=31994825"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "originalPostId": "={{ $('Loop Over Items').item.json.id }}",
+            "originalPostUrl": "={{ $('Loop Over Items').item.json.postUrl}}",
+            "generatedContent": "={{ $json.message.content.postBody }}",
+            "originalLinkedinUrl": "={{ $('Loop Over Items').item.json.linkedinUrl }}",
+            "generatedAt": "={{ $now }}",
+            "postStatus": "draft"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "originalPostId",
+              "displayName": "originalPostId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "originalPostUrl",
+              "displayName": "originalPostUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "generatedContent",
+              "displayName": "generatedContent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "originalLinkedinUrl",
+              "displayName": "originalLinkedinUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "generatedAt",
+              "displayName": "generatedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "postStatus",
+              "displayName": "postStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "useAppend": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        2220,
+        900
+      ],
+      "id": "028649b0-589c-460a-a9ba-c3d40da6e06e",
+      "name": "Google Sheets6",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EOibXIc4U8wcXyRR",
+          "name": "YouTube"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.5-preview",
+          "mode": "list",
+          "cachedResultName": "GPT-4.5-PREVIEW"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You're a helpful, intelligent writing assistant that takes an outline and uses it to write a high quality piece of content for LinkedIn.",
+              "role": "system"
+            },
+            {
+              "content": "Your task is to take as input an outline and then output a high quality LinkedIn post.\n\nOutput your LinkedIn post in JSON using this format:\n\n{\"postBody\":\"\"}\n\nContext:\n- The intended style and attitude is generally analytical, inquisitive, and precise, despite exploring complex topics, in the “classic style” of Western writing.\nthe level of formality should be inverse to the topic’s novelty: the weirder something is, the more formal. For ‘safer’ topics, one should cut loose with the humor, epigraphs, typographical stunts and experiments, etc.\n- Avoid hedging and qualifying, even at the risk of making overly-strong claims. It is a slippery slope.\n- Use casual abbreviations (like San Francisco -> SF, thanks -> thx, question -> q ), casual contractions (like \"I've\"), shortened forms of common nouns (like \"info\", \"vid\", \"app\") as this signals more human written speech. Do not use em dashes (eliminate — from your vocabulary completely!\n- No rhetorical questions.\n- Don't output a title. Only bullet points (and sparingly)."
+            },
+            {
+              "content": "Outline:\n\n**Money, Power, and Freedom**\n=============================\n\n**The Relationship Between Money, Power, and Freedom**\n------------------------------------------------------\n\n### **Money as a Proxy for Power**\n\n*   Money equates to power in contemporary society.\n    \n\n### **Power as a Proxy for Freedom**\n\n*   Power allows individuals to exercise freedom.\n    \n\n### **Direct Correlation Between Money and Freedom**\n\n*   More money (assets included) directly increases your level of freedom.\n    \n\n**Practical Examples of Money Providing Freedom**\n-------------------------------------------------\n\n### **Leisure Activities**\n\n*   Example: Parasailing in Cancun requires money → power → freedom.\n    \n\n### **Career Decisions**\n\n*   Example: Quitting a job to spend the day watching _Friends_ requires money → power → freedom.\n    \n\n### **Housing Choices**\n\n*   Example: Owning a family home necessitates money → power → freedom.\n    \n\n**Entrepreneurs’ Understanding of the Money-Freedom Equation**\n--------------------------------------------------------------\n\n### **Conscious and Subconscious Calculations**\n\n*   Entrepreneurs intuitively grasp that traditional employment restricts money, power, and thus freedom.\n    \n*   Often not explicitly verbalized, but deeply understood.\n    \n\n### **Limitations of Traditional Employment**\n\n*   Average 9–5 job yields limited financial gain, power, and freedom.\n    \n*   Example: Average Canadian earns about $50,000/year.\n    \n\n**Analyzing the Value of Traditional Employment**\n-------------------------------------------------\n\n### **Lifetime Earnings Calculation**\n\n*   Typical worker earning $50K/year from age 25 to 65 accumulates $2M.\n    \n\n### **Evaluating Life Trade-offs**\n\n*   Questioning if 40 years of life are worth $2M.\n    \n*   Business owners typically conclude it’s not worth it.\n    \n\n**The Entrepreneurial Imperative**\n----------------------------------\n\n### **Pursuing Alternative Paths to Wealth**\n\n*   Encouragement to seek methods for achieving $2M faster and independently.\n    \n\n### **Taking Action and Overcoming Fear**\n\n*   If capable, entrepreneurs are urged to break from traditional paths without hesitation."
+            },
+            {
+              "content": "In the modern world, money is a proxy for power.\n\nPower is a proxy for freedom.\n\nBy way of equivalency, then, the amount of money you possess (including assets) is directly correlated to how much freedom you have.\n\nEntrepreneurs understand that.\n\nWant to go parasailing in Cancun? Well, you need money. Money gives you power, which then gives you the freedom to make that choice.\n\nWant to quit your job and watch Friends all day? You need money. Again, because money gives you power, and power gives you the freedom to make that choice.\n\nWant a house to live in with your family? Money -> power -> freedom.\n\nPeople that start their own businesses have done the math. Not consciously, perhaps, not in a way that they can verbalize. \n\nBut somewhere along the lines they have come to the realization that the average person working a 9-5 earns very little money, exercises very little power, and has very little freedom.\n\nThe average Canadian salary is $50K. If you work for somebody else from the ages of 25-65 (like many think you're supposed to), you'll earn $2M by the time you retire.\n\nIs $2M worth the majority of your life? I certainly don't think so. Neither do many other business owners.\n\nSo if you can find a way (on your own) to make that $2M in less than 40 years, don't be afraid. Do it.\n",
+              "role": "assistant"
+            },
+            {
+              "content": "=Outline:\n\n{{ $json.message.content.outline }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1840,
+        900
+      ],
+      "id": "01e21d23-791f-470a-9d3f-ad371fb84200",
+      "name": "Generate Content (no description)",
+      "credentials": {
+        "openAiApi": {
+          "id": "kRhXLl2JwVGc05AE",
+          "name": "AI Facebook Ad Analyzer"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.5-preview",
+          "mode": "list",
+          "cachedResultName": "GPT-4.5-PREVIEW"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You're a helpful, intelligent writing assistant that takes an outline and uses it to write a high quality piece of content for LinkedIn.",
+              "role": "system"
+            },
+            {
+              "content": "Your task is to take as input an outline and then output a high quality LinkedIn post.\n\nOutput your LinkedIn post in JSON using this format:\n\n{\"postBody\":\"\"}\n\nContext:\n- The intended style and attitude is generally analytical, inquisitive, and precise, despite exploring complex topics, in the “classic style” of Western writing.\nthe level of formality should be inverse to the topic’s novelty: the weirder something is, the more formal. For ‘safer’ topics, one should cut loose with the humor, epigraphs, typographical stunts and experiments, etc.\n- Avoid hedging and qualifying, even at the risk of making overly-strong claims. It is a slippery slope.\n- Use casual abbreviations (like San Francisco -> SF, thanks -> thx, question -> q ), casual contractions (like \"I've\"), shortened forms of common nouns (like \"info\", \"vid\", \"app\") as this signals more human written speech. Do not use em dashes (eliminate — from your vocabulary completely!\n- No rhetorical questions.\n- Don't output a title. Only bullet points (and sparingly)."
+            },
+            {
+              "content": "Outline:\n\n**Money, Power, and Freedom**\n=============================\n\n**The Relationship Between Money, Power, and Freedom**\n------------------------------------------------------\n\n### **Money as a Proxy for Power**\n\n*   Money equates to power in contemporary society.\n    \n\n### **Power as a Proxy for Freedom**\n\n*   Power allows individuals to exercise freedom.\n    \n\n### **Direct Correlation Between Money and Freedom**\n\n*   More money (assets included) directly increases your level of freedom.\n    \n\n**Practical Examples of Money Providing Freedom**\n-------------------------------------------------\n\n### **Leisure Activities**\n\n*   Example: Parasailing in Cancun requires money → power → freedom.\n    \n\n### **Career Decisions**\n\n*   Example: Quitting a job to spend the day watching _Friends_ requires money → power → freedom.\n    \n\n### **Housing Choices**\n\n*   Example: Owning a family home necessitates money → power → freedom.\n    \n\n**Entrepreneurs’ Understanding of the Money-Freedom Equation**\n--------------------------------------------------------------\n\n### **Conscious and Subconscious Calculations**\n\n*   Entrepreneurs intuitively grasp that traditional employment restricts money, power, and thus freedom.\n    \n*   Often not explicitly verbalized, but deeply understood.\n    \n\n### **Limitations of Traditional Employment**\n\n*   Average 9–5 job yields limited financial gain, power, and freedom.\n    \n*   Example: Average Canadian earns about $50,000/year.\n    \n\n**Analyzing the Value of Traditional Employment**\n-------------------------------------------------\n\n### **Lifetime Earnings Calculation**\n\n*   Typical worker earning $50K/year from age 25 to 65 accumulates $2M.\n    \n\n### **Evaluating Life Trade-offs**\n\n*   Questioning if 40 years of life are worth $2M.\n    \n*   Business owners typically conclude it’s not worth it.\n    \n\n**The Entrepreneurial Imperative**\n----------------------------------\n\n### **Pursuing Alternative Paths to Wealth**\n\n*   Encouragement to seek methods for achieving $2M faster and independently.\n    \n\n### **Taking Action and Overcoming Fear**\n\n*   If capable, entrepreneurs are urged to break from traditional paths without hesitation."
+            },
+            {
+              "content": "In the modern world, money is a proxy for power.\n\nPower is a proxy for freedom.\n\nBy way of equivalency, then, the amount of money you possess (including assets) is directly correlated to how much freedom you have.\n\nEntrepreneurs understand that.\n\nWant to go parasailing in Cancun? Well, you need money. Money gives you power, which then gives you the freedom to make that choice.\n\nWant to quit your job and watch Friends all day? You need money. Again, because money gives you power, and power gives you the freedom to make that choice.\n\nWant a house to live in with your family? Money -> power -> freedom.\n\nPeople that start their own businesses have done the math. Not consciously, perhaps, not in a way that they can verbalize. \n\nBut somewhere along the lines they have come to the realization that the average person working a 9-5 earns very little money, exercises very little power, and has very little freedom.\n\nThe average Canadian salary is $50K. If you work for somebody else from the ages of 25-65 (like many think you're supposed to), you'll earn $2M by the time you retire.\n\nIs $2M worth the majority of your life? I certainly don't think so. Neither do many other business owners.\n\nSo if you can find a way (on your own) to make that $2M in less than 40 years, don't be afraid. Do it.\n",
+              "role": "assistant"
+            },
+            {
+              "content": "=Outline:\n\n{{ $json.message.content.outline }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1840,
+        700
+      ],
+      "id": "ff8b2c3c-9d46-4a62-97bb-3ee873834be6",
+      "name": "Generate Content (w description)",
+      "credentials": {
+        "openAiApi": {
+          "id": "kRhXLl2JwVGc05AE",
+          "name": "AI Facebook Ad Analyzer"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2440,
+        800
+      ],
+      "id": "679c9151-a187-4b5b-bdc6-b7942348a068",
+      "name": "Merge"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2660,
+        880
+      ],
+      "id": "49f96c42-235e-4a1c-aecb-dcd7e4df2221",
+      "name": "Wait",
+      "webhookId": "80b29494-cb40-4925-a3c3-e5b8fd84ab5d"
+    },
+    {
+      "parameters": {
+        "content": "## 4. Scheduled LinkedIn Poster\n\nThis posts on LinkedIn and then updates the Google Sheet so that the published destination posts are set to \"Published\". You'll have to update your credentials in the HTTP request module.",
+        "height": 220,
+        "width": 320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        1100
+      ],
+      "id": "5e131b92-c9ce-4db2-8c71-0b8c974358d0",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1kyAmkPEr3FOmkUzsOQuiN-SnL5O31ecXL7kFHVL6unM",
+          "mode": "list",
+          "cachedResultName": "LinkedIn Parasite System",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kyAmkPEr3FOmkUzsOQuiN-SnL5O31ecXL7kFHVL6unM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 31994825,
+          "mode": "list",
+          "cachedResultName": "Destination Posts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kyAmkPEr3FOmkUzsOQuiN-SnL5O31ecXL7kFHVL6unM/edit#gid=31994825"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "postStatus",
+              "lookupValue": "draft"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        220,
+        1380
+      ],
+      "id": "89c14c4c-1028-4b95-a70a-07b6afe3d670",
+      "name": "Google Sheets4",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EOibXIc4U8wcXyRR",
+          "name": "YouTube"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "person": "8T6KYGfJF7",
+        "text": "={{ $json.generatedContent }}",
+        "additionalFields": {
+          "visibility": "CONNECTIONS"
+        }
+      },
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        420,
+        1380
+      ],
+      "id": "41de5e60-5e15-4c13-9a2b-5f08ee1da24f",
+      "name": "LinkedIn",
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "8rBF2RkK8q2DyFuZ",
+          "name": "Personal LinkedIn Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1kyAmkPEr3FOmkUzsOQuiN-SnL5O31ecXL7kFHVL6unM",
+          "mode": "list",
+          "cachedResultName": "LinkedIn Parasite System",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kyAmkPEr3FOmkUzsOQuiN-SnL5O31ecXL7kFHVL6unM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 31994825,
+          "mode": "list",
+          "cachedResultName": "Destination Posts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kyAmkPEr3FOmkUzsOQuiN-SnL5O31ecXL7kFHVL6unM/edit#gid=31994825"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "originalPostId": "={{ $('Google Sheets4').item.json.originalPostId }}",
+            "postStatus": "published"
+          },
+          "matchingColumns": [
+            "originalPostId"
+          ],
+          "schema": [
+            {
+              "id": "originalPostId",
+              "displayName": "originalPostId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "originalPostUrl",
+              "displayName": "originalPostUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "generatedContent",
+              "displayName": "generatedContent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "originalLinkedinUrl",
+              "displayName": "originalLinkedinUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "generatedAt",
+              "displayName": "generatedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "postStatus",
+              "displayName": "postStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        640,
+        1380
+      ],
+      "id": "bbc43481-faba-40f4-a6f5-ccf148d7e4dc",
+      "name": "Google Sheets7",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EOibXIc4U8wcXyRR",
+          "name": "YouTube"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "daysInterval": 7
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -20,
+        880
+      ],
+      "id": "a03cb1ff-c8c1-454c-a21b-3e4dfc262a58",
+      "name": "Schedule Trigger2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Find Web Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Web Data": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate Outline (no description)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Generate Outline (w img description)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Outline (w img description)": {
+      "main": [
+        [
+          {
+            "node": "Generate Content (w description)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Outline (no description)": {
+      "main": [
+        [
+          {
+            "node": "Generate Content (no description)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets5": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets6": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Generate Content (no description)": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Content (w description)": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets4": {
+      "main": [
+        [
+          {
+            "node": "LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger2": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8b0c358b-2f75-40a3-a60a-89eafba84a2d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d7661a849ead114a9aa6d9ceaf4160465aeb79532a35bde62160c840ffba9fc8"
+  },
+  "id": "w5pAW8OYWl0EmbB5",
+  "tags": []
+}

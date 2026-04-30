@@ -1,0 +1,878 @@
+{
+  "name": "Deep Content Generator",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1100,
+        180
+      ],
+      "id": "d639de09-f92b-4e16-9b95-c0934fab8764",
+      "name": "Test Flow"
+    },
+    {
+      "parameters": {
+        "formTitle": "Example Form",
+        "formDescription": "Fill out this form to generate content.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "keyword",
+              "placeholder": "keyword",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "email",
+              "fieldType": "email",
+              "placeholder": "email",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -720,
+        180
+      ],
+      "id": "72ce7dce-54f5-4b4f-b0dc-71264a8edeb9",
+      "name": "On form submission",
+      "webhookId": "5dbd18f6-ad2d-439c-8471-9009594f4af6"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are a helpful, intelligent content assistant.",
+              "role": "system"
+            },
+            {
+              "content": "Your task is to take the output of a search module, and reformat that into JSON.\n\nYour JSON should follow this format:\n\n{\n  \"articleOutlines\": [\n    {\n      \"title\": \"\",\n      \"markdownOutline\": \"\"\n    }\n  ]\n}\n\nRules:\n- There will be three outlines. Insert all of them into the appropriate object using the \"markdownOutline\" parameter. In addition, make sure you replace any newlines with \\n (since I'm sending this elsewhere via HTTP request).\n- Only use the supplied parameters—i.e, title & markdownOutline\n- If any of that information is missing, leave the value as \"\".\n- To structure the outlines, insert the title as an H1 (#). Then, insert the next headings as H2s (##). If there are any nested subheadings, use H3s (###), etc."
+            },
+            {
+              "content": "={{ $('Find Outlines').item.json.choices[0].message.content }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        -120,
+        180
+      ],
+      "id": "8e5a9d22-6b89-4ce2-ae48-8d034187adba",
+      "name": "Extract & Format Outlines",
+      "credentials": {
+        "openAiApi": {
+          "id": "kRhXLl2JwVGc05AE",
+          "name": "YouTube_Feb 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.5-preview",
+          "mode": "list",
+          "cachedResultName": "GPT-4.5-PREVIEW"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are a helpful, intelligent writing assistant.",
+              "role": "system"
+            },
+            {
+              "content": "Your task is to generate a high-quality, comprehensive outline for an article on a given topic. \n\nThe topic will be provided to you, along with three outlines of other articles that we've scraped from the web, as well as a bunch of citations with one-line conclusions.\n\nYou must:\n- Digest these three outlines fully and completely.\n- Understand the citations and one-line conclusions.\n- Generate a new outline, using content from the previous three outlines as inspiration, and then weave in the citations.\n- Make sure your outline is significantly better, more comprehensive, and discusses more topics.\n- Ensure that you're not repeating (verbatim) what the outlines are, but effectively encapsulate the concepts and ideas they're talking about in your new, \"mega\" outline.\n\nOutput in JSON using this format:\n\n{\"megaOutline\":\"\"}\n\nRules:\n- Output your megaOutline in Markdown (atx) format.\n- Vary formatting—use H1s, H2s, H3s, H4s, bullet points, etc.\n- Do not include any personal information (say, of the writer of one of these outlines) in your finished product. Sometimes they add or append their names to things—leave that out.\n- Make sure to include all of the citations you're given. Use Markdown (atx) format when linking them in the outline."
+            },
+            {
+              "content": "=Keyword: {{ $('On form submission').item.json.keyword }}\n\nOutlines:\n\n1. {{ $json.message.content.articleOutlines[0].markdownOutline }}\n2. {{ $json.message.content.articleOutlines[0].markdownOutline }}\n3. {{ $json.message.content.articleOutlines[0].markdownOutline }}\n\nResources: {{ $('Find Citations').all().last().json.choices[0].message.content }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        240,
+        180
+      ],
+      "id": "e91de6b0-5fa5-4c53-ac7c-ec3c0cdf13dd",
+      "name": "Generate Better Outline",
+      "credentials": {
+        "openAiApi": {
+          "id": "kRhXLl2JwVGc05AE",
+          "name": "YouTube_Feb 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_OPENAI_API_KEY"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gpt-4o-search-preview\",\n  \"web_search_options\": {},\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Find me three high-ranking articles about this keyword: {{ $json.keyword }}, and then extract their outlines (in markdown format). Output as a numbered list—i.e the first article's outline should be 1., the second article's outline should be 2., and so on.\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -520,
+        180
+      ],
+      "id": "2d87e560-a5bf-4b34-a12f-b11a92efd427",
+      "name": "Find Outlines"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_OPENAI_API_KEY"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gpt-4o-search-preview\",\n  \"web_search_options\": {},\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Find me 5 statistics, citations, or educational resources on the following keyword: {{ $('On form submission').item.json.keyword }}. For each link, provide a one-line summary of the key findings.\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -320,
+        180
+      ],
+      "id": "9669ce5c-127d-4ebb-a8d8-64595f95b630",
+      "name": "Find Citations"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"sections\": {{ $json.message.content.megaOutline.split(\"\\n## \").slice(1) }}\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        600,
+        180
+      ],
+      "id": "e0ebc718-9d2a-4420-9368-32264d3b7180",
+      "name": "Separate Into Sections"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "sections",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        820,
+        180
+      ],
+      "id": "733c5486-80a4-421e-bf1c-59afc9d65757",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.5-preview",
+          "mode": "list",
+          "cachedResultName": "GPT-4.5-PREVIEW"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are a helpful, intelligent writer.",
+              "role": "system"
+            },
+            {
+              "content": "Your task is to generate a high-quality, comprehensive section of an article using a piece of an outline.\n\nThis piece is not the whole outline—it is but a part. Knowing this, confine exactly *what* you write to the contents of the provided section. \n\nReturn your written section in JSON using this format:\n\n{\n   \"articleSection\":\"markdown content goes here\"\n}\n\nRules:\n- Write in Markdown (atx) format. Make sure the heading is in H2 (##)\n- Do not write additional or accessory content that doesn't belong in this section. \n- Do not write calls-to-action (CTAs) or introductions unless you are explicitly instructed to do so (say, with an Introduction heading)\n- Make sure you weave in any provided citations in Markdown (atx) format as well.\n- Use a simple, straightforward tone of voice—no fluff."
+            },
+            {
+              "content": "=Keyword of the wider article: {{ $('On form submission').item.json.keyword }}\n\nYour specific section: {{ $json.sections }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        1020,
+        180
+      ],
+      "id": "a8c2dfaa-db28-416f-a0fe-f40179efeabb",
+      "name": "Write Section",
+      "credentials": {
+        "openAiApi": {
+          "id": "kRhXLl2JwVGc05AE",
+          "name": "YouTube_Feb 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2480,
+        180
+      ],
+      "id": "5751d1dc-4109-4676-bcde-967345ceee43",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d8c94af0-af14-4888-b733-873de171d3c0",
+              "name": "draft",
+              "value": "={{  $('Generate Better Outline').all().first().json.message.content.megaOutline.split(\"\\n## \")[0]}}\n{{ $json.data.map(item => item.sectionAndImage).join(\"\\n\\n\") }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2680,
+        180
+      ],
+      "id": "8a3d029e-0e96-4e1b-80c5-845e2375b607",
+      "name": "Set Draft Article"
+    },
+    {
+      "parameters": {
+        "maxItems": 100
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        1380,
+        180
+      ],
+      "id": "58df695f-620c-49ff-ace2-5010a65e0f45",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "=Generate me a simple, stylized image (hand-drawn, pen, squiggy lines, cute) of a subject.\n\nRules: \n- No text.\n- Extraordinarily simple. Minimalistic. As few pen strokes as possible.\n\nThe subject should relate to & correspond to the section of an article below. \n\nSection:\n\n{{ $json.message.content.summary }}\n\n--\n\nMake sure it's cute and simple. Blob-like. No text!",
+        "options": {
+          "style": "vivid",
+          "returnImageUrls": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        1920,
+        40
+      ],
+      "id": "15616374-6935-414f-8716-817c8dd27f66",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "kRhXLl2JwVGc05AE",
+          "name": "YouTube_Feb 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        2100,
+        180
+      ],
+      "id": "748342f0-f4fc-4b02-8e5a-ca04e3c77801",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2f52f380-6084-4fb2-89a9-fcc291bb2856",
+              "name": "sectionAndImage",
+              "value": "={{ $json.message.content.articleSection }}\n\n![]({{ $json.url }})",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2280,
+        180
+      ],
+      "id": "060644d0-f8d6-4ab6-bd80-9c81e7e2a8d3",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "mode": "markdownToHtml",
+        "markdown": "={{ $json.draft }}",
+        "options": {
+          "completeHTMLDocument": true
+        }
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        2900,
+        180
+      ],
+      "id": "0fcb0e25-9c33-453a-8d30-173040cec0c1",
+      "name": "Markdown"
+    },
+    {
+      "parameters": {
+        "operation": "createFromText",
+        "content": "={{ $('Markdown').item.json.data }}",
+        "name": "={{$('Generate Better Outline').all().first().json.message.content.megaOutline.split(\"\\n\")[0].replace(\"# \",\"\")}}.html",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3120,
+        180
+      ],
+      "id": "b136cab2-bfb5-4b85-91a5-acf4de10e06b",
+      "name": "Create HTML File",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "8R2NiLt8owCA0E2O",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3340,
+        180
+      ],
+      "id": "a553e617-c0c0-4d76-820f-aaf0eeb20e6f",
+      "name": "Download to N8N",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "8R2NiLt8owCA0E2O",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "={{$('Generate Better Outline').all().first().json.message.content.megaOutline.split(\"\\n\")[0].replace(\"# \",\"\")}}.html",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {
+          "useContentAsIndexableText": true,
+          "simplifyOutput": true
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3560,
+        180
+      ],
+      "id": "8015213b-b0eb-4ff0-9088-c6b3a8acbf3d",
+      "name": "Reupload to Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "8R2NiLt8owCA0E2O",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteFile",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Create HTML File').all().first().json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3780,
+        180
+      ],
+      "id": "caef810e-12a8-4794-a5cc-8ee356c26e38",
+      "name": "Delete HTML File",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "8R2NiLt8owCA0E2O",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "share",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Reupload to Drive').item.json.id }}",
+          "mode": "id"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "reader",
+            "type": "user",
+            "emailAddress": "={{ $('On form submission').item.json.email }}"
+          }
+        },
+        "options": {
+          "emailMessage": "Hi—your file is ready. Find it at this link.",
+          "sendNotificationEmail": true
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4000,
+        180
+      ],
+      "id": "1684323f-f0cf-45c9-9a4c-079d014ae087",
+      "name": "Share Link & Email",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "8R2NiLt8owCA0E2O",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You're a helpful, intelligent writing assistant."
+            },
+            {
+              "content": "=Summarize the below article section in 3 sentences. Return output in JSON:\n\n{\"summary\": \"\"}"
+            },
+            {
+              "content": "={\"articleSection\":\"{{ $json.message.content.articleSection }}\"}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        1560,
+        40
+      ],
+      "id": "fbd175ce-55e6-479c-ba70-94c76fe79764",
+      "name": "OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "kRhXLl2JwVGc05AE",
+          "name": "YouTube_Feb 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Platform-specific\n\nThis will rely on the particulars of the platform you're uploading to. For demonstration purposes, I've created a Google Doc file—but you could upload to WordPress, Webflow, a CMS like Contentful, etc.",
+        "height": 360,
+        "width": 1380
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2820,
+        60
+      ],
+      "id": "fb67c2cc-7666-4e5b-b3d1-534faf76b71c",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## HTTP Requests\n\nN8N now has the \"Web Search\" model built in to their OpenAI nodes, so you don't need to do a direct HTTP request if you don't want to. I did, though, just for demonstration purposes.",
+        "height": 440,
+        "width": 440
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -580,
+        -20
+      ],
+      "id": "ec8af094-d672-48d1-b5e4-567d11c0df19",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Image Model\n\nI've used DALLE-3 for the image production. But note that there are some issues with this that (in my humble opinion—and you can certainly fix most of it with prompts, but probably not all) reduce the output quality of the article. You can hotswap this with an HTTP request to another image generator, perhaps something on FAL, or an unofficial Midjourney API.",
+        "height": 580,
+        "width": 580
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        -160
+      ],
+      "id": "6003145f-25b6-4887-8731-e9798045940e",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Test Flow": {
+      "main": [
+        []
+      ]
+    },
+    "Extract & Format Outlines": {
+      "main": [
+        [
+          {
+            "node": "Generate Better Outline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Outlines": {
+      "main": [
+        [
+          {
+            "node": "Find Citations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Citations": {
+      "main": [
+        [
+          {
+            "node": "Extract & Format Outlines",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Better Outline": {
+      "main": [
+        [
+          {
+            "node": "Separate Into Sections",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Separate Into Sections": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Write Section",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Section": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Set Draft Article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "OpenAI1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Draft Article": {
+      "main": [
+        [
+          {
+            "node": "Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Markdown": {
+      "main": [
+        [
+          {
+            "node": "Create HTML File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Find Outlines",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create HTML File": {
+      "main": [
+        [
+          {
+            "node": "Download to N8N",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download to N8N": {
+      "main": [
+        [
+          {
+            "node": "Reupload to Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reupload to Drive": {
+      "main": [
+        [
+          {
+            "node": "Delete HTML File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete HTML File": {
+      "main": [
+        [
+          {
+            "node": "Share Link & Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share Link & Email": {
+      "main": [
+        []
+      ]
+    },
+    "OpenAI1": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2f0a45fa-fe16-41ae-b4d7-4c9473a90884",
+  "meta": {
+    "instanceId": "d7661a849ead114a9aa6d9ceaf4160465aeb79532a35bde62160c840ffba9fc8"
+  },
+  "id": "CjGD5tOZ4z0Yy4s2",
+  "tags": [
+    {
+      "createdAt": "2025-01-23T18:12:52.273Z",
+      "updatedAt": "2025-01-23T18:12:52.273Z",
+      "id": "l8MPK4ZirgwFWMno",
+      "name": "N8N Course"
+    }
+  ]
+}

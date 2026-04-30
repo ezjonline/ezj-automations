@@ -1,0 +1,2796 @@
+{
+  "name": "Twitter Apify Parasite",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "=https://api.apify.com/v2/datasets/{{ $json.body.resource.defaultDatasetId }}/items",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "format",
+              "value": "json"
+            },
+            {
+              "name": "limit",
+              "value": "100"
+            },
+            {
+              "name": "clean",
+              "value": "true"
+            },
+            {
+              "name": "simplified",
+              "value": "false"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Set API Key Apify').item.json.apifyKey }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1500,
+        -580
+      ],
+      "id": "ff2046a1-c29e-4f0f-96e2-6888bddfea96",
+      "name": "Get Apify Dataset",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "httpMethod": "POST",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1280,
+        -580
+      ],
+      "id": "8d869e0e-db4e-4e90-936d-ab641ec9aff2",
+      "name": "Wait Run Succeded",
+      "webhookId": "8a4742ef-b18e-4837-a402-67a4f2330784"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4-turbo",
+          "mode": "list",
+          "cachedResultName": "GPT-4-TURBO"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You're a helpful, intelligent writing assistant.",
+              "role": "system"
+            },
+            {
+              "content": "Rewrite each message in a way that encapsulates the original theme but uses different words."
+            },
+            {
+              "content": "=I made $210K USD in the last 12 mo on Upwork.\n\nWorked 2-3 hours per day, spent a big chunk of the year travelling.\n\nWould there be interest in a long thread detailing how I did it?"
+            },
+            {
+              "content": "Over the last year I generated $210,000 on Upwork. This required very minimal work and I got to do a bunch of fun stuff like travel, enjoy my life, etc. I'm curious as to whether anyone wants a detailed breakdown of how I did it?",
+              "role": "assistant"
+            },
+            {
+              "content": "={{ $('Get Apify Dataset').item.json.full_text }}"
+            }
+          ]
+        },
+        "options": {
+          "maxTokens": 4096
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1760,
+        -580
+      ],
+      "id": "609a45ce-b565-4f8d-be93-ba83f2f1d0b7",
+      "name": "Reword Tweets",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "openAiApi": {
+          "id": "a2xwb5PX9qEfwIVL",
+          "name": "santi@pulpsense.com (26 Jan 25)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "17XTkLUHhBSSyefciTlbgiNzSZlQ4FzvVwzFs15BTsHE",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1906288220,
+          "mode": "list",
+          "cachedResultName": "Tweets",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17XTkLUHhBSSyefciTlbgiNzSZlQ4FzvVwzFs15BTsHE/edit#gid=1906288220"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Copy Post": "={{ $json.message.content }}",
+            "Original Post": "={{ $('Get Apify Dataset').item.json.full_text }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Original Post",
+              "displayName": "Original Post",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Copy Post",
+              "displayName": "Copy Post",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2120,
+        -580
+      ],
+      "id": "9a60f6a1-965b-4c23-9398-09bd82cf9f9a",
+      "name": "Add Tweets to Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xqwkTMJv8ZrYhqaW",
+          "name": "santi@pulpsense.com (1 Mar 25)"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        620,
+        -580
+      ],
+      "id": "dfe4c901-5e5f-4f1e-82c8-0f6d1bd25105",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/quacker~twitter-scraper/runs",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "webhooks",
+              "value": "={{ `[ { \"eventTypes\": [\"ACTOR.RUN.SUCCEEDED\"], \"requestUrl\": \"${$execution.resumeUrl}\" } ]`.base64Encode() }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "="
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"addUserInfo\": true,\n  \"handles\": [\n    \"nicksaraev\"\n  ],\n  \"proxyConfig\": {\n    \"useApifyProxy\": true\n  },\n  \"tweetsDesired\": 20\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1060,
+        -580
+      ],
+      "id": "27d6cca7-f386-4372-bf4d-0780866504f6",
+      "name": "Run Twitter Scrape Actor Apify"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1986c329-0c29-42e8-b594-a436dffb06c8",
+              "name": "apifyKey",
+              "value": "<your_key>",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        840,
+        -580
+      ],
+      "id": "1f7b03b0-efeb-475a-99d6-cf8128c3be16",
+      "name": "Set API Key Apify"
+    }
+  ],
+  "pinData": {
+    "Run Twitter Scrape Actor Apify": [
+      {
+        "json": {
+          "data": {
+            "id": "gg8a5dgfpdHWBWAy4",
+            "actId": "u6ppkMWAx2E2MpEuF",
+            "userId": "Whm3eYcdlY09aGIkE",
+            "startedAt": "2025-03-06T14:23:42.432Z",
+            "finishedAt": null,
+            "status": "READY",
+            "meta": {
+              "origin": "API",
+              "userAgent": "axios/1.7.4"
+            },
+            "stats": {
+              "inputBodyLen": 116,
+              "rebootCount": 0,
+              "restartCount": 0,
+              "resurrectCount": 0,
+              "computeUnits": 0
+            },
+            "options": {
+              "build": "version-1",
+              "timeoutSecs": 604800,
+              "memoryMbytes": 4096,
+              "maxItems": 10824,
+              "diskMbytes": 8192
+            },
+            "buildId": "A0eEOUt0YnymJefmS",
+            "defaultKeyValueStoreId": "ZCCvRpjBG5CtIctPo",
+            "defaultDatasetId": "6eZFiadluT4C5bCKu",
+            "defaultRequestQueueId": "PdJPgl6bqgIcuMa0e",
+            "pricingInfo": {
+              "pricingModel": "PRICE_PER_DATASET_ITEM",
+              "pricePerUnitUsd": 0.0035,
+              "unitName": "posts",
+              "startedAt": "2024-01-25T00:00:00.000Z",
+              "createdAt": "2024-01-11T13:08:31.996Z",
+              "apifyMarginPercentage": 0.2,
+              "notifiedAboutFutureChangeAt": "2024-01-11T13:09:28.287Z",
+              "notifiedAboutChangeAt": "2024-01-25T01:06:21.014Z"
+            },
+            "buildNumber": "1.0.223",
+            "containerUrl": "https://v1trztsmd6hz.runs.apify.net",
+            "usage": {
+              "ACTOR_COMPUTE_UNITS": 0,
+              "DATASET_READS": 0,
+              "DATASET_WRITES": 0,
+              "KEY_VALUE_STORE_READS": 0,
+              "KEY_VALUE_STORE_WRITES": 1,
+              "KEY_VALUE_STORE_LISTS": 0,
+              "REQUEST_QUEUE_READS": 0,
+              "REQUEST_QUEUE_WRITES": 0,
+              "DATA_TRANSFER_INTERNAL_GBYTES": 0,
+              "DATA_TRANSFER_EXTERNAL_GBYTES": 0,
+              "PROXY_RESIDENTIAL_TRANSFER_GBYTES": 0,
+              "PROXY_SERPS": 0
+            },
+            "usageTotalUsd": 0.00005,
+            "usageUsd": {
+              "ACTOR_COMPUTE_UNITS": 0,
+              "DATASET_READS": 0,
+              "DATASET_WRITES": 0,
+              "KEY_VALUE_STORE_READS": 0,
+              "KEY_VALUE_STORE_WRITES": 0.00005,
+              "KEY_VALUE_STORE_LISTS": 0,
+              "REQUEST_QUEUE_READS": 0,
+              "REQUEST_QUEUE_WRITES": 0,
+              "DATA_TRANSFER_INTERNAL_GBYTES": 0,
+              "DATA_TRANSFER_EXTERNAL_GBYTES": 0,
+              "PROXY_RESIDENTIAL_TRANSFER_GBYTES": 0,
+              "PROXY_SERPS": 0
+            }
+          }
+        }
+      }
+    ],
+    "Wait Run Succeded": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.pulpsense.com",
+            "user-agent": "axios/1.7.9",
+            "content-length": "2651",
+            "accept": "application/json, text/plain, */*",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1",
+            "cf-connecting-ip": "34.224.107.31",
+            "cf-ipcountry": "US",
+            "cf-ray": "91c28384e80339b6-IAD",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "content-type": "application/json",
+            "x-apify-request-origin": "WEBHOOK",
+            "x-apify-webhook": "yo",
+            "x-apify-webhook-dispatch-id": "LiOFA3nfrH05CxHtF",
+            "x-apify-workflow-key": "uihhhx0zqkmy",
+            "x-forwarded-for": "172.70.38.129",
+            "x-forwarded-host": "n8n.pulpsense.com",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "7ba1fcbf2052",
+            "x-real-ip": "172.70.38.129"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "userId": "Whm3eYcdlY09aGIkE",
+            "createdAt": "2025-03-06T14:23:55.622Z",
+            "eventType": "ACTOR.RUN.SUCCEEDED",
+            "eventData": {
+              "actorId": "u6ppkMWAx2E2MpEuF",
+              "actorRunId": "gg8a5dgfpdHWBWAy4"
+            },
+            "resource": {
+              "id": "gg8a5dgfpdHWBWAy4",
+              "actId": "u6ppkMWAx2E2MpEuF",
+              "userId": "Whm3eYcdlY09aGIkE",
+              "startedAt": "2025-03-06T14:23:42.432Z",
+              "finishedAt": "2025-03-06T14:23:49.547Z",
+              "status": "SUCCEEDED",
+              "statusMessage": "Finished! Total 1 requests: 1 succeeded, 0 failed.",
+              "isStatusMessageTerminal": true,
+              "meta": {
+                "origin": "API",
+                "userAgent": "axios/1.7.4"
+              },
+              "stats": {
+                "inputBodyLen": 116,
+                "rebootCount": 0,
+                "restartCount": 0,
+                "durationMillis": 7006,
+                "resurrectCount": 0,
+                "runTimeSecs": 7.006,
+                "metamorph": 0,
+                "computeUnits": 0.0077844444444444445,
+                "memAvgBytes": 247803831.04034126,
+                "memMaxBytes": 294473728,
+                "memCurrentBytes": 0,
+                "cpuAvgUsage": 13.185901317132581,
+                "cpuMaxUsage": 60.19997562461914,
+                "cpuCurrentUsage": 0,
+                "netRxBytes": 84750,
+                "netTxBytes": 30020
+              },
+              "options": {
+                "build": "version-1",
+                "timeoutSecs": 604800,
+                "memoryMbytes": 4096,
+                "maxItems": 10824,
+                "diskMbytes": 8192
+              },
+              "buildId": "A0eEOUt0YnymJefmS",
+              "exitCode": 0,
+              "defaultKeyValueStoreId": "ZCCvRpjBG5CtIctPo",
+              "defaultDatasetId": "6eZFiadluT4C5bCKu",
+              "defaultRequestQueueId": "PdJPgl6bqgIcuMa0e",
+              "pricingInfo": {
+                "pricingModel": "PRICE_PER_DATASET_ITEM",
+                "pricePerUnitUsd": 0.0035,
+                "unitName": "posts",
+                "startedAt": "2024-01-25T00:00:00.000Z",
+                "createdAt": "2024-01-11T13:08:31.996Z",
+                "apifyMarginPercentage": 0.2,
+                "notifiedAboutFutureChangeAt": "2024-01-11T13:09:28.287Z",
+                "notifiedAboutChangeAt": "2024-01-25T01:06:21.014Z"
+              },
+              "buildNumber": "1.0.223",
+              "containerUrl": "https://v1trztsmd6hz.runs.apify.net",
+              "usage": {
+                "ACTOR_COMPUTE_UNITS": 0.0077844444444444445,
+                "DATASET_READS": 0,
+                "DATASET_WRITES": 20,
+                "KEY_VALUE_STORE_READS": 1,
+                "KEY_VALUE_STORE_WRITES": 4,
+                "KEY_VALUE_STORE_LISTS": 0,
+                "REQUEST_QUEUE_READS": 1,
+                "REQUEST_QUEUE_WRITES": 4,
+                "DATA_TRANSFER_INTERNAL_GBYTES": 0.00006020162254571915,
+                "DATA_TRANSFER_EXTERNAL_GBYTES": 0.000020464882254600525,
+                "PROXY_RESIDENTIAL_TRANSFER_GBYTES": 0,
+                "PROXY_SERPS": 0
+              },
+              "usageTotalUsd": 0.0035098808353559835,
+              "usageUsd": {
+                "ACTOR_COMPUTE_UNITS": 0.003113777777777778,
+                "DATASET_READS": 0,
+                "DATASET_WRITES": 0.0001,
+                "KEY_VALUE_STORE_READS": 0.000005,
+                "KEY_VALUE_STORE_WRITES": 0.0002,
+                "KEY_VALUE_STORE_LISTS": 0,
+                "REQUEST_QUEUE_READS": 0.000004,
+                "REQUEST_QUEUE_WRITES": 0.00008,
+                "DATA_TRANSFER_INTERNAL_GBYTES": 0.0000030100811272859575,
+                "DATA_TRANSFER_EXTERNAL_GBYTES": 0.000004092976450920105,
+                "PROXY_RESIDENTIAL_TRANSFER_GBYTES": 0,
+                "PROXY_SERPS": 0
+              },
+              "links": {
+                "publicRunUrl": "https://console.apify.com/view/runs/gg8a5dgfpdHWBWAy4",
+                "consoleRunUrl": "https://console.apify.com/actors/u6ppkMWAx2E2MpEuF/runs/gg8a5dgfpdHWBWAy4",
+                "apiRunUrl": "https://api.apify.com/v2/actor-runs/gg8a5dgfpdHWBWAy4"
+              }
+            }
+          },
+          "webhookUrl": "https://n8n.pulpsense.com/webhook/",
+          "executionMode": "production"
+        }
+      }
+    ],
+    "Get Apify Dataset": [
+      {
+        "json": {
+          "id": 0,
+          "location": "",
+          "conversation_id_str": "1867946708564681150",
+          "created_at": "Sat Dec 14 14:56:14 +0000 2024",
+          "display_text_range": [
+            0,
+            214
+          ],
+          "entities": {
+            "user_mentions": [],
+            "urls": [],
+            "hashtags": [],
+            "symbols": [],
+            "media": []
+          },
+          "favorite_count": 79,
+          "favorited": false,
+          "full_text": "I want to livestream a full day of my work. Like every minute. \n\nPeak \"show not tell\". I bet there'd be a lot of value for people doing the same thing as me (but earlier on in their journey).\n\nHas anyone done this?",
+          "id_str": "1867946708564681150",
+          "lang": "en",
+          "permalink": "/nicksaraev/status/1867946708564681150",
+          "possibly_sensitive": false,
+          "quote_count": 1,
+          "reply_count": 20,
+          "retweet_count": 1,
+          "retweeted": false,
+          "text": "I want to livestream a full day of my work. Like every minute. \n\nPeak \"show not tell\". I bet there'd be a lot of value for people doing the same thing as me (but earlier on in their journey).\n\nHas anyone done this?",
+          "user": {
+            "blocking": false,
+            "created_at": "Sat Mar 28 00:09:08 +0000 2020",
+            "default_profile": true,
+            "default_profile_image": false,
+            "description": "Founder, Maker School | The straight line path to growing an automation agency.\n\nLearn: https://t.co/rXs9sV4KKi\nContact: nick@leftclick.ai (no DMs)",
+            "entities": {
+              "description": {
+                "urls": [
+                  {
+                    "display_url": "youtube.com/@nicksaraev",
+                    "expanded_url": "http://youtube.com/@nicksaraev",
+                    "url": "https://t.co/rXs9sV4KKi",
+                    "indices": [
+                      88,
+                      111
+                    ]
+                  }
+                ]
+              },
+              "url": {
+                "urls": [
+                  {
+                    "display_url": "skool.com/makerschool",
+                    "expanded_url": "https://skool.com/makerschool",
+                    "url": "https://t.co/UtC2uDloKE",
+                    "indices": [
+                      0,
+                      23
+                    ]
+                  }
+                ]
+              }
+            },
+            "fast_followers_count": 0,
+            "favourites_count": 6036,
+            "follow_request_sent": false,
+            "followed_by": false,
+            "followers_count": 3651,
+            "following": false,
+            "friends_count": 261,
+            "has_custom_timelines": false,
+            "id": 0,
+            "id_str": "1243691528540663808",
+            "is_translator": false,
+            "listed_count": 40,
+            "location": "Get automation customer #1 →",
+            "media_count": 225,
+            "name": "nicky",
+            "normal_followers_count": 3651,
+            "notifications": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/1243691528540663808/1734141651",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/1867691740481957891/9F0iaxdK_normal.jpg",
+            "protected": false,
+            "screen_name": "nicksaraev",
+            "show_all_inline_media": false,
+            "statuses_count": 3890,
+            "time_zone": "",
+            "translator_type": "none",
+            "url": "https://t.co/UtC2uDloKE",
+            "utc_offset": 0,
+            "verified": false,
+            "withheld_in_countries": [],
+            "withheld_scope": "",
+            "is_blue_verified": true
+          },
+          "startUrl": "https://twitter.com/nicksaraev"
+        }
+      },
+      {
+        "json": {
+          "id": 0,
+          "location": "",
+          "conversation_id_str": "1766418692362174860",
+          "created_at": "Sat Mar 09 12:13:58 +0000 2024",
+          "display_text_range": [
+            11,
+            115
+          ],
+          "entities": {
+            "user_mentions": [
+              {
+                "id_str": "1075888541387931650",
+                "name": "peter! 🥷",
+                "screen_name": "pwang_szn",
+                "indices": [
+                  0,
+                  10
+                ]
+              }
+            ],
+            "urls": [],
+            "hashtags": [],
+            "symbols": [],
+            "media": []
+          },
+          "favorite_count": 794,
+          "favorited": false,
+          "full_text": "@pwang_szn Did he ask if she knew about it, or did he *tell* her to use it? Her words make it seem like the latter.",
+          "id_str": "1766437269693690308",
+          "in_reply_to_name": "pwang_szn",
+          "in_reply_to_screen_name": "pwang_szn",
+          "in_reply_to_status_id_str": "1766418692362174860",
+          "in_reply_to_user_id_str": "1075888541387931650",
+          "lang": "en",
+          "permalink": "/nicksaraev/status/1766437269693690308",
+          "possibly_sensitive": false,
+          "quote_count": 0,
+          "reply_count": 8,
+          "retweet_count": 0,
+          "retweeted": false,
+          "text": "@pwang_szn Did he ask if she knew about it, or did he *tell* her to use it? Her words make it seem like the latter.",
+          "user": {
+            "blocking": false,
+            "created_at": "Sat Mar 28 00:09:08 +0000 2020",
+            "default_profile": true,
+            "default_profile_image": false,
+            "description": "Founder, Maker School | The straight line path to growing an automation agency.\n\nLearn: https://t.co/rXs9sV4KKi\nContact: nick@leftclick.ai (no DMs)",
+            "entities": {
+              "description": {
+                "urls": [
+                  {
+                    "display_url": "youtube.com/@nicksaraev",
+                    "expanded_url": "http://youtube.com/@nicksaraev",
+                    "url": "https://t.co/rXs9sV4KKi",
+                    "indices": [
+                      88,
+                      111
+                    ]
+                  }
+                ]
+              },
+              "url": {
+                "urls": [
+                  {
+                    "display_url": "skool.com/makerschool",
+                    "expanded_url": "https://skool.com/makerschool",
+                    "url": "https://t.co/UtC2uDloKE",
+                    "indices": [
+                      0,
+                      23
+                    ]
+                  }
+                ]
+              }
+            },
+            "fast_followers_count": 0,
+            "favourites_count": 6036,
+            "follow_request_sent": false,
+            "followed_by": false,
+            "followers_count": 3651,
+            "following": false,
+            "friends_count": 261,
+            "has_custom_timelines": false,
+            "id": 0,
+            "id_str": "1243691528540663808",
+            "is_translator": false,
+            "listed_count": 40,
+            "location": "Get automation customer #1 →",
+            "media_count": 225,
+            "name": "nicky",
+            "normal_followers_count": 3651,
+            "notifications": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/1243691528540663808/1734141651",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/1867691740481957891/9F0iaxdK_normal.jpg",
+            "protected": false,
+            "screen_name": "nicksaraev",
+            "show_all_inline_media": false,
+            "statuses_count": 3890,
+            "time_zone": "",
+            "translator_type": "none",
+            "url": "https://t.co/UtC2uDloKE",
+            "utc_offset": 0,
+            "verified": false,
+            "withheld_in_countries": [],
+            "withheld_scope": "",
+            "is_blue_verified": true
+          },
+          "startUrl": "https://twitter.com/nicksaraev"
+        }
+      },
+      {
+        "json": {
+          "id": 0,
+          "location": "",
+          "conversation_id_str": "1728176453634981911",
+          "created_at": "Sat Nov 25 00:27:14 +0000 2023",
+          "display_text_range": [
+            14,
+            291
+          ],
+          "entities": {
+            "user_mentions": [
+              {
+                "id_str": "1316471712549011456",
+                "name": "andrew gao",
+                "screen_name": "itsandrewgao",
+                "indices": [
+                  0,
+                  13
+                ]
+              }
+            ],
+            "urls": [],
+            "hashtags": [],
+            "symbols": [],
+            "media": []
+          },
+          "favorite_count": 654,
+          "favorited": false,
+          "full_text": "@itsandrewgao Programming is one of those weird careers that gets exponentially easier. \n\nYour first job is extremely difficult to acquire, but every job after that pays you more for less work. \n\nWhen you're ~10 yrs in it's not uncommon to juggle a dozen or more offers - while having a job.",
+          "id_str": "1728208688652104027",
+          "in_reply_to_name": "itsandrewgao",
+          "in_reply_to_screen_name": "itsandrewgao",
+          "in_reply_to_status_id_str": "1728176453634981911",
+          "in_reply_to_user_id_str": "1316471712549011456",
+          "lang": "en",
+          "permalink": "/nicksaraev/status/1728208688652104027",
+          "possibly_sensitive": false,
+          "quote_count": 0,
+          "reply_count": 14,
+          "retweet_count": 8,
+          "retweeted": false,
+          "text": "@itsandrewgao Programming is one of those weird careers that gets exponentially easier. \n\nYour first job is extremely difficult to acquire, but every job after that pays you more for less work. \n\nWhen you're ~10 yrs in it's not uncommon to juggle a dozen or more offers - while having a job.",
+          "user": {
+            "blocking": false,
+            "created_at": "Sat Mar 28 00:09:08 +0000 2020",
+            "default_profile": true,
+            "default_profile_image": false,
+            "description": "Founder, Maker School | The straight line path to growing an automation agency.\n\nLearn: https://t.co/rXs9sV4KKi\nContact: nick@leftclick.ai (no DMs)",
+            "entities": {
+              "description": {
+                "urls": [
+                  {
+                    "display_url": "youtube.com/@nicksaraev",
+                    "expanded_url": "http://youtube.com/@nicksaraev",
+                    "url": "https://t.co/rXs9sV4KKi",
+                    "indices": [
+                      88,
+                      111
+                    ]
+                  }
+                ]
+              },
+              "url": {
+                "urls": [
+                  {
+                    "display_url": "skool.com/makerschool",
+                    "expanded_url": "https://skool.com/makerschool",
+                    "url": "https://t.co/UtC2uDloKE",
+                    "indices": [
+                      0,
+                      23
+                    ]
+                  }
+                ]
+              }
+            },
+            "fast_followers_count": 0,
+            "favourites_count": 6036,
+            "follow_request_sent": false,
+            "followed_by": false,
+            "followers_count": 3651,
+            "following": false,
+            "friends_count": 261,
+            "has_custom_timelines": false,
+            "id": 0,
+            "id_str": "1243691528540663808",
+            "is_translator": false,
+            "listed_count": 40,
+            "location": "Get automation customer #1 →",
+            "media_count": 225,
+            "name": "nicky",
+            "normal_followers_count": 3651,
+            "notifications": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/1243691528540663808/1734141651",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/1867691740481957891/9F0iaxdK_normal.jpg",
+            "protected": false,
+            "screen_name": "nicksaraev",
+            "show_all_inline_media": false,
+            "statuses_count": 3890,
+            "time_zone": "",
+            "translator_type": "none",
+            "url": "https://t.co/UtC2uDloKE",
+            "utc_offset": 0,
+            "verified": false,
+            "withheld_in_countries": [],
+            "withheld_scope": "",
+            "is_blue_verified": true
+          },
+          "startUrl": "https://twitter.com/nicksaraev"
+        }
+      },
+      {
+        "json": {
+          "id": 0,
+          "location": "",
+          "conversation_id_str": "1732874799960211624",
+          "created_at": "Fri Dec 08 00:01:47 +0000 2023",
+          "display_text_range": [
+            8,
+            118
+          ],
+          "entities": {
+            "user_mentions": [
+              {
+                "id_str": "221838349",
+                "name": "Austen Allred",
+                "screen_name": "Austen",
+                "indices": [
+                  0,
+                  7
+                ]
+              }
+            ],
+            "urls": [],
+            "hashtags": [],
+            "symbols": [],
+            "media": []
+          },
+          "favorite_count": 557,
+          "favorited": false,
+          "full_text": "@Austen To be fair, television shows are interesting primarily because the characters don't have their lives together.",
+          "id_str": "1732913327100268657",
+          "in_reply_to_name": "Austen",
+          "in_reply_to_screen_name": "Austen",
+          "in_reply_to_status_id_str": "1732874799960211624",
+          "in_reply_to_user_id_str": "221838349",
+          "lang": "en",
+          "permalink": "/nicksaraev/status/1732913327100268657",
+          "possibly_sensitive": false,
+          "quote_count": 1,
+          "reply_count": 4,
+          "retweet_count": 3,
+          "retweeted": false,
+          "text": "@Austen To be fair, television shows are interesting primarily because the characters don't have their lives together.",
+          "user": {
+            "blocking": false,
+            "created_at": "Sat Mar 28 00:09:08 +0000 2020",
+            "default_profile": true,
+            "default_profile_image": false,
+            "description": "Founder, Maker School | The straight line path to growing an automation agency.\n\nLearn: https://t.co/rXs9sV4KKi\nContact: nick@leftclick.ai (no DMs)",
+            "entities": {
+              "description": {
+                "urls": [
+                  {
+                    "display_url": "youtube.com/@nicksaraev",
+                    "expanded_url": "http://youtube.com/@nicksaraev",
+                    "url": "https://t.co/rXs9sV4KKi",
+                    "indices": [
+                      88,
+                      111
+                    ]
+                  }
+                ]
+              },
+              "url": {
+                "urls": [
+                  {
+                    "display_url": "skool.com/makerschool",
+                    "expanded_url": "https://skool.com/makerschool",
+                    "url": "https://t.co/UtC2uDloKE",
+                    "indices": [
+                      0,
+                      23
+                    ]
+                  }
+                ]
+              }
+            },
+            "fast_followers_count": 0,
+            "favourites_count": 6036,
+            "follow_request_sent": false,
+            "followed_by": false,
+            "followers_count": 3651,
+            "following": false,
+            "friends_count": 261,
+            "has_custom_timelines": false,
+            "id": 0,
+            "id_str": "1243691528540663808",
+            "is_translator": false,
+            "listed_count": 40,
+            "location": "Get automation customer #1 →",
+            "media_count": 225,
+            "name": "nicky",
+            "normal_followers_count": 3651,
+            "notifications": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/1243691528540663808/1734141651",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/1867691740481957891/9F0iaxdK_normal.jpg",
+            "protected": false,
+            "screen_name": "nicksaraev",
+            "show_all_inline_media": false,
+            "statuses_count": 3890,
+            "time_zone": "",
+            "translator_type": "none",
+            "url": "https://t.co/UtC2uDloKE",
+            "utc_offset": 0,
+            "verified": false,
+            "withheld_in_countries": [],
+            "withheld_scope": "",
+            "is_blue_verified": true
+          },
+          "startUrl": "https://twitter.com/nicksaraev"
+        }
+      },
+      {
+        "json": {
+          "id": 0,
+          "location": "",
+          "conversation_id_str": "1722788791851606493",
+          "created_at": "Fri Nov 10 16:27:47 +0000 2023",
+          "display_text_range": [
+            13,
+            233
+          ],
+          "entities": {
+            "user_mentions": [
+              {
+                "id_str": "519786310",
+                "name": "Austin Byrd",
+                "screen_name": "AustinTByrd",
+                "indices": [
+                  0,
+                  12
+                ]
+              }
+            ],
+            "urls": [],
+            "hashtags": [],
+            "symbols": [],
+            "media": []
+          },
+          "favorite_count": 510,
+          "favorited": false,
+          "full_text": "@AustinTByrd This isn't a \"scam\". It's a legitimate attempt to create an AI hardware product. \n\nThe first few tries in any space are always janky - assuming malicious intent when this is really just earnest effort doesnt help anyone.",
+          "id_str": "1723014598704706043",
+          "in_reply_to_name": "AustinTByrd",
+          "in_reply_to_screen_name": "AustinTByrd",
+          "in_reply_to_status_id_str": "1722788791851606493",
+          "in_reply_to_user_id_str": "519786310",
+          "lang": "en",
+          "permalink": "/nicksaraev/status/1723014598704706043",
+          "possibly_sensitive": false,
+          "quote_count": 1,
+          "reply_count": 34,
+          "retweet_count": 6,
+          "retweeted": false,
+          "text": "@AustinTByrd This isn't a \"scam\". It's a legitimate attempt to create an AI hardware product. \n\nThe first few tries in any space are always janky - assuming malicious intent when this is really just earnest effort doesnt help anyone.",
+          "user": {
+            "blocking": false,
+            "created_at": "Sat Mar 28 00:09:08 +0000 2020",
+            "default_profile": true,
+            "default_profile_image": false,
+            "description": "Founder, Maker School | The straight line path to growing an automation agency.\n\nLearn: https://t.co/rXs9sV4KKi\nContact: nick@leftclick.ai (no DMs)",
+            "entities": {
+              "description": {
+                "urls": [
+                  {
+                    "display_url": "youtube.com/@nicksaraev",
+                    "expanded_url": "http://youtube.com/@nicksaraev",
+                    "url": "https://t.co/rXs9sV4KKi",
+                    "indices": [
+                      88,
+                      111
+                    ]
+                  }
+                ]
+              },
+              "url": {
+                "urls": [
+                  {
+                    "display_url": "skool.com/makerschool",
+                    "expanded_url": "https://skool.com/makerschool",
+                    "url": "https://t.co/UtC2uDloKE",
+                    "indices": [
+                      0,
+                      23
+                    ]
+                  }
+                ]
+              }
+            },
+            "fast_followers_count": 0,
+            "favourites_count": 6036,
+            "follow_request_sent": false,
+            "followed_by": false,
+            "followers_count": 3651,
+            "following": false,
+            "friends_count": 261,
+            "has_custom_timelines": false,
+            "id": 0,
+            "id_str": "1243691528540663808",
+            "is_translator": false,
+            "listed_count": 40,
+            "location": "Get automation customer #1 →",
+            "media_count": 225,
+            "name": "nicky",
+            "normal_followers_count": 3651,
+            "notifications": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/1243691528540663808/1734141651",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/1867691740481957891/9F0iaxdK_normal.jpg",
+            "protected": false,
+            "screen_name": "nicksaraev",
+            "show_all_inline_media": false,
+            "statuses_count": 3890,
+            "time_zone": "",
+            "translator_type": "none",
+            "url": "https://t.co/UtC2uDloKE",
+            "utc_offset": 0,
+            "verified": false,
+            "withheld_in_countries": [],
+            "withheld_scope": "",
+            "is_blue_verified": true
+          },
+          "startUrl": "https://twitter.com/nicksaraev"
+        }
+      },
+      {
+        "json": {
+          "id": 0,
+          "location": "",
+          "conversation_id_str": "1722733588343558323",
+          "created_at": "Fri Nov 10 00:28:50 +0000 2023",
+          "display_text_range": [
+            25,
+            110
+          ],
+          "entities": {
+            "user_mentions": [
+              {
+                "id_str": "1237312746",
+                "name": "Rosanne Liu",
+                "screen_name": "savvyRL",
+                "indices": [
+                  0,
+                  8
+                ]
+              },
+              {
+                "id_str": "3928615990",
+                "name": "Piotr Padlewski",
+                "screen_name": "PiotrPadlewski",
+                "indices": [
+                  9,
+                  24
+                ]
+              },
+              {
+                "id_str": "3928615990",
+                "name": "Piotr Padlewski",
+                "screen_name": "PiotrPadlewski",
+                "indices": [
+                  39,
+                  54
+                ]
+              }
+            ],
+            "urls": [],
+            "hashtags": [],
+            "symbols": [],
+            "media": []
+          },
+          "favorite_count": 391,
+          "favorited": false,
+          "full_text": "@savvyRL @PiotrPadlewski 0 reasons for @PiotrPadlewski to be embarrassed. On your end, though, there's plenty.",
+          "id_str": "1722773273677832341",
+          "in_reply_to_name": "savvyRL",
+          "in_reply_to_screen_name": "savvyRL",
+          "in_reply_to_status_id_str": "1722760631500280037",
+          "in_reply_to_user_id_str": "1237312746",
+          "lang": "en",
+          "permalink": "/nicksaraev/status/1722773273677832341",
+          "possibly_sensitive": false,
+          "quote_count": 0,
+          "reply_count": 2,
+          "retweet_count": 0,
+          "retweeted": false,
+          "text": "@savvyRL @PiotrPadlewski 0 reasons for @PiotrPadlewski to be embarrassed. On your end, though, there's plenty.",
+          "user": {
+            "blocking": false,
+            "created_at": "Sat Mar 28 00:09:08 +0000 2020",
+            "default_profile": true,
+            "default_profile_image": false,
+            "description": "Founder, Maker School | The straight line path to growing an automation agency.\n\nLearn: https://t.co/rXs9sV4KKi\nContact: nick@leftclick.ai (no DMs)",
+            "entities": {
+              "description": {
+                "urls": [
+                  {
+                    "display_url": "youtube.com/@nicksaraev",
+                    "expanded_url": "http://youtube.com/@nicksaraev",
+                    "url": "https://t.co/rXs9sV4KKi",
+                    "indices": [
+                      88,
+                      111
+                    ]
+                  }
+                ]
+              },
+              "url": {
+                "urls": [
+                  {
+                    "display_url": "skool.com/makerschool",
+                    "expanded_url": "https://skool.com/makerschool",
+                    "url": "https://t.co/UtC2uDloKE",
+                    "indices": [
+                      0,
+                      23
+                    ]
+                  }
+                ]
+              }
+            },
+            "fast_followers_count": 0,
+            "favourites_count": 6036,
+            "follow_request_sent": false,
+            "followed_by": false,
+            "followers_count": 3651,
+            "following": false,
+            "friends_count": 261,
+            "has_custom_timelines": false,
+            "id": 0,
+            "id_str": "1243691528540663808",
+            "is_translator": false,
+            "listed_count": 40,
+            "location": "Get automation customer #1 →",
+            "media_count": 225,
+            "name": "nicky",
+            "normal_followers_count": 3651,
+            "notifications": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/1243691528540663808/1734141651",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/1867691740481957891/9F0iaxdK_normal.jpg",
+            "protected": false,
+            "screen_name": "nicksaraev",
+            "show_all_inline_media": false,
+            "statuses_count": 3890,
+            "time_zone": "",
+            "translator_type": "none",
+            "url": "https://t.co/UtC2uDloKE",
+            "utc_offset": 0,
+            "verified": false,
+            "withheld_in_countries": [],
+            "withheld_scope": "",
+            "is_blue_verified": true
+          },
+          "startUrl": "https://twitter.com/nicksaraev"
+        }
+      },
+      {
+        "json": {
+          "id": 0,
+          "location": "",
+          "conversation_id_str": "1726270608219226523",
+          "created_at": "Sun Nov 19 22:10:10 +0000 2023",
+          "display_text_range": [
+            10,
+            81
+          ],
+          "entities": {
+            "user_mentions": [
+              {
+                "id_str": "1409592375425462272",
+                "name": "Rona likes compilers",
+                "screen_name": "ronawang",
+                "indices": [
+                  0,
+                  9
+                ]
+              }
+            ],
+            "urls": [],
+            "hashtags": [],
+            "symbols": [],
+            "media": []
+          },
+          "favorite_count": 369,
+          "favorited": false,
+          "full_text": "@ronawang Today it's less \"sharing\" and more \"being held at gunpoint to give it\".",
+          "id_str": "1726362253266715091",
+          "in_reply_to_name": "ronawang",
+          "in_reply_to_screen_name": "ronawang",
+          "in_reply_to_status_id_str": "1726270608219226523",
+          "in_reply_to_user_id_str": "1409592375425462272",
+          "lang": "en",
+          "permalink": "/nicksaraev/status/1726362253266715091",
+          "possibly_sensitive": false,
+          "quote_count": 0,
+          "reply_count": 1,
+          "retweet_count": 4,
+          "retweeted": false,
+          "text": "@ronawang Today it's less \"sharing\" and more \"being held at gunpoint to give it\".",
+          "user": {
+            "blocking": false,
+            "created_at": "Sat Mar 28 00:09:08 +0000 2020",
+            "default_profile": true,
+            "default_profile_image": false,
+            "description": "Founder, Maker School | The straight line path to growing an automation agency.\n\nLearn: https://t.co/rXs9sV4KKi\nContact: nick@leftclick.ai (no DMs)",
+            "entities": {
+              "description": {
+                "urls": [
+                  {
+                    "display_url": "youtube.com/@nicksaraev",
+                    "expanded_url": "http://youtube.com/@nicksaraev",
+                    "url": "https://t.co/rXs9sV4KKi",
+                    "indices": [
+                      88,
+                      111
+                    ]
+                  }
+                ]
+              },
+              "url": {
+                "urls": [
+                  {
+                    "display_url": "skool.com/makerschool",
+                    "expanded_url": "https://skool.com/makerschool",
+                    "url": "https://t.co/UtC2uDloKE",
+                    "indices": [
+                      0,
+                      23
+                    ]
+                  }
+                ]
+              }
+            },
+            "fast_followers_count": 0,
+            "favourites_count": 6036,
+            "follow_request_sent": false,
+            "followed_by": false,
+            "followers_count": 3651,
+            "following": false,
+            "friends_count": 261,
+            "has_custom_timelines": false,
+            "id": 0,
+            "id_str": "1243691528540663808",
+            "is_translator": false,
+            "listed_count": 40,
+            "location": "Get automation customer #1 →",
+            "media_count": 225,
+            "name": "nicky",
+            "normal_followers_count": 3651,
+            "notifications": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/1243691528540663808/1734141651",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/1867691740481957891/9F0iaxdK_normal.jpg",
+            "protected": false,
+            "screen_name": "nicksaraev",
+            "show_all_inline_media": false,
+            "statuses_count": 3890,
+            "time_zone": "",
+            "translator_type": "none",
+            "url": "https://t.co/UtC2uDloKE",
+            "utc_offset": 0,
+            "verified": false,
+            "withheld_in_countries": [],
+            "withheld_scope": "",
+            "is_blue_verified": true
+          },
+          "startUrl": "https://twitter.com/nicksaraev"
+        }
+      },
+      {
+        "json": {
+          "id": 0,
+          "location": "",
+          "conversation_id_str": "1726347129759936973",
+          "created_at": "Sun Nov 19 21:43:10 +0000 2023",
+          "display_text_range": [
+            15,
+            288
+          ],
+          "entities": {
+            "user_mentions": [
+              {
+                "id_str": "1062005076204642305",
+                "name": "Toby Ord",
+                "screen_name": "tobyordoxford",
+                "indices": [
+                  0,
+                  14
+                ]
+              }
+            ],
+            "urls": [],
+            "hashtags": [],
+            "symbols": [],
+            "media": []
+          },
+          "favorite_count": 326,
+          "favorited": false,
+          "full_text": "@tobyordoxford I mean, their board was set up exactly for reasons like this: to minimize the existential risk of a party behaving in a way that maximizes profit over the equitable distribution of AGI. \n\nIn that sense, it worked as intended. But socially, letting Sam go was a clusterfuck.",
+          "id_str": "1726355458292936999",
+          "in_reply_to_name": "tobyordoxford",
+          "in_reply_to_screen_name": "tobyordoxford",
+          "in_reply_to_status_id_str": "1726347129759936973",
+          "in_reply_to_user_id_str": "1062005076204642305",
+          "lang": "en",
+          "permalink": "/nicksaraev/status/1726355458292936999",
+          "possibly_sensitive": false,
+          "quote_count": 0,
+          "reply_count": 9,
+          "retweet_count": 7,
+          "retweeted": false,
+          "text": "@tobyordoxford I mean, their board was set up exactly for reasons like this: to minimize the existential risk of a party behaving in a way that maximizes profit over the equitable distribution of AGI. \n\nIn that sense, it worked as intended. But socially, letting Sam go was a clusterfuck.",
+          "user": {
+            "blocking": false,
+            "created_at": "Sat Mar 28 00:09:08 +0000 2020",
+            "default_profile": true,
+            "default_profile_image": false,
+            "description": "Founder, Maker School | The straight line path to growing an automation agency.\n\nLearn: https://t.co/rXs9sV4KKi\nContact: nick@leftclick.ai (no DMs)",
+            "entities": {
+              "description": {
+                "urls": [
+                  {
+                    "display_url": "youtube.com/@nicksaraev",
+                    "expanded_url": "http://youtube.com/@nicksaraev",
+                    "url": "https://t.co/rXs9sV4KKi",
+                    "indices": [
+                      88,
+                      111
+                    ]
+                  }
+                ]
+              },
+              "url": {
+                "urls": [
+                  {
+                    "display_url": "skool.com/makerschool",
+                    "expanded_url": "https://skool.com/makerschool",
+                    "url": "https://t.co/UtC2uDloKE",
+                    "indices": [
+                      0,
+                      23
+                    ]
+                  }
+                ]
+              }
+            },
+            "fast_followers_count": 0,
+            "favourites_count": 6036,
+            "follow_request_sent": false,
+            "followed_by": false,
+            "followers_count": 3651,
+            "following": false,
+            "friends_count": 261,
+            "has_custom_timelines": false,
+            "id": 0,
+            "id_str": "1243691528540663808",
+            "is_translator": false,
+            "listed_count": 40,
+            "location": "Get automation customer #1 →",
+            "media_count": 225,
+            "name": "nicky",
+            "normal_followers_count": 3651,
+            "notifications": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/1243691528540663808/1734141651",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/1867691740481957891/9F0iaxdK_normal.jpg",
+            "protected": false,
+            "screen_name": "nicksaraev",
+            "show_all_inline_media": false,
+            "statuses_count": 3890,
+            "time_zone": "",
+            "translator_type": "none",
+            "url": "https://t.co/UtC2uDloKE",
+            "utc_offset": 0,
+            "verified": false,
+            "withheld_in_countries": [],
+            "withheld_scope": "",
+            "is_blue_verified": true
+          },
+          "startUrl": "https://twitter.com/nicksaraev"
+        }
+      },
+      {
+        "json": {
+          "id": 0,
+          "location": "",
+          "conversation_id_str": "1726701175553265714",
+          "created_at": "Tue Nov 21 02:39:20 +0000 2023",
+          "display_text_range": [
+            16,
+            213
+          ],
+          "entities": {
+            "user_mentions": [
+              {
+                "id_str": "902520345651007488",
+                "name": "sílvia is",
+                "screen_name": "this_is_silvia",
+                "indices": [
+                  0,
+                  15
+                ]
+              }
+            ],
+            "urls": [],
+            "hashtags": [],
+            "symbols": [],
+            "media": []
+          },
+          "favorite_count": 319,
+          "favorited": false,
+          "full_text": "@this_is_silvia It's always seemed weird to me: in the vast majority of conversations, I'm never asked a single question. \n\nBut when I talk to people, I ask them tons of questions. And they happily talk for hours!",
+          "id_str": "1726792380987355594",
+          "in_reply_to_name": "this_is_silvia",
+          "in_reply_to_screen_name": "this_is_silvia",
+          "in_reply_to_status_id_str": "1726701175553265714",
+          "in_reply_to_user_id_str": "902520345651007488",
+          "lang": "en",
+          "permalink": "/nicksaraev/status/1726792380987355594",
+          "possibly_sensitive": false,
+          "quote_count": 2,
+          "reply_count": 5,
+          "retweet_count": 31,
+          "retweeted": false,
+          "text": "@this_is_silvia It's always seemed weird to me: in the vast majority of conversations, I'm never asked a single question. \n\nBut when I talk to people, I ask them tons of questions. And they happily talk for hours!",
+          "user": {
+            "blocking": false,
+            "created_at": "Sat Mar 28 00:09:08 +0000 2020",
+            "default_profile": true,
+            "default_profile_image": false,
+            "description": "Founder, Maker School | The straight line path to growing an automation agency.\n\nLearn: https://t.co/rXs9sV4KKi\nContact: nick@leftclick.ai (no DMs)",
+            "entities": {
+              "description": {
+                "urls": [
+                  {
+                    "display_url": "youtube.com/@nicksaraev",
+                    "expanded_url": "http://youtube.com/@nicksaraev",
+                    "url": "https://t.co/rXs9sV4KKi",
+                    "indices": [
+                      88,
+                      111
+                    ]
+                  }
+                ]
+              },
+              "url": {
+                "urls": [
+                  {
+                    "display_url": "skool.com/makerschool",
+                    "expanded_url": "https://skool.com/makerschool",
+                    "url": "https://t.co/UtC2uDloKE",
+                    "indices": [
+                      0,
+                      23
+                    ]
+                  }
+                ]
+              }
+            },
+            "fast_followers_count": 0,
+            "favourites_count": 6036,
+            "follow_request_sent": false,
+            "followed_by": false,
+            "followers_count": 3651,
+            "following": false,
+            "friends_count": 261,
+            "has_custom_timelines": false,
+            "id": 0,
+            "id_str": "1243691528540663808",
+            "is_translator": false,
+            "listed_count": 40,
+            "location": "Get automation customer #1 →",
+            "media_count": 225,
+            "name": "nicky",
+            "normal_followers_count": 3651,
+            "notifications": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/1243691528540663808/1734141651",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/1867691740481957891/9F0iaxdK_normal.jpg",
+            "protected": false,
+            "screen_name": "nicksaraev",
+            "show_all_inline_media": false,
+            "statuses_count": 3890,
+            "time_zone": "",
+            "translator_type": "none",
+            "url": "https://t.co/UtC2uDloKE",
+            "utc_offset": 0,
+            "verified": false,
+            "withheld_in_countries": [],
+            "withheld_scope": "",
+            "is_blue_verified": true
+          },
+          "startUrl": "https://twitter.com/nicksaraev"
+        }
+      },
+      {
+        "json": {
+          "id": 0,
+          "location": "",
+          "conversation_id_str": "1727465975887397360",
+          "created_at": "Thu Nov 23 02:57:02 +0000 2023",
+          "display_text_range": [
+            12,
+            197
+          ],
+          "entities": {
+            "user_mentions": [
+              {
+                "id_str": "1257963166602088449",
+                "name": "Siméon",
+                "screen_name": "Simeon_Cps",
+                "indices": [
+                  0,
+                  11
+                ]
+              }
+            ],
+            "urls": [],
+            "hashtags": [],
+            "symbols": [],
+            "media": []
+          },
+          "favorite_count": 318,
+          "favorited": false,
+          "full_text": "@Simeon_Cps These sorts of events seem planned when you look backwards, but rarely are. In reality, effective businesspeople are simply adept opportunists. Sam is good at taking advantage of chaos.",
+          "id_str": "1727521609731408270",
+          "in_reply_to_name": "Simeon_Cps",
+          "in_reply_to_screen_name": "Simeon_Cps",
+          "in_reply_to_status_id_str": "1727465975887397360",
+          "in_reply_to_user_id_str": "1257963166602088449",
+          "lang": "en",
+          "permalink": "/nicksaraev/status/1727521609731408270",
+          "possibly_sensitive": false,
+          "quote_count": 2,
+          "reply_count": 2,
+          "retweet_count": 2,
+          "retweeted": false,
+          "text": "@Simeon_Cps These sorts of events seem planned when you look backwards, but rarely are. In reality, effective businesspeople are simply adept opportunists. Sam is good at taking advantage of chaos.",
+          "user": {
+            "blocking": false,
+            "created_at": "Sat Mar 28 00:09:08 +0000 2020",
+            "default_profile": true,
+            "default_profile_image": false,
+            "description": "Founder, Maker School | The straight line path to growing an automation agency.\n\nLearn: https://t.co/rXs9sV4KKi\nContact: nick@leftclick.ai (no DMs)",
+            "entities": {
+              "description": {
+                "urls": [
+                  {
+                    "display_url": "youtube.com/@nicksaraev",
+                    "expanded_url": "http://youtube.com/@nicksaraev",
+                    "url": "https://t.co/rXs9sV4KKi",
+                    "indices": [
+                      88,
+                      111
+                    ]
+                  }
+                ]
+              },
+              "url": {
+                "urls": [
+                  {
+                    "display_url": "skool.com/makerschool",
+                    "expanded_url": "https://skool.com/makerschool",
+                    "url": "https://t.co/UtC2uDloKE",
+                    "indices": [
+                      0,
+                      23
+                    ]
+                  }
+                ]
+              }
+            },
+            "fast_followers_count": 0,
+            "favourites_count": 6036,
+            "follow_request_sent": false,
+            "followed_by": false,
+            "followers_count": 3651,
+            "following": false,
+            "friends_count": 261,
+            "has_custom_timelines": false,
+            "id": 0,
+            "id_str": "1243691528540663808",
+            "is_translator": false,
+            "listed_count": 40,
+            "location": "Get automation customer #1 →",
+            "media_count": 225,
+            "name": "nicky",
+            "normal_followers_count": 3651,
+            "notifications": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/1243691528540663808/1734141651",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/1867691740481957891/9F0iaxdK_normal.jpg",
+            "protected": false,
+            "screen_name": "nicksaraev",
+            "show_all_inline_media": false,
+            "statuses_count": 3890,
+            "time_zone": "",
+            "translator_type": "none",
+            "url": "https://t.co/UtC2uDloKE",
+            "utc_offset": 0,
+            "verified": false,
+            "withheld_in_countries": [],
+            "withheld_scope": "",
+            "is_blue_verified": true
+          },
+          "startUrl": "https://twitter.com/nicksaraev"
+        }
+      },
+      {
+        "json": {
+          "id": 0,
+          "location": "",
+          "conversation_id_str": "1468806429855424514",
+          "created_at": "Thu Dec 09 16:53:19 +0000 2021",
+          "display_text_range": [
+            13,
+            220
+          ],
+          "entities": {
+            "user_mentions": [
+              {
+                "id_str": "1869281564275998720",
+                "name": "Joshua Taylor",
+                "screen_name": "Leftistwonk",
+                "indices": [
+                  0,
+                  12
+                ]
+              }
+            ],
+            "urls": [],
+            "hashtags": [],
+            "symbols": [],
+            "media": []
+          },
+          "favorite_count": 289,
+          "favorited": false,
+          "full_text": "@LeftistWonk Terrible title. Quite misleading, too. He produced more carbon in that time period than a person in the lowest billion of carbon emitters in the world would over their life, not an entire one billion people.",
+          "id_str": "1468987133213884418",
+          "lang": "en",
+          "permalink": "/nicksaraev/status/1468987133213884418",
+          "possibly_sensitive": false,
+          "quote_count": 1,
+          "reply_count": 3,
+          "retweet_count": 0,
+          "retweeted": false,
+          "text": "@LeftistWonk Terrible title. Quite misleading, too. He produced more carbon in that time period than a person in the lowest billion of carbon emitters in the world would over their life, not an entire one billion people.",
+          "user": {
+            "blocking": false,
+            "created_at": "Sat Mar 28 00:09:08 +0000 2020",
+            "default_profile": true,
+            "default_profile_image": false,
+            "description": "Founder, Maker School | The straight line path to growing an automation agency.\n\nLearn: https://t.co/rXs9sV4KKi\nContact: nick@leftclick.ai (no DMs)",
+            "entities": {
+              "description": {
+                "urls": [
+                  {
+                    "display_url": "youtube.com/@nicksaraev",
+                    "expanded_url": "http://youtube.com/@nicksaraev",
+                    "url": "https://t.co/rXs9sV4KKi",
+                    "indices": [
+                      88,
+                      111
+                    ]
+                  }
+                ]
+              },
+              "url": {
+                "urls": [
+                  {
+                    "display_url": "skool.com/makerschool",
+                    "expanded_url": "https://skool.com/makerschool",
+                    "url": "https://t.co/UtC2uDloKE",
+                    "indices": [
+                      0,
+                      23
+                    ]
+                  }
+                ]
+              }
+            },
+            "fast_followers_count": 0,
+            "favourites_count": 6036,
+            "follow_request_sent": false,
+            "followed_by": false,
+            "followers_count": 3651,
+            "following": false,
+            "friends_count": 261,
+            "has_custom_timelines": false,
+            "id": 0,
+            "id_str": "1243691528540663808",
+            "is_translator": false,
+            "listed_count": 40,
+            "location": "Get automation customer #1 →",
+            "media_count": 225,
+            "name": "nicky",
+            "normal_followers_count": 3651,
+            "notifications": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/1243691528540663808/1734141651",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/1867691740481957891/9F0iaxdK_normal.jpg",
+            "protected": false,
+            "screen_name": "nicksaraev",
+            "show_all_inline_media": false,
+            "statuses_count": 3890,
+            "time_zone": "",
+            "translator_type": "none",
+            "url": "https://t.co/UtC2uDloKE",
+            "utc_offset": 0,
+            "verified": false,
+            "withheld_in_countries": [],
+            "withheld_scope": "",
+            "is_blue_verified": true
+          },
+          "startUrl": "https://twitter.com/nicksaraev"
+        }
+      },
+      {
+        "json": {
+          "id": 0,
+          "location": "",
+          "conversation_id_str": "1737739132632535500",
+          "created_at": "Thu Dec 21 20:12:00 +0000 2023",
+          "display_text_range": [
+            15,
+            84
+          ],
+          "entities": {
+            "user_mentions": [
+              {
+                "id_str": "945519234972491776",
+                "name": "kurt",
+                "screen_name": "virtualmusing",
+                "indices": [
+                  0,
+                  14
+                ]
+              }
+            ],
+            "urls": [],
+            "hashtags": [],
+            "symbols": [],
+            "media": []
+          },
+          "favorite_count": 132,
+          "favorited": false,
+          "full_text": "@virtualmusing \"Passive aggressive manipulation\" gets a helpful rebrand. Thanks ABC!",
+          "id_str": "1737928927669289233",
+          "in_reply_to_name": "virtualmusing",
+          "in_reply_to_screen_name": "virtualmusing",
+          "in_reply_to_status_id_str": "1737739132632535500",
+          "in_reply_to_user_id_str": "945519234972491776",
+          "lang": "en",
+          "permalink": "/nicksaraev/status/1737928927669289233",
+          "possibly_sensitive": false,
+          "quote_count": 0,
+          "reply_count": 1,
+          "retweet_count": 2,
+          "retweeted": false,
+          "text": "@virtualmusing \"Passive aggressive manipulation\" gets a helpful rebrand. Thanks ABC!",
+          "user": {
+            "blocking": false,
+            "created_at": "Sat Mar 28 00:09:08 +0000 2020",
+            "default_profile": true,
+            "default_profile_image": false,
+            "description": "Founder, Maker School | The straight line path to growing an automation agency.\n\nLearn: https://t.co/rXs9sV4KKi\nContact: nick@leftclick.ai (no DMs)",
+            "entities": {
+              "description": {
+                "urls": [
+                  {
+                    "display_url": "youtube.com/@nicksaraev",
+                    "expanded_url": "http://youtube.com/@nicksaraev",
+                    "url": "https://t.co/rXs9sV4KKi",
+                    "indices": [
+                      88,
+                      111
+                    ]
+                  }
+                ]
+              },
+              "url": {
+                "urls": [
+                  {
+                    "display_url": "skool.com/makerschool",
+                    "expanded_url": "https://skool.com/makerschool",
+                    "url": "https://t.co/UtC2uDloKE",
+                    "indices": [
+                      0,
+                      23
+                    ]
+                  }
+                ]
+              }
+            },
+            "fast_followers_count": 0,
+            "favourites_count": 6036,
+            "follow_request_sent": false,
+            "followed_by": false,
+            "followers_count": 3651,
+            "following": false,
+            "friends_count": 261,
+            "has_custom_timelines": false,
+            "id": 0,
+            "id_str": "1243691528540663808",
+            "is_translator": false,
+            "listed_count": 40,
+            "location": "Get automation customer #1 →",
+            "media_count": 225,
+            "name": "nicky",
+            "normal_followers_count": 3651,
+            "notifications": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/1243691528540663808/1734141651",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/1867691740481957891/9F0iaxdK_normal.jpg",
+            "protected": false,
+            "screen_name": "nicksaraev",
+            "show_all_inline_media": false,
+            "statuses_count": 3890,
+            "time_zone": "",
+            "translator_type": "none",
+            "url": "https://t.co/UtC2uDloKE",
+            "utc_offset": 0,
+            "verified": false,
+            "withheld_in_countries": [],
+            "withheld_scope": "",
+            "is_blue_verified": true
+          },
+          "startUrl": "https://twitter.com/nicksaraev"
+        }
+      },
+      {
+        "json": {
+          "id": 0,
+          "location": "",
+          "conversation_id_str": "1722095343259603262",
+          "created_at": "Wed Nov 08 03:51:11 +0000 2023",
+          "display_text_range": [
+            9,
+            258
+          ],
+          "entities": {
+            "user_mentions": [
+              {
+                "id_str": "12901712",
+                "name": "Brian Chesky",
+                "screen_name": "bchesky",
+                "indices": [
+                  0,
+                  8
+                ]
+              }
+            ],
+            "urls": [],
+            "hashtags": [],
+            "symbols": [],
+            "media": []
+          },
+          "favorite_count": 125,
+          "favorited": false,
+          "full_text": "@bchesky The biggest problem w AirBNB is the pricing. It's 100% dark patterns. \n\nI know you'd lose money making pricing clear and fair in the short-term but you'd gain a lot of respect and usability, both of which should make you more money in the long term.",
+          "id_str": "1722099420907630989",
+          "in_reply_to_name": "bchesky",
+          "in_reply_to_screen_name": "bchesky",
+          "in_reply_to_status_id_str": "1722095343259603262",
+          "in_reply_to_user_id_str": "12901712",
+          "lang": "en",
+          "permalink": "/nicksaraev/status/1722099420907630989",
+          "possibly_sensitive": false,
+          "quote_count": 0,
+          "reply_count": 6,
+          "retweet_count": 2,
+          "retweeted": false,
+          "text": "@bchesky The biggest problem w AirBNB is the pricing. It's 100% dark patterns. \n\nI know you'd lose money making pricing clear and fair in the short-term but you'd gain a lot of respect and usability, both of which should make you more money in the long term.",
+          "user": {
+            "blocking": false,
+            "created_at": "Sat Mar 28 00:09:08 +0000 2020",
+            "default_profile": true,
+            "default_profile_image": false,
+            "description": "Founder, Maker School | The straight line path to growing an automation agency.\n\nLearn: https://t.co/rXs9sV4KKi\nContact: nick@leftclick.ai (no DMs)",
+            "entities": {
+              "description": {
+                "urls": [
+                  {
+                    "display_url": "youtube.com/@nicksaraev",
+                    "expanded_url": "http://youtube.com/@nicksaraev",
+                    "url": "https://t.co/rXs9sV4KKi",
+                    "indices": [
+                      88,
+                      111
+                    ]
+                  }
+                ]
+              },
+              "url": {
+                "urls": [
+                  {
+                    "display_url": "skool.com/makerschool",
+                    "expanded_url": "https://skool.com/makerschool",
+                    "url": "https://t.co/UtC2uDloKE",
+                    "indices": [
+                      0,
+                      23
+                    ]
+                  }
+                ]
+              }
+            },
+            "fast_followers_count": 0,
+            "favourites_count": 6036,
+            "follow_request_sent": false,
+            "followed_by": false,
+            "followers_count": 3651,
+            "following": false,
+            "friends_count": 261,
+            "has_custom_timelines": false,
+            "id": 0,
+            "id_str": "1243691528540663808",
+            "is_translator": false,
+            "listed_count": 40,
+            "location": "Get automation customer #1 →",
+            "media_count": 225,
+            "name": "nicky",
+            "normal_followers_count": 3651,
+            "notifications": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/1243691528540663808/1734141651",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/1867691740481957891/9F0iaxdK_normal.jpg",
+            "protected": false,
+            "screen_name": "nicksaraev",
+            "show_all_inline_media": false,
+            "statuses_count": 3890,
+            "time_zone": "",
+            "translator_type": "none",
+            "url": "https://t.co/UtC2uDloKE",
+            "utc_offset": 0,
+            "verified": false,
+            "withheld_in_countries": [],
+            "withheld_scope": "",
+            "is_blue_verified": true
+          },
+          "startUrl": "https://twitter.com/nicksaraev"
+        }
+      },
+      {
+        "json": {
+          "id": 0,
+          "location": "",
+          "conversation_id_str": "1494092820260532227",
+          "created_at": "Thu Feb 17 00:03:45 +0000 2022",
+          "display_text_range": [
+            15,
+            286
+          ],
+          "entities": {
+            "user_mentions": [
+              {
+                "id_str": "20675681",
+                "name": "James Melville 🚜",
+                "screen_name": "JamesMelville",
+                "indices": [
+                  0,
+                  14
+                ]
+              }
+            ],
+            "urls": [],
+            "hashtags": [],
+            "symbols": [],
+            "media": []
+          },
+          "favorite_count": 113,
+          "favorited": false,
+          "full_text": "@JamesMelville Interesting. I verified this myself: got in on the first try, but when I tried with my phone, mine stopped being accessible. \n\nMost likely explanation is a shared resource or server relied upon by the big banks (Canada-specific) is down. Very coincidental timing, though.",
+          "id_str": "1494100216877752320",
+          "in_reply_to_name": "JamesMelville",
+          "in_reply_to_screen_name": "JamesMelville",
+          "in_reply_to_status_id_str": "1494092820260532227",
+          "in_reply_to_user_id_str": "20675681",
+          "lang": "en",
+          "permalink": "/nicksaraev/status/1494100216877752320",
+          "possibly_sensitive": false,
+          "quote_count": 1,
+          "reply_count": 16,
+          "retweet_count": 11,
+          "retweeted": false,
+          "text": "@JamesMelville Interesting. I verified this myself: got in on the first try, but when I tried with my phone, mine stopped being accessible. \n\nMost likely explanation is a shared resource or server relied upon by the big banks (Canada-specific) is down. Very coincidental timing, though.",
+          "user": {
+            "blocking": false,
+            "created_at": "Sat Mar 28 00:09:08 +0000 2020",
+            "default_profile": true,
+            "default_profile_image": false,
+            "description": "Founder, Maker School | The straight line path to growing an automation agency.\n\nLearn: https://t.co/rXs9sV4KKi\nContact: nick@leftclick.ai (no DMs)",
+            "entities": {
+              "description": {
+                "urls": [
+                  {
+                    "display_url": "youtube.com/@nicksaraev",
+                    "expanded_url": "http://youtube.com/@nicksaraev",
+                    "url": "https://t.co/rXs9sV4KKi",
+                    "indices": [
+                      88,
+                      111
+                    ]
+                  }
+                ]
+              },
+              "url": {
+                "urls": [
+                  {
+                    "display_url": "skool.com/makerschool",
+                    "expanded_url": "https://skool.com/makerschool",
+                    "url": "https://t.co/UtC2uDloKE",
+                    "indices": [
+                      0,
+                      23
+                    ]
+                  }
+                ]
+              }
+            },
+            "fast_followers_count": 0,
+            "favourites_count": 6036,
+            "follow_request_sent": false,
+            "followed_by": false,
+            "followers_count": 3651,
+            "following": false,
+            "friends_count": 261,
+            "has_custom_timelines": false,
+            "id": 0,
+            "id_str": "1243691528540663808",
+            "is_translator": false,
+            "listed_count": 40,
+            "location": "Get automation customer #1 →",
+            "media_count": 225,
+            "name": "nicky",
+            "normal_followers_count": 3651,
+            "notifications": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/1243691528540663808/1734141651",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/1867691740481957891/9F0iaxdK_normal.jpg",
+            "protected": false,
+            "screen_name": "nicksaraev",
+            "show_all_inline_media": false,
+            "statuses_count": 3890,
+            "time_zone": "",
+            "translator_type": "none",
+            "url": "https://t.co/UtC2uDloKE",
+            "utc_offset": 0,
+            "verified": false,
+            "withheld_in_countries": [],
+            "withheld_scope": "",
+            "is_blue_verified": true
+          },
+          "startUrl": "https://twitter.com/nicksaraev"
+        }
+      },
+      {
+        "json": {
+          "id": 0,
+          "location": "",
+          "conversation_id_str": "1494405770540167173",
+          "created_at": "Fri Feb 18 02:12:04 +0000 2022",
+          "display_text_range": [
+            15,
+            294
+          ],
+          "entities": {
+            "user_mentions": [
+              {
+                "id_str": "23655688",
+                "name": "Ottawa Citizen",
+                "screen_name": "OttawaCitizen",
+                "indices": [
+                  0,
+                  14
+                ]
+              }
+            ],
+            "urls": [],
+            "hashtags": [],
+            "symbols": [],
+            "media": []
+          },
+          "favorite_count": 105,
+          "favorited": false,
+          "full_text": "@OttawaCitizen This is... a compression of democracy. A survey of 1,518 Canadians is not even 0.07% of *Vancouver*, not to mention Canada. \n\nI understand the need to take society's pulse from time to time. Using a tiny survey as justification for a wartime emergency act is not the way forward.",
+          "id_str": "1494494895226036229",
+          "in_reply_to_name": "OttawaCitizen",
+          "in_reply_to_screen_name": "OttawaCitizen",
+          "in_reply_to_status_id_str": "1494405770540167173",
+          "in_reply_to_user_id_str": "23655688",
+          "lang": "en",
+          "permalink": "/nicksaraev/status/1494494895226036229",
+          "possibly_sensitive": false,
+          "quote_count": 0,
+          "reply_count": 8,
+          "retweet_count": 8,
+          "retweeted": false,
+          "text": "@OttawaCitizen This is... a compression of democracy. A survey of 1,518 Canadians is not even 0.07% of *Vancouver*, not to mention Canada. \n\nI understand the need to take society's pulse from time to time. Using a tiny survey as justification for a wartime emergency act is not the way forward.",
+          "user": {
+            "blocking": false,
+            "created_at": "Sat Mar 28 00:09:08 +0000 2020",
+            "default_profile": true,
+            "default_profile_image": false,
+            "description": "Founder, Maker School | The straight line path to growing an automation agency.\n\nLearn: https://t.co/rXs9sV4KKi\nContact: nick@leftclick.ai (no DMs)",
+            "entities": {
+              "description": {
+                "urls": [
+                  {
+                    "display_url": "youtube.com/@nicksaraev",
+                    "expanded_url": "http://youtube.com/@nicksaraev",
+                    "url": "https://t.co/rXs9sV4KKi",
+                    "indices": [
+                      88,
+                      111
+                    ]
+                  }
+                ]
+              },
+              "url": {
+                "urls": [
+                  {
+                    "display_url": "skool.com/makerschool",
+                    "expanded_url": "https://skool.com/makerschool",
+                    "url": "https://t.co/UtC2uDloKE",
+                    "indices": [
+                      0,
+                      23
+                    ]
+                  }
+                ]
+              }
+            },
+            "fast_followers_count": 0,
+            "favourites_count": 6036,
+            "follow_request_sent": false,
+            "followed_by": false,
+            "followers_count": 3651,
+            "following": false,
+            "friends_count": 261,
+            "has_custom_timelines": false,
+            "id": 0,
+            "id_str": "1243691528540663808",
+            "is_translator": false,
+            "listed_count": 40,
+            "location": "Get automation customer #1 →",
+            "media_count": 225,
+            "name": "nicky",
+            "normal_followers_count": 3651,
+            "notifications": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/1243691528540663808/1734141651",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/1867691740481957891/9F0iaxdK_normal.jpg",
+            "protected": false,
+            "screen_name": "nicksaraev",
+            "show_all_inline_media": false,
+            "statuses_count": 3890,
+            "time_zone": "",
+            "translator_type": "none",
+            "url": "https://t.co/UtC2uDloKE",
+            "utc_offset": 0,
+            "verified": false,
+            "withheld_in_countries": [],
+            "withheld_scope": "",
+            "is_blue_verified": true
+          },
+          "startUrl": "https://twitter.com/nicksaraev"
+        }
+      },
+      {
+        "json": {
+          "id": 0,
+          "location": "",
+          "conversation_id_str": "1727184409512587270",
+          "created_at": "Wed Nov 22 21:02:31 +0000 2023",
+          "display_text_range": [
+            15,
+            286
+          ],
+          "entities": {
+            "user_mentions": [
+              {
+                "id_str": "18800569",
+                "name": "Jason",
+                "screen_name": "requestmethod",
+                "indices": [
+                  0,
+                  14
+                ]
+              }
+            ],
+            "urls": [],
+            "hashtags": [],
+            "symbols": [],
+            "media": []
+          },
+          "favorite_count": 102,
+          "favorited": false,
+          "full_text": "@requestmethod It seems obvious that annual performance reviews suck. They're procrastination for managers—instead of being candid 24/7, you only have to be candid once a year.\n\nNewsflash: the market doesn't evaluate your company's performance once a year. You're scrutinized every day.",
+          "id_str": "1727432394154865144",
+          "in_reply_to_name": "requestmethod",
+          "in_reply_to_screen_name": "requestmethod",
+          "in_reply_to_status_id_str": "1727184409512587270",
+          "in_reply_to_user_id_str": "18800569",
+          "lang": "en",
+          "permalink": "/nicksaraev/status/1727432394154865144",
+          "possibly_sensitive": false,
+          "quote_count": 0,
+          "reply_count": 1,
+          "retweet_count": 2,
+          "retweeted": false,
+          "text": "@requestmethod It seems obvious that annual performance reviews suck. They're procrastination for managers—instead of being candid 24/7, you only have to be candid once a year.\n\nNewsflash: the market doesn't evaluate your company's performance once a year. You're scrutinized every day.",
+          "user": {
+            "blocking": false,
+            "created_at": "Sat Mar 28 00:09:08 +0000 2020",
+            "default_profile": true,
+            "default_profile_image": false,
+            "description": "Founder, Maker School | The straight line path to growing an automation agency.\n\nLearn: https://t.co/rXs9sV4KKi\nContact: nick@leftclick.ai (no DMs)",
+            "entities": {
+              "description": {
+                "urls": [
+                  {
+                    "display_url": "youtube.com/@nicksaraev",
+                    "expanded_url": "http://youtube.com/@nicksaraev",
+                    "url": "https://t.co/rXs9sV4KKi",
+                    "indices": [
+                      88,
+                      111
+                    ]
+                  }
+                ]
+              },
+              "url": {
+                "urls": [
+                  {
+                    "display_url": "skool.com/makerschool",
+                    "expanded_url": "https://skool.com/makerschool",
+                    "url": "https://t.co/UtC2uDloKE",
+                    "indices": [
+                      0,
+                      23
+                    ]
+                  }
+                ]
+              }
+            },
+            "fast_followers_count": 0,
+            "favourites_count": 6036,
+            "follow_request_sent": false,
+            "followed_by": false,
+            "followers_count": 3651,
+            "following": false,
+            "friends_count": 261,
+            "has_custom_timelines": false,
+            "id": 0,
+            "id_str": "1243691528540663808",
+            "is_translator": false,
+            "listed_count": 40,
+            "location": "Get automation customer #1 →",
+            "media_count": 225,
+            "name": "nicky",
+            "normal_followers_count": 3651,
+            "notifications": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/1243691528540663808/1734141651",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/1867691740481957891/9F0iaxdK_normal.jpg",
+            "protected": false,
+            "screen_name": "nicksaraev",
+            "show_all_inline_media": false,
+            "statuses_count": 3890,
+            "time_zone": "",
+            "translator_type": "none",
+            "url": "https://t.co/UtC2uDloKE",
+            "utc_offset": 0,
+            "verified": false,
+            "withheld_in_countries": [],
+            "withheld_scope": "",
+            "is_blue_verified": true
+          },
+          "startUrl": "https://twitter.com/nicksaraev"
+        }
+      },
+      {
+        "json": {
+          "id": 0,
+          "location": "",
+          "conversation_id_str": "1511019587277664256",
+          "created_at": "Tue Apr 05 00:05:05 +0000 2022",
+          "display_text_range": [
+            10,
+            279
+          ],
+          "entities": {
+            "user_mentions": [
+              {
+                "id_str": "33838201",
+                "name": "Google AI",
+                "screen_name": "GoogleAI",
+                "indices": [
+                  0,
+                  9
+                ]
+              }
+            ],
+            "urls": [],
+            "hashtags": [],
+            "symbols": [],
+            "media": []
+          },
+          "favorite_count": 95,
+          "favorited": false,
+          "full_text": "@GoogleAI Something that you may have glossed over:\n\n\"PaLM 540B 5-shot also does better than the average performance of people asked to solve the same tasks.\"\n\nBetter-than-human performance on a wide range of tasks - and it can also do them thousands of times faster. Incredible.",
+          "id_str": "1511132781388042241",
+          "in_reply_to_name": "GoogleAI",
+          "in_reply_to_screen_name": "GoogleAI",
+          "in_reply_to_status_id_str": "1511019587277664256",
+          "in_reply_to_user_id_str": "33838201",
+          "lang": "en",
+          "permalink": "/nicksaraev/status/1511132781388042241",
+          "possibly_sensitive": false,
+          "quote_count": 1,
+          "reply_count": 2,
+          "retweet_count": 6,
+          "retweeted": false,
+          "text": "@GoogleAI Something that you may have glossed over:\n\n\"PaLM 540B 5-shot also does better than the average performance of people asked to solve the same tasks.\"\n\nBetter-than-human performance on a wide range of tasks - and it can also do them thousands of times faster. Incredible.",
+          "user": {
+            "blocking": false,
+            "created_at": "Sat Mar 28 00:09:08 +0000 2020",
+            "default_profile": true,
+            "default_profile_image": false,
+            "description": "Founder, Maker School | The straight line path to growing an automation agency.\n\nLearn: https://t.co/rXs9sV4KKi\nContact: nick@leftclick.ai (no DMs)",
+            "entities": {
+              "description": {
+                "urls": [
+                  {
+                    "display_url": "youtube.com/@nicksaraev",
+                    "expanded_url": "http://youtube.com/@nicksaraev",
+                    "url": "https://t.co/rXs9sV4KKi",
+                    "indices": [
+                      88,
+                      111
+                    ]
+                  }
+                ]
+              },
+              "url": {
+                "urls": [
+                  {
+                    "display_url": "skool.com/makerschool",
+                    "expanded_url": "https://skool.com/makerschool",
+                    "url": "https://t.co/UtC2uDloKE",
+                    "indices": [
+                      0,
+                      23
+                    ]
+                  }
+                ]
+              }
+            },
+            "fast_followers_count": 0,
+            "favourites_count": 6036,
+            "follow_request_sent": false,
+            "followed_by": false,
+            "followers_count": 3651,
+            "following": false,
+            "friends_count": 261,
+            "has_custom_timelines": false,
+            "id": 0,
+            "id_str": "1243691528540663808",
+            "is_translator": false,
+            "listed_count": 40,
+            "location": "Get automation customer #1 →",
+            "media_count": 225,
+            "name": "nicky",
+            "normal_followers_count": 3651,
+            "notifications": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/1243691528540663808/1734141651",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/1867691740481957891/9F0iaxdK_normal.jpg",
+            "protected": false,
+            "screen_name": "nicksaraev",
+            "show_all_inline_media": false,
+            "statuses_count": 3890,
+            "time_zone": "",
+            "translator_type": "none",
+            "url": "https://t.co/UtC2uDloKE",
+            "utc_offset": 0,
+            "verified": false,
+            "withheld_in_countries": [],
+            "withheld_scope": "",
+            "is_blue_verified": true
+          },
+          "startUrl": "https://twitter.com/nicksaraev"
+        }
+      },
+      {
+        "json": {
+          "id": 0,
+          "location": "",
+          "conversation_id_str": "1722181701672305140",
+          "created_at": "Wed Nov 08 14:57:16 +0000 2023",
+          "display_text_range": [
+            14,
+            98
+          ],
+          "entities": {
+            "user_mentions": [
+              {
+                "id_str": "1524857452616855552",
+                "name": "fudge",
+                "screen_name": "fuckpoasting",
+                "indices": [
+                  0,
+                  13
+                ]
+              }
+            ],
+            "urls": [],
+            "hashtags": [],
+            "symbols": [],
+            "media": []
+          },
+          "favorite_count": 95,
+          "favorited": false,
+          "full_text": "@fuckpoasting 4-5 years tops before we're back in 1700s France level entrenched social immobility.",
+          "id_str": "1722267043846852770",
+          "in_reply_to_name": "fuckpoasting",
+          "in_reply_to_screen_name": "fuckpoasting",
+          "in_reply_to_status_id_str": "1722181701672305140",
+          "in_reply_to_user_id_str": "1524857452616855552",
+          "lang": "en",
+          "permalink": "/nicksaraev/status/1722267043846852770",
+          "possibly_sensitive": false,
+          "quote_count": 1,
+          "reply_count": 9,
+          "retweet_count": 1,
+          "retweeted": false,
+          "text": "@fuckpoasting 4-5 years tops before we're back in 1700s France level entrenched social immobility.",
+          "user": {
+            "blocking": false,
+            "created_at": "Sat Mar 28 00:09:08 +0000 2020",
+            "default_profile": true,
+            "default_profile_image": false,
+            "description": "Founder, Maker School | The straight line path to growing an automation agency.\n\nLearn: https://t.co/rXs9sV4KKi\nContact: nick@leftclick.ai (no DMs)",
+            "entities": {
+              "description": {
+                "urls": [
+                  {
+                    "display_url": "youtube.com/@nicksaraev",
+                    "expanded_url": "http://youtube.com/@nicksaraev",
+                    "url": "https://t.co/rXs9sV4KKi",
+                    "indices": [
+                      88,
+                      111
+                    ]
+                  }
+                ]
+              },
+              "url": {
+                "urls": [
+                  {
+                    "display_url": "skool.com/makerschool",
+                    "expanded_url": "https://skool.com/makerschool",
+                    "url": "https://t.co/UtC2uDloKE",
+                    "indices": [
+                      0,
+                      23
+                    ]
+                  }
+                ]
+              }
+            },
+            "fast_followers_count": 0,
+            "favourites_count": 6036,
+            "follow_request_sent": false,
+            "followed_by": false,
+            "followers_count": 3651,
+            "following": false,
+            "friends_count": 261,
+            "has_custom_timelines": false,
+            "id": 0,
+            "id_str": "1243691528540663808",
+            "is_translator": false,
+            "listed_count": 40,
+            "location": "Get automation customer #1 →",
+            "media_count": 225,
+            "name": "nicky",
+            "normal_followers_count": 3651,
+            "notifications": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/1243691528540663808/1734141651",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/1867691740481957891/9F0iaxdK_normal.jpg",
+            "protected": false,
+            "screen_name": "nicksaraev",
+            "show_all_inline_media": false,
+            "statuses_count": 3890,
+            "time_zone": "",
+            "translator_type": "none",
+            "url": "https://t.co/UtC2uDloKE",
+            "utc_offset": 0,
+            "verified": false,
+            "withheld_in_countries": [],
+            "withheld_scope": "",
+            "is_blue_verified": true
+          },
+          "startUrl": "https://twitter.com/nicksaraev"
+        }
+      },
+      {
+        "json": {
+          "id": 0,
+          "location": "",
+          "conversation_id_str": "1722093019195994240",
+          "created_at": "Wed Nov 08 04:40:45 +0000 2023",
+          "display_text_range": [
+            16,
+            118
+          ],
+          "entities": {
+            "user_mentions": [
+              {
+                "id_str": "1313628449630679040",
+                "name": "Eric Farraro",
+                "screen_name": "EFarraro",
+                "indices": [
+                  0,
+                  9
+                ]
+              },
+              {
+                "id_str": "1720665183188922368",
+                "name": "Grok",
+                "screen_name": "grok",
+                "indices": [
+                  10,
+                  15
+                ]
+              }
+            ],
+            "urls": [],
+            "hashtags": [],
+            "symbols": [],
+            "media": []
+          },
+          "favorite_count": 86,
+          "favorited": false,
+          "full_text": "@EFarraro @grok Linking to real tweets is an awesome feature. Makes diving through the rabbit hole that much more fun.",
+          "id_str": "1722111892741816330",
+          "in_reply_to_name": "EFarraro",
+          "in_reply_to_screen_name": "EFarraro",
+          "in_reply_to_status_id_str": "1722093019195994240",
+          "in_reply_to_user_id_str": "1313628449630679040",
+          "lang": "en",
+          "permalink": "/nicksaraev/status/1722111892741816330",
+          "possibly_sensitive": false,
+          "quote_count": 0,
+          "reply_count": 1,
+          "retweet_count": 5,
+          "retweeted": false,
+          "text": "@EFarraro @grok Linking to real tweets is an awesome feature. Makes diving through the rabbit hole that much more fun.",
+          "user": {
+            "blocking": false,
+            "created_at": "Sat Mar 28 00:09:08 +0000 2020",
+            "default_profile": true,
+            "default_profile_image": false,
+            "description": "Founder, Maker School | The straight line path to growing an automation agency.\n\nLearn: https://t.co/rXs9sV4KKi\nContact: nick@leftclick.ai (no DMs)",
+            "entities": {
+              "description": {
+                "urls": [
+                  {
+                    "display_url": "youtube.com/@nicksaraev",
+                    "expanded_url": "http://youtube.com/@nicksaraev",
+                    "url": "https://t.co/rXs9sV4KKi",
+                    "indices": [
+                      88,
+                      111
+                    ]
+                  }
+                ]
+              },
+              "url": {
+                "urls": [
+                  {
+                    "display_url": "skool.com/makerschool",
+                    "expanded_url": "https://skool.com/makerschool",
+                    "url": "https://t.co/UtC2uDloKE",
+                    "indices": [
+                      0,
+                      23
+                    ]
+                  }
+                ]
+              }
+            },
+            "fast_followers_count": 0,
+            "favourites_count": 6036,
+            "follow_request_sent": false,
+            "followed_by": false,
+            "followers_count": 3651,
+            "following": false,
+            "friends_count": 261,
+            "has_custom_timelines": false,
+            "id": 0,
+            "id_str": "1243691528540663808",
+            "is_translator": false,
+            "listed_count": 40,
+            "location": "Get automation customer #1 →",
+            "media_count": 225,
+            "name": "nicky",
+            "normal_followers_count": 3651,
+            "notifications": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/1243691528540663808/1734141651",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/1867691740481957891/9F0iaxdK_normal.jpg",
+            "protected": false,
+            "screen_name": "nicksaraev",
+            "show_all_inline_media": false,
+            "statuses_count": 3890,
+            "time_zone": "",
+            "translator_type": "none",
+            "url": "https://t.co/UtC2uDloKE",
+            "utc_offset": 0,
+            "verified": false,
+            "withheld_in_countries": [],
+            "withheld_scope": "",
+            "is_blue_verified": true
+          },
+          "startUrl": "https://twitter.com/nicksaraev"
+        }
+      },
+      {
+        "json": {
+          "id": 0,
+          "location": "",
+          "conversation_id_str": "1602280347357810688",
+          "created_at": "Mon Dec 12 22:42:14 +0000 2022",
+          "display_text_range": [
+            14,
+            282
+          ],
+          "entities": {
+            "user_mentions": [
+              {
+                "id_str": "240049622",
+                "name": "David Perell",
+                "screen_name": "david_perell",
+                "indices": [
+                  0,
+                  13
+                ]
+              }
+            ],
+            "urls": [],
+            "hashtags": [],
+            "symbols": [],
+            "media": []
+          },
+          "favorite_count": 82,
+          "favorited": false,
+          "full_text": "@david_perell children learn the most effective social strategy for navigating their environment, whatever that environment may be. \n\ni.e surround them with adults &amp; they'll learn to talk like adults (meanwhile, everyone their age will consider them weird). inverse applies too.",
+          "id_str": "1602433672770383872",
+          "in_reply_to_name": "david_perell",
+          "in_reply_to_screen_name": "david_perell",
+          "in_reply_to_status_id_str": "1602280347357810688",
+          "in_reply_to_user_id_str": "240049622",
+          "lang": "en",
+          "permalink": "/nicksaraev/status/1602433672770383872",
+          "possibly_sensitive": false,
+          "quote_count": 2,
+          "reply_count": 4,
+          "retweet_count": 4,
+          "retweeted": false,
+          "text": "@david_perell children learn the most effective social strategy for navigating their environment, whatever that environment may be. \n\ni.e surround them with adults &amp; they'll learn to talk like adults (meanwhile, everyone their age will consider them weird). inverse applies too.",
+          "user": {
+            "blocking": false,
+            "created_at": "Sat Mar 28 00:09:08 +0000 2020",
+            "default_profile": true,
+            "default_profile_image": false,
+            "description": "Founder, Maker School | The straight line path to growing an automation agency.\n\nLearn: https://t.co/rXs9sV4KKi\nContact: nick@leftclick.ai (no DMs)",
+            "entities": {
+              "description": {
+                "urls": [
+                  {
+                    "display_url": "youtube.com/@nicksaraev",
+                    "expanded_url": "http://youtube.com/@nicksaraev",
+                    "url": "https://t.co/rXs9sV4KKi",
+                    "indices": [
+                      88,
+                      111
+                    ]
+                  }
+                ]
+              },
+              "url": {
+                "urls": [
+                  {
+                    "display_url": "skool.com/makerschool",
+                    "expanded_url": "https://skool.com/makerschool",
+                    "url": "https://t.co/UtC2uDloKE",
+                    "indices": [
+                      0,
+                      23
+                    ]
+                  }
+                ]
+              }
+            },
+            "fast_followers_count": 0,
+            "favourites_count": 6036,
+            "follow_request_sent": false,
+            "followed_by": false,
+            "followers_count": 3651,
+            "following": false,
+            "friends_count": 261,
+            "has_custom_timelines": false,
+            "id": 0,
+            "id_str": "1243691528540663808",
+            "is_translator": false,
+            "listed_count": 40,
+            "location": "Get automation customer #1 →",
+            "media_count": 225,
+            "name": "nicky",
+            "normal_followers_count": 3651,
+            "notifications": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/1243691528540663808/1734141651",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/1867691740481957891/9F0iaxdK_normal.jpg",
+            "protected": false,
+            "screen_name": "nicksaraev",
+            "show_all_inline_media": false,
+            "statuses_count": 3890,
+            "time_zone": "",
+            "translator_type": "none",
+            "url": "https://t.co/UtC2uDloKE",
+            "utc_offset": 0,
+            "verified": false,
+            "withheld_in_countries": [],
+            "withheld_scope": "",
+            "is_blue_verified": true
+          },
+          "startUrl": "https://twitter.com/nicksaraev"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Wait Run Succeded": {
+      "main": [
+        [
+          {
+            "node": "Get Apify Dataset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Apify Dataset": {
+      "main": [
+        [
+          {
+            "node": "Reword Tweets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reword Tweets": {
+      "main": [
+        [
+          {
+            "node": "Add Tweets to Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Set API Key Apify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Twitter Scrape Actor Apify": {
+      "main": [
+        [
+          {
+            "node": "Wait Run Succeded",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set API Key Apify": {
+      "main": [
+        [
+          {
+            "node": "Run Twitter Scrape Actor Apify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ade5b4ef-4cf8-481f-bee2-fc432897d32c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b0dcdc2a61168afbc3bb8907befe60a34408308859f86b899e8ba57a64038046"
+  },
+  "id": "hFPIO3Q0DXc4ow6d",
+  "tags": [
+    {
+      "createdAt": "2025-02-25T16:53:08.138Z",
+      "updatedAt": "2025-02-25T16:53:08.138Z",
+      "id": "987WX9PvnYkGNzpl",
+      "name": "Nick n8n"
+    }
+  ]
+}

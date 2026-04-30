@@ -1,0 +1,695 @@
+{
+  "name": "Parasite Medium SEO System",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "=https://api.apify.com/v2/datasets/{{ $json.body.resource.defaultDatasetId }}/items",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "format",
+              "value": "json"
+            },
+            {
+              "name": "limit",
+              "value": "100"
+            },
+            {
+              "name": "clean",
+              "value": "true"
+            },
+            {
+              "name": "simplified",
+              "value": "false"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer <your_key>"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        240
+      ],
+      "id": "64520839-f7da-4b85-b9b3-d075338ca292",
+      "name": "Apify - Get Dataset Items",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "html": "={{ $json.raw_article }}",
+        "destinationKey": "raw_text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        660,
+        240
+      ],
+      "id": "67a2b07e-b7ce-435c-b5ae-7f18601aafb8",
+      "name": "Markdown"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "45091c8d-0b5b-460f-9df0-7948c10aa81a",
+              "name": "raw_text",
+              "value": "={{$json[\"raw_text\"].split(\"\\nShare\\n\")[1]}}",
+              "type": "string"
+            },
+            {
+              "id": "639f0e1f-4f0c-4f32-aef6-4d9843078be9",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        240
+      ],
+      "id": "26e0002d-52b4-45f7-a408-9f8bc89e49c1",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are a helpful, intelligent writing assistant.Tone of voice: 50% spartan, casual.\n\nAdditionally, in the final outline, include a few descriptive placeholders to indicate where bullet points or numbered lists should be used. For example:\n\n(Insert bullet list of 3–5 key takeaways here)\n(Include a numbered list of 5 practical steps here)\nBe sure these placeholders appear in relevant sections, so that when the outline is later expanded, the lists are clearly incorporated.",
+              "role": "system"
+            },
+            {
+              "content": "Your task is to convert a blog post into a list of extremely detailed bullet points."
+            },
+            {
+              "content": "Welcome to The Cusp: cutting-edge AI news (and its implications) explained in simple English.\n\nIn this week’s issue:\n\nAI models can now surf the internet for you.\n\nCompressing audio 10x with no loss in quality? AWS is about to get hit — hard.\n\nNew: Semantic Mixing and the virtually limitless ways AI can add concepts as easily as we add numbers.\n\nLet’s dive in.\n\nAI Models Can Now Surf The Internet\n\nAI has made incredible strides in language and image generation over the last two years.\n\nBut models still struggle with making that information factual and relevant. GPT-3, for instance, is known for generating impressive-sounding paragraphs on any topic — until you realize much of it is complete nonsense.\n\nThat’s where WebGPT comes in.\n\nWebGPT is a conversational interface that searches the internet and finds real-world information for you before processing it internally. It can provide relevant results for things like:\n\nHow the features of one product compare to another in 2022\n\nThe average price of a good or service at Walmart\n\nThe current weather in a given location\n\nIt was actually technically done in 2021 by OpenAI. But Twitter did its thing and recreated it using advanced prompts last week.\n\nUntil now, real-world relevance has been the #1 challenge for AI chatbots. WebGPT and approaches like it unlock a new world of possibilities for AI-powered tools, and they’re going to upset the economy.\n\nHow does it work?\n\nIt’s simpler than you think. WebGPT takes two principles:\n\nLanguage models are fantastic at summarizing information\n\nGoogle is the world’s largest repository of information (and it’s usually checked in some way for accuracy)\n\nFirst, WebGPT searches the internet for results on the topic you’re asking. Then, it uses GPT-3 to summarize those results into a cohesive answer.\n\nMultiple prompt chains can refine the answer using a consensus-based approach to ensure contextual relevance and accuracy.\n\nWhy is this a big deal?\n\nThis is a huge development for three reasons:\n\nIt gives chatbots and digital assistants access to real-world data: a memory of sorts\n\nIt lets the intelligence of the model exist separately from the information in the model\n\nYou can now implement this yourself, without waiting for a major company to deem it “okay”\n\nPlus, this means major AI companies no longer need to worry about training their language model on billions of factoids and data points (like GPT-3 or Jurassic-1).\n\nAs long as you give them a question, they can go off and find the answer — completely on their own. Given how models have been hitting a ceiling in both parameter size and data availability, this changes everything.\n\nHow can we take advantage of this?\n\nHere’s the cool part: you can use this approach internally, too.\n\nConversational models, until now, have been limited to information they’ve read during training. GPT-3, for instance, is really only relevant up until ~ mid 2021.\n\nWanted to write about something that happened afterwards, like COVID-19? Your content would be almost guaranteed gibberish.\n\nBut with this new development, you can make flexible agents that reference any data — including that of your company.\n\nFor instance, let’s say you’re running an email marketing campaign. You can now make an agent that:\n\nPulls in data about a subscriber from your CRM.\n\nReads factual information about that user; hobbies, interests, etc.\n\nGenerates a templated email with that information.\n\nEither sends it automatically, closing the loop — or hands it off to a human agent to click send.\n\nAlternatively, let’s say you run a company chatbot to help minimize customer service requests. With this new development, you can make an agent that:\n\nSearches your company’s docs for relevant information.\n\nSummarizes it using GPT-3.\n\nReturns the answer to the user in natural language.\n\nAs long as you have data, you can now make a chatbot that understands and responds to it with relevance and accuracy.\n\nThere are so many more applications. I’ll list a few of them here:\n\nInstant news commentary and analysis — new event triggers a workflow that takes in a topic, searches the web for historical examples and supporting information, and then drafts a relevant piece within seconds for immediate publishing.\n\nAcademic paper writing. Until now, asking complex logical questions concerning facts often resulted in nonsense (i.e why does the mechanism of action of X cause Y?). Now, you can train a secondary model to classify “factual” questions, use that model as a trigger for WebGPT, and then return the factual search results before integrating them into a paper.\n\nSimilarly, you can draft a large portion of customer service emails. Use the aforementioned secondary model to classify factual questions and then use WebGPT to reference your internal company database for answers. Add extra steps as necessary to clean up the output.\n\nCompressing audio 10x with no loss in quality?\n\nFacebook recently released Encodec, a new AI-powered audio compression technique that compresses audio files by up to 10x (!) with no loss in quality.\n\nThe idea is similar to image and video compression, which we covered last week: AI identifies data patterns and removes redundancy.\n\nBut Encodec does it an order of magnitude better and achieves virtually lossless hypercompression. It’s also real-time. I.e., the algorithm can analyze, compress, and decompress audio signals as they’re being sent or received.\n\nHow can we take advantage of this?\n\nAny company whose primary mode of communication is voice (e.g., phone calls, conference calls, VoIP, etc.) can now save an incredible amount of money in bandwidth, storage, and processing costs.\n\nNetflix, for instance, spends $228 million/year on AWS transfer costs. Imagine them cutting that by 90%. The math is a little more complicated in reality, but companies will undoubtedly massively decrease their data expenditures.\n\nCompanies will scramble to adopt this technology. And validation of this approach means more hypercompression is probably on the horizon. There’s no fundamental reason why this technique couldn’t be applied to video or 3D environments, for instance.\n\nYou could:\n\nLook for investment opportunities in companies whose primary expenditures are data. AWS costs (roughly) $0.12 per GB transferred — that’s going to change dramatically with technologies like this. Necessary disclaimer: I’m not a financial advisor & this isn’t financial advice.\n\nBuild a service that implements Encodec or uses a similar approach. A simple endpoint that receives an audio file and returns its compressed version, for instance. Market your service to small or mid-sized streaming platforms as a way to cut transfer costs by >90%.\n\nThe implications of real-time, lossless audio compression will also have far-reaching effects on culture and our economy.\n\nFor example, imagine you’re a doctor in a remote location and need to consult with a specialist. Most VoIP connections require at least 64kbs. But with Encodec, you could have a high-quality call with almost no lag — even on 6kbps.\n\nPlaces that were previously off-limits because of poor internet service will probably grow into attractive destinations over the next few years. Satellite might only get 30mbps in Fiji… but will that matter when your computer automatically upsamples that to 300mbps?\n\nSemantic Mixing\n\nThis one is fun: Semantic Mixing is a recently-unveiled approach that lets you add concepts as easily as you might add numbers.\n\nWatermelon plus speaker, for instance, yields a vaguely watermelon-slice-shaped speaker. Rabbit plus tiger looks like a realistic (if scary) new bunny breed.\n\nIt works primarily on objects, letting you mix and match characteristics from two or more items. The results are often extremely plausible and always possess the form of the source image modified by the style of the second.\n\nWhy is this a big deal?\n\nSemantic Mixing isn’t going to change the world. Img2Img has been a thing for a while.\n\nBut, compared to earlier approaches to combining image characteristics, this one has significantly more commercial potential due to the increased coherency.\n\nHow can we take advantage of it?\n\nBecause each output maintains the form of the source image, your result is predictable. This opens myriad doors, specifically for e-commerce applications: product ideation, prototyping, and testing.\n\nRun an e-commerce brand? Take a product mockup (like a t-shirt) and iterate over thousands of common animals, objects, and colors automatically. You can do this for cultural or meme products, too.\n\nQuickly determine consumer preference before manufacturing with generated images. Semantically mix hundreds of different product types, run extremely similar ad campaigns, and split test for results.\n\nThat’s a wrap!\n\nEnjoyed this? Consider sharing with someone you know. And if you’re reading this because someone you know sent you this, get the next newsletter by signing up here.\n\nSee you next week.\n\n– Nick"
+            },
+            {
+              "content": "- **AI Models Can Now Surf The Internet:**\n\n  - Significant advancements in language and image generation over the past two years.\n\n  - Existing models, like GPT-3, struggle with factual accuracy and relevance.\n\n  - Introduction of WebGPT:\n\n    - Searches the internet to find real-world information before processing it internally.\n\n    - Provides relevant results on product comparisons, prices at Walmart, current weather conditions, etc.\n\n    - Initially created by OpenAI in 2021; recently recreated using advanced prompts on Twitter.\n\n\n\n- **Functionality of WebGPT:**\n\n  - Combines two principles:\n\n    - Language models excel at summarizing information.\n\n    - Google is a vast repository of relatively accurate information.\n\n  - Process:\n\n    - Searches the internet for answers to user queries.\n\n    - Uses GPT-3 to summarize these results cohesively.\n\n    - Refines answers through multiple prompt chains using a consensus-based approach.\n\n\n\n- **Significance:**\n\n  - Grants chatbots and digital assistants access to real-time data (a form of memory).\n\n  - Separates model intelligence from stored information within the model itself.\n\n  - Enables independent implementation without waiting for major companies' approval.\n\n\n\n- **Applications and Advantages:**\n\n  – Allows creation of flexible agents that can reference any data (including company-specific info).\n\n      Examples include email marketing campaigns or customer service chatbots that pull personalized data/relevant documents respectively before generating responses. \n\n   – Potential applications span various fields such as instant news commentary/analysis, academic paper writing (classifying \"factual\" questions), automated customer service emails referencing internal databases.\n\n\n\n**Compressing Audio by Up To Ten Times Without Quality Loss:**\n\n\n\n - Facebook’s new AI-powered audio compression technique “Encodec” offers tenfold file size reduction while maintaining quality. \n\n- Similar to image and video compression, Encodec identifies data patterns and removes redundancy.\n\n  - Operates in real-time, analyzing, compressing, and decompressing audio signals as they are transmitted.\n\n\n\n- **Business Impact:**\n\n  - Significant cost savings for companies reliant on voice communication (e.g., phone calls, VoIP).\n\n  - Example: Netflix could drastically reduce its $228 million annual AWS transfer costs.\n\n  - Potential for widespread adoption; hypercompression may extend to video or 3D environments.\n\n  \n\n- **Opportunities:**\n\n   – Investments in companies with high data expenditures will become lucrative as operational costs drop. \n\n   – Building services that leverage Encodec for small/mid-sized streaming platforms could cut transfer costs by >90%.\n\n   – Broader cultural/economic impacts include enabling high-quality remote consultations even in low-bandwidth areas.\n\n\n\n**Semantic Mixing:**\n\n\n\n- **Concept Overview:**\n\n    - New approach allowing the combination of concepts as easily as adding numbers.\n\n    - Example outcomes include objects like a \"watermelon-shaped speaker\" or a \"rabbit-tiger hybrid.\"\n\n    - Primarily works on objects by mixing characteristics from different items with plausible results.\n\n\n\n- **Significance and Commercial Potential:**\n\n    – Semantic Mixing does not revolutionize but enhances Img2Img approaches due to improved coherency. \n\n    – High commercial potential for e-commerce applications—product ideation, prototyping, testing.\n\n\n\n- **Practical Uses:**\n\n     Examples:\n\n       * E-commerce brands can iterate product mockups (like t-shirts) with various animals/objects/colors automatically.\n\n       * Testing consumer preferences rapidly through generated images before manufacturing products. \n\n       * Running split tests with semantically mixed product types to determine optimal designs based on ad campaign results.\n\n\n\n**Conclusion & Call-to-action:** \n\n\n\n– Share insights from this issue within networks/communities. Subscription link provided for new readers interested in cutting-edge AI news updates directly via newsletter.",
+              "role": "assistant"
+            },
+            {
+              "content": "Welcome to The Cusp: cutting-edge AI news (and its implications) explained in simple English.\n\nIn this week’s issue:\n\nThe results are in: Google officially destroys AI generated content. But by how much — and is it still profitable to use?\n\nNew AI developments set to decimate the interior design industry in just a few years.\n\nAre you in 3D? Companies like Quixel are in for a major shock thanks to this AI.\n\nLet’s dive in.\n\n1. Google Penalizes AI Generated Content By At Least 20%, Probably More\n\nLast year, large language models like GPT-3 made headlines for their ability to generate eerily human-like text. Naturally, affiliate marketers and content writers (myself included) were quick to try and game the system.\n\nBut it turns out, Google fought back.\n\nNeil Patel, a popular internet marketing blogger, just announced the first real test of Google’s new stance on AI generated writing. And the results are definitive: AI generated content destroys your search traffic.\n\nNeil took 50 websites, and separated them into two groups. One group was AI-generated only — for the other, he had humans write, edit, or perform a mix of both approaches.\n\nThen he waited for Google to index them. The results? Purely AI generated content was given a 20% penalty right off the bat — and that’s just the average. In some cases, the penalty was as high as 60%.\n\nMany of you will be thinking: 20%… that’s it? Why is this a big deal?\n\nBecause there are massive, asymmetrical gains the higher up you are on Google search. Traffic increases exponentially the closer you are to the top.\n\nIf you’re in first place, you get double what you’d get in second. If you’re in second, you get almost six times more clicks than if you’re in eighth.\n\nSo getting dinged just 20% for using AI is almost always enough to shift you down at least a couple of places — which means you’re losing 75% or more of your traffic.\n\nThere’s some silver lining, though. Content that was generated by AI, but *modified* by humans, only dropped an average of 6%.\n\nSince AI writing routinely provides speedups of 4x-5x, this is probably still a very worthwhile investment — especially for low-competition keywords.\n\nHow can we take advantage of this?\n\nRun a website and want to rank better?\n\nDon’t try to automatically generate content — that’s a race to the bottom.\n\nInstead, augment your current, capable writers with AI like GPT-3 or Jurassic-1.\n\nMake sure they edit the result for clarity, style, and tone of voice.\n\nDollar for dollar, you’ll increase output by ~400% with a loss in rank potential of just 6%. If you’re targeting longer-tail keywords without much competition, that’s more than enough to offset the decrease plus give you a big leg up in terms of volume.\n\n2. 3D Interior Designers Will Soon Be Obsolete, Thanks to AI\n\nNeRF (neural radiance fields) just got a big upgrade.\n\nThe above clip was built from a couple dozen interior photographs. NeRF seamlessly wove those photos together, and — with the help of style transfer — lets you instantly change the colors, mood, and furniture.\n\nThe library in question (NeRF Studio) is still in development, but it’s already clear that it has the potential to disrupt the $4.1 billion interior design software industry.\n\nAnd it’s not just because NeRF is free: it’s also orders of magnitude faster than traditional methods of design.\n\nIn the past, you had to take dozens of photos of a space, create a detailed floor plan, and then pay someone hundreds (or thousands) of dollars for a mockup.\n\nMore recently, solutions like Matterport have gained popularity; they use 3D scanning to quickly create a model of a space. But Matterport quality is notoriously crappy, and the imaging process is slow and non-intuitive.\n\nNeRF, on the other hand, takes just a few minutes.\n\nIt’s not long before everybody in the 3D interior design industry makes the switch — and when they do, the market is in for a massive upset.\n\nInstant render services\n\nIn addition to 3D interior design, instant render services are another AI-driven approach that’s quickly gaining popularity.\n\nInterior AI is a free design mockup app that takes images of your room and then uses Stable Diffusion to superimpose new imagery, complete with furniture and other objects, to show you how your space could look.\n\n\n\nThe above example, while not incredible, already serves a market niche. And given the rate of growth of image generation AI — I mean, we went from blurry, 16x16 cows to completely realistic human faces in just 6 years — similar services will soon outperform human designers on every level.\n\nHow can we take advantage of this?\n\nIn design? There’s a ton of quick money on the table.\n\nLearn how NeRF works, and begin implementing it into your workflow\n\nIn addition to the improved output, create information products (course, ebook, etc) teaching other designers to do the same\n\nAlternatively: in architecture or real estate? You’re about to get a lot more efficient.\n\nUse NeRF to quickly create 3D models of properties\n\nAutomate the ideation process with instant render AI\n\nGenerate models of what a space could look like, then send to a designer for touchups\n\nYou don’t have to be on the receiving end of major disruptions to your industry. Plan ahead, make some changes to your workflow, and profit.\n\n3. AI Texture Generation Will Soon Give Companies Like Quixel A Run For Their Money\n\nSpeaking of 3D: AI texture generation has made massive leaps and bounds in the past few years. And it’s about to give companies like Quixel, who create and sell 3D textures, a run for their money.\n\nFor those not in the know, Quixel creates 3D textures that are used in video games, movies, and other CGI.\n\nBut these textures take a ton of time and money to create — photographers have to travel to remote locations to zoom in on real-world objects and take pictures of them at different angles to create a comprehensive texture library.\n\nNow? AI can do all of that work in a fraction of the time, and for a fraction of the cost.\n\nRunway.ml recently released a cutting-edge texture generation feature to helps designers, artists, and 3D professionals make textures in a tenth of the time. And while it’s not quite on par with Quixel’s patented Megascan library yet, it’s getting close — and fast.\n\nPlus (and this is very important) it can generate an infinite variety of textures that don’t exist in the real world.\n\nWhat does this mean?\n\nThe 3D mapping and modelling industry is worth approximately $13B, according to Mordor Intelligence.\n\nBut in conjunction with Stable Diffusion 3D models, texture generators will almost certainly unemploy vast swathes of this industry in the very near future. An entire industry is poised to disappear virtually overnight.\n\nHow can we take advantage of this?\n\nLuckily, if you’re a forward-thinker, there’s plenty of time to prepare and make a splash.\n\nFirst, learn how to use Stable Diffusion to generate your own textures (or use a pre-made solution like Runway.ml)\n\nCreate a pipeline that generates & upscales high quality 3D textures\n\nBefore they go bust, sell as many as you can on marketplaces like CGTrader. When sales start slowing down (and they will), pitch the pipeline itself for extra runway\n\nCreate information products that teach CGI professionals how to begin working with AI\n\nWhile it’s always sad to see a creative industry get automated, there’s no denying the economic potential. And what’s more: AI 3D asset generation will have tremendous (positive) impacts on media, storytelling, and our culture. At least we’ll have something to watch when we’re unemployed laying on the couch.\n\nEnjoyed this? Consider sharing with someone you know. And if you’re reading this because someone you know sent you this, get the next newsletter by signing up here.\n\nSee you next week.\n\n– Nick"
+            },
+            {
+              "content": "### Summary of The Cusp: AI News & Implications\n\n\n\n**1. Google Penalizes AI-Generated Content by At Least 20%**\n\n\n\n- **Context:**\n\n  - Large language models like GPT-3 gained traction for generating human-like text.\n\n  - Affiliate marketers and content writers tested automated content creation.\n\n  \n\n- **Study Results:**\n\n  - Neil Patel's test with two groups (AI-generated vs. human-modified):\n\n    - Purely AI-generated content faced a minimum average penalty of 20%.\n\n    - Penalties could be as high as 60%.\n\n    - Human-modified AI content dropped only by an average of 6%.\n\n\n\n- **Implications:**\n\n   – Slight penalties lead to significant drops in search rankings due to exponential traffic increases at the top positions.\n\n   – Even a small penalty can result in losing up to 75% of traffic.\n\n\n\n- **Strategy for Marketers/Writers:**\n\n   – Use AI tools like GPT-3 or Jurassic-1 to assist, not replace, human writers.\n\n   – Ensure human editing for clarity, style, and tone.\n\n   – Focus on low competition keywords; potential output increase ~400% with minimal rank loss.\n\n**2. AI in Interior Design: NeRF Technology**\n\n\n\n- **NeRF (Neural Radiance Fields):**\n\n  - Upgraded technology allows seamless integration and transformation of interior photographs.\n\n  - Potential to disrupt the $4.1 billion interior design software industry.\n\n  - Faster than traditional methods, requiring only a few minutes versus days.\n\n\n\n- **Advantages over Existing Solutions:**\n\n  - Outperforms popular tools like Matterport in quality and speed.\n\n  - Instant render services like Interior AI use style transfer to visualize new designs, gaining rapid traction.\n\n\n\n- **Implications for Designers & Real Estate:**\n\n   – NeRF can expedite the creation of 3D models from photographs.\n\n   – Instant render services can automate ideation processes, drafting mockups with new imagery.\n\n\n\n- **Opportunities:**\n\n   – Implement NeRF in existing workflows or create educational products about its use.\n\n   – Utilize AI to streamline architectural or real estate project visualizations.\n\n\n\n**3. AI Texture Generation vs. Quixel**\n\n\n\n- **AI Advancements:**\n\n  - Tools like Runway.ml rapidly generate high-quality textures at a fraction of the traditional cost and time.\n\n  - While not yet equal to Quixel’s Megascan library, they are progressing quickly.\n\n\n\n- **Industry Impact:**\n\n   – The $13B mapping and modeling industry faces significant disruption as AI can create infinite varieties of non-existent textures.\n\n\n\n- **Strategic Moves:**\n\n   – Learn to use Stable Diffusion for texture generation.\n\n   – Develop pipelines for creating & upscaling high-quality textures; sell on platforms like CGTrader.\n\n   – Create educational materials for CGI professionals transitioning to AI tools.\n\n### Conclusion\n\n- Share these insights with peers or subscribe for more updates on cutting-edge AI developments impacting various industries.",
+              "role": "assistant"
+            },
+            {
+              "content": "={{ $json.raw_text }}"
+            }
+          ]
+        },
+        "simplify": false,
+        "options": {
+          "frequency_penalty": 0.6,
+          "maxTokens": 4096,
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1100,
+        240
+      ],
+      "id": "a445d909-d200-4855-9962-3a2c2ece3bf2",
+      "name": "Blog -> Bullet Point",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "openAiApi": {
+          "id": "a2xwb5PX9qEfwIVL",
+          "name": "santi@pulpsense.com (26 Jan 25)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are a helpful, intelligent writing assistant.Tone of voice: 50% spartan, casual.\n\nAdditionally, in the final outline, include a few descriptive placeholders to indicate where bullet points or numbered lists should be used. For example:\n\n(Insert bullet list of 3–5 key takeaways here)\n(Include a numbered list of 5 practical steps here)\nBe sure these placeholders appear in relevant sections, so that when the outline is later expanded, the lists are clearly incorporated.",
+              "role": "system"
+            },
+            {
+              "content": "Your task is to convert a list of detailed bullet points into a high quality blog post. Use spartan, to-the-point language. Write the article in Markdown (atx) format."
+            },
+            {
+              "content": "\n\n- **AI Models Can Now Surf The Internet:**\n\n  - Significant advancements in language and image generation over the past two years.\n\n  - Existing models, like GPT-3, struggle with factual accuracy and relevance.\n\n  - Introduction of WebGPT:\n\n    - Searches the internet to find real-world information before processing it internally.\n\n    - Provides relevant results on product comparisons, prices at Walmart, current weather conditions, etc.\n\n    - Initially created by OpenAI in 2021; recently recreated using advanced prompts on Twitter.\n\n\n\n- **Functionality of WebGPT:**\n\n  - Combines two principles:\n\n    - Language models excel at summarizing information.\n\n    - Google is a vast repository of relatively accurate information.\n\n  - Process:\n\n    - Searches the internet for answers to user queries.\n\n    - Uses GPT-3 to summarize these results cohesively.\n\n    - Refines answers through multiple prompt chains using a consensus-based approach.\n\n\n\n- **Significance:**\n\n  - Grants chatbots and digital assistants access to real-time data (a form of memory).\n\n  - Separates model intelligence from stored information within the model itself.\n\n  - Enables independent implementation without waiting for major companies' approval.\n\n\n\n- **Applications and Advantages:**\n\n  – Allows creation of flexible agents that can reference any data (including company-specific info).\n\n      Examples include email marketing campaigns or customer service chatbots that pull personalized data/relevant documents respectively before generating responses. \n\n   – Potential applications span various fields such as instant news commentary/analysis, academic paper writing (classifying \"factual\" questions), automated customer service emails referencing internal databases.\n\n\n\n**Compressing Audio by Up To Ten Times Without Quality Loss:**\n\n\n\n - Facebook’s new AI-powered audio compression technique “Encodec” offers tenfold file size reduction while maintaining quality. \n\n- Similar to image and video compression, Encodec identifies data patterns and removes redundancy.\n\n  - Operates in real-time, analyzing, compressing, and decompressing audio signals as they are transmitted.\n\n\n\n- **Business Impact:**\n\n  - Significant cost savings for companies reliant on voice communication (e.g., phone calls, VoIP).\n\n  - Example: Netflix could drastically reduce its $228 million annual AWS transfer costs.\n\n  - Potential for widespread adoption; hypercompression may extend to video or 3D environments.\n\n  \n\n- **Opportunities:**\n\n   – Investments in companies with high data expenditures will become lucrative as operational costs drop. \n\n   – Building services that leverage Encodec for small/mid-sized streaming platforms could cut transfer costs by >90%.\n\n   – Broader cultural/economic impacts include enabling high-quality remote consultations even in low-bandwidth areas.\n\n\n\n**Semantic Mixing:**\n\n\n\n- **Concept Overview:**\n\n    - New approach allowing the combination of concepts as easily as adding numbers.\n\n    - Example outcomes include objects like a \"watermelon-shaped speaker\" or a \"rabbit-tiger hybrid.\"\n\n    - Primarily works on objects by mixing characteristics from different items with plausible results.\n\n\n\n- **Significance and Commercial Potential:**\n\n    – Semantic Mixing does not revolutionize but enhances Img2Img approaches due to improved coherency. \n\n    – High commercial potential for e-commerce applications—product ideation, prototyping, testing.\n\n\n\n- **Practical Uses:**\n\n     Examples:\n\n       * E-commerce brands can iterate product mockups (like t-shirts) with various animals/objects/colors automatically.\n\n       * Testing consumer preferences rapidly through generated images before manufacturing products. \n\n       * Running split tests with semantically mixed product types to determine optimal designs based on ad campaign results.\n\n\n\n**Conclusion & Call-to-action:** \n\n\n\n– Share insights from this issue within networks/communities. Subscription link provided for new readers interested in cutting-edge AI news updates directly via newsletter."
+            },
+            {
+              "content": "Welcome to The Cusp: cutting-edge AI news (and its implications) explained in simple English.\n\nIn this week’s issue:\n\nAI models can now surf the internet for you.\n\nCompressing audio 10x with no loss in quality? AWS is about to get hit — hard.\n\nNew: Semantic Mixing and the virtually limitless ways AI can add concepts as easily as we add numbers.\n\nLet’s dive in.\n\n## AI Models Can Now Surf The Internet\n\nAI has made incredible strides in language and image generation over the last two years.\n\nBut models still struggle with making that information factual and relevant. GPT-3, for instance, is known for generating impressive-sounding paragraphs on any topic — until you realize much of it is complete nonsense.\n\nThat’s where WebGPT comes in.\n\nWebGPT is a conversational interface that searches the internet and finds real-world information for you before processing it internally. It can provide relevant results for things like:\n\nHow the features of one product compare to another in 2022\n\nThe average price of a good or service at Walmart\n\nThe current weather in a given location\n\nIt was actually technically done in 2021 by OpenAI. But Twitter did its thing and recreated it using advanced prompts last week.\n\nUntil now, real-world relevance has been the #1 challenge for AI chatbots. WebGPT and approaches like it unlock a new world of possibilities for AI-powered tools, and they’re going to upset the economy.\n\n## How does it work?\n\nIt’s simpler than you think. WebGPT takes two principles:\n\nLanguage models are fantastic at summarizing information\n\nGoogle is the world’s largest repository of information (and it’s usually checked in some way for accuracy)\n\nFirst, WebGPT searches the internet for results on the topic you’re asking. Then, it uses GPT-3 to summarize those results into a cohesive answer.\n\nMultiple prompt chains can refine the answer using a consensus-based approach to ensure contextual relevance and accuracy.\n\n## Why is this a big deal?\n\nThis is a huge development for three reasons:\n\nIt gives chatbots and digital assistants access to real-world data: a memory of sorts\n\nIt lets the intelligence of the model exist separately from the information in the model\n\nYou can now implement this yourself, without waiting for a major company to deem it “okay”\n\nPlus, this means major AI companies no longer need to worry about training their language model on billions of factoids and data points (like GPT-3 or Jurassic-1).\n\nAs long as you give them a question, they can go off and find the answer — completely on their own. Given how models have been hitting a ceiling in both parameter size and data availability, this changes everything.\n\n## How can we take advantage of this?\n\nHere’s the cool part: you can use this approach internally, too.\n\nConversational models, until now, have been limited to information they’ve read during training. GPT-3, for instance, is really only relevant up until ~ mid 2021.\n\nWanted to write about something that happened afterwards, like COVID-19? Your content would be almost guaranteed gibberish.\n\nBut with this new development, you can make flexible agents that reference any data — including that of your company.\n\nFor instance, let’s say you’re running an email marketing campaign. You can now make an agent that:\n\n- Pulls in data about a subscriber from your CRM.\n\n- Reads factual information about that user; hobbies, interests, etc.\n\n- Generates a templated email with that information.\n\n- Either sends it automatically, closing the loop — or hands it off to a human agent to click send.\n\nAlternatively, let’s say you run a company chatbot to help minimize customer service requests. With this new development, you can make an agent that:\n\nSearches your company’s docs for relevant information.\n\nSummarizes it using GPT-3.\n\nReturns the answer to the user in natural language.\n\nAs long as you have data, you can now make a chatbot that understands and responds to it with relevance and accuracy.\n\nThere are so many more applications. I’ll list a few of them here:\n\nInstant news commentary and analysis — new event triggers a workflow that takes in a topic, searches the web for historical examples and supporting information, and then drafts a relevant piece within seconds for immediate publishing.\n\nAcademic paper writing. Until now, asking complex logical questions concerning facts often resulted in nonsense (i.e why does the mechanism of action of X cause Y?). Now, you can train a secondary model to classify “factual” questions, use that model as a trigger for WebGPT, and then return the factual search results before integrating them into a paper.\n\nSimilarly, you can draft a large portion of customer service emails. Use the aforementioned secondary model to classify factual questions and then use WebGPT to reference your internal company database for answers. Add extra steps as necessary to clean up the output.\n\n## Compressing audio 10x with no loss in quality?\n\nFacebook recently released Encodec, a new AI-powered audio compression technique that compresses audio files by up to 10x (!) with no loss in quality.\n\nThe idea is similar to image and video compression, which we covered last week: AI identifies data patterns and removes redundancy.\n\nBut Encodec does it an order of magnitude better and achieves virtually lossless hypercompression. It’s also real-time. I.e., the algorithm can analyze, compress, and decompress audio signals as they’re being sent or received.\n\n## How can we take advantage of this?\n\nAny company whose primary mode of communication is voice (e.g., phone calls, conference calls, VoIP, etc.) can now save an incredible amount of money in bandwidth, storage, and processing costs.\n\nNetflix, for instance, spends $228 million/year on AWS transfer costs. Imagine them cutting that by 90%. The math is a little more complicated in reality, but companies will undoubtedly massively decrease their data expenditures.\n\nCompanies will scramble to adopt this technology. And validation of this approach means more hypercompression is probably on the horizon. There’s no fundamental reason why this technique couldn’t be applied to video or 3D environments, for instance.\n\nYou could:\n\nLook for investment opportunities in companies whose primary expenditures are data. AWS costs (roughly) $0.12 per GB transferred — that’s going to change dramatically with technologies like this. Necessary disclaimer: I’m not a financial advisor & this isn’t financial advice.\n\nBuild a service that implements Encodec or uses a similar approach. A simple endpoint that receives an audio file and returns its compressed version, for instance. Market your service to small or mid-sized streaming platforms as a way to cut transfer costs by >90%.\n\nThe implications of real-time, lossless audio compression will also have far-reaching effects on culture and our economy.\n\nFor example, imagine you’re a doctor in a remote location and need to consult with a specialist. Most VoIP connections require at least 64kbs. But with Encodec, you could have a high-quality call with almost no lag — even on 6kbps.\n\nPlaces that were previously off-limits because of poor internet service will probably grow into attractive destinations over the next few years. Satellite might only get 30mbps in Fiji… but will that matter when your computer automatically upsamples that to 300mbps?\n\n## Semantic Mixing\n\nThis one is fun: Semantic Mixing is a recently-unveiled approach that lets you add concepts as easily as you might add numbers.\n\nWatermelon plus speaker, for instance, yields a vaguely watermelon-slice-shaped speaker. Rabbit plus tiger looks like a realistic (if scary) new bunny breed.\n\nIt works primarily on objects, letting you mix and match characteristics from two or more items. The results are often extremely plausible and always possess the form of the source image modified by the style of the second.\n\n## Why is this a big deal?\n\nSemantic Mixing isn’t going to change the world. Img2Img has been a thing for a while.\n\nBut, compared to earlier approaches to combining image characteristics, this one has significantly more commercial potential due to the increased coherency.\n\n## How can we take advantage of it?\n\nBecause each output maintains the form of the source image, your result is predictable. This opens myriad doors, specifically for e-commerce applications: product ideation, prototyping, and testing.\n\nRun an e-commerce brand? Take a product mockup (like a t-shirt) and iterate over thousands of common animals, objects, and colors automatically. You can do this for cultural or meme products, too.\n\nQuickly determine consumer preference before manufacturing with generated images. Semantically mix hundreds of different product types, run extremely similar ad campaigns, and split test for results.\n\nThat’s a wrap!\n\nEnjoyed this? Consider sharing with someone you know. And if you’re reading this because someone you know sent you this, get the next newsletter by signing up here.\n\nSee you next week.\n\n– Nick",
+              "role": "assistant"
+            },
+            {
+              "content": "\n\n### Summary of The Cusp: AI News & Implications\n\n\n\n**1. Google Penalizes AI-Generated Content by At Least 20%**\n\n\n\n- **Context:**\n\n  - Large language models like GPT-3 gained traction for generating human-like text.\n\n  - Affiliate marketers and content writers tested automated content creation.\n\n  \n\n- **Study Results:**\n\n  - Neil Patel's test with two groups (AI-generated vs. human-modified):\n\n    - Purely AI-generated content faced a minimum average penalty of 20%.\n\n    - Penalties could be as high as 60%.\n\n    - Human-modified AI content dropped only by an average of 6%.\n\n\n\n- **Implications:**\n\n   – Slight penalties lead to significant drops in search rankings due to exponential traffic increases at the top positions.\n\n   – Even a small penalty can result in losing up to 75% of traffic.\n\n\n\n- **Strategy for Marketers/Writers:**\n\n   – Use AI tools like GPT-3 or Jurassic-1 to assist, not replace, human writers.\n\n   – Ensure human editing for clarity, style, and tone.\n\n   – Focus on low competition keywords; potential output increase ~400% with minimal rank loss.\n\n**2. AI in Interior Design: NeRF Technology**\n\n\n\n- **NeRF (Neural Radiance Fields):**\n\n  - Upgraded technology allows seamless integration and transformation of interior photographs.\n\n  - Potential to disrupt the $4.1 billion interior design software industry.\n\n  - Faster than traditional methods, requiring only a few minutes versus days.\n\n\n\n- **Advantages over Existing Solutions:**\n\n  - Outperforms popular tools like Matterport in quality and speed.\n\n  - Instant render services like Interior AI use style transfer to visualize new designs, gaining rapid traction.\n\n\n\n- **Implications for Designers & Real Estate:**\n\n   – NeRF can expedite the creation of 3D models from photographs.\n\n   – Instant render services can automate ideation processes, drafting mockups with new imagery.\n\n\n\n- **Opportunities:**\n\n   – Implement NeRF in existing workflows or create educational products about its use.\n\n   – Utilize AI to streamline architectural or real estate project visualizations.\n\n\n\n**3. AI Texture Generation vs. Quixel**\n\n\n\n- **AI Advancements:**\n\n  - Tools like Runway.ml rapidly generate high-quality textures at a fraction of the traditional cost and time.\n\n  - While not yet equal to Quixel’s Megascan library, they are progressing quickly.\n\n\n\n- **Industry Impact:**\n\n   – The $13B mapping and modeling industry faces significant disruption as AI can create infinite varieties of non-existent textures.\n\n\n\n- **Strategic Moves:**\n\n   – Learn to use Stable Diffusion for texture generation.\n\n   – Develop pipelines for creating & upscaling high-quality textures; sell on platforms like CGTrader.\n\n   – Create educational materials for CGI professionals transitioning to AI tools.\n\n### Conclusion\n\n- Share these insights with peers or subscribe for more updates on cutting-edge AI developments impacting various industries."
+            },
+            {
+              "content": "Welcome to The Cusp: cutting-edge AI news (and its implications) explained in simple English.\n\nIn this week’s issue:\n\nThe results are in: Google officially destroys AI generated content. But by how much — and is it still profitable to use?\n\nNew AI developments set to decimate the interior design industry in just a few years.\n\nAre you in 3D? Companies like Quixel are in for a major shock thanks to this AI.\n\nLet’s dive in.\n\n## 1. Google Penalizes AI Generated Content By At Least 20%, Probably More\n\nLast year, large language models like GPT-3 made headlines for their ability to generate eerily human-like text. Naturally, affiliate marketers and content writers (myself included) were quick to try and game the system.\n\nBut it turns out, Google fought back.\n\nNeil Patel, a popular internet marketing blogger, just announced the first real test of Google’s new stance on AI generated writing. And the results are definitive: AI generated content destroys your search traffic.\n\nNeil took 50 websites, and separated them into two groups. One group was AI-generated only — for the other, he had humans write, edit, or perform a mix of both approaches.\n\nThen he waited for Google to index them. The results? Purely AI generated content was given a 20% penalty right off the bat — and that’s just the average. In some cases, the penalty was as high as 60%.\n\nMany of you will be thinking: 20%… that’s it? Why is this a big deal?\n\nBecause there are massive, asymmetrical gains the higher up you are on Google search. Traffic increases exponentially the closer you are to the top.\n\nIf you’re in first place, you get double what you’d get in second. If you’re in second, you get almost six times more clicks than if you’re in eighth.\n\nSo getting dinged just 20% for using AI is almost always enough to shift you down at least a couple of places — which means you’re losing 75% or more of your traffic.\n\nThere’s some silver lining, though. Content that was generated by AI, but *modified* by humans, only dropped an average of 6%.\n\nSince AI writing routinely provides speedups of 4x-5x, this is probably still a very worthwhile investment — especially for low-competition keywords.\n\n## How can we take advantage of this?\n\nRun a website and want to rank better?\n\nDon’t try to automatically generate content — that’s a race to the bottom.\n\nInstead, augment your current, capable writers with AI like GPT-3 or Jurassic-1.\n\nMake sure they edit the result for clarity, style, and tone of voice.\n\nDollar for dollar, you’ll increase output by ~400% with a loss in rank potential of just 6%. If you’re targeting longer-tail keywords without much competition, that’s more than enough to offset the decrease plus give you a big leg up in terms of volume.\n\n## 2. 3D Interior Designers Will Soon Be Obsolete, Thanks to AI\n\nNeRF (neural radiance fields) just got a big upgrade.\n\nThe above clip was built from a couple dozen interior photographs. NeRF seamlessly wove those photos together, and — with the help of style transfer — lets you instantly change the colors, mood, and furniture.\n\nThe library in question (NeRF Studio) is still in development, but it’s already clear that it has the potential to disrupt the $4.1 billion interior design software industry.\n\nAnd it’s not just because NeRF is free: it’s also orders of magnitude faster than traditional methods of design.\n\nIn the past, you had to take dozens of photos of a space, create a detailed floor plan, and then pay someone hundreds (or thousands) of dollars for a mockup.\n\nMore recently, solutions like Matterport have gained popularity; they use 3D scanning to quickly create a model of a space. But Matterport quality is notoriously crappy, and the imaging process is slow and non-intuitive.\n\nNeRF, on the other hand, takes just a few minutes.\n\nIt’s not long before everybody in the 3D interior design industry makes the switch — and when they do, the market is in for a massive upset.\n\n## Instant render services\n\nIn addition to 3D interior design, instant render services are another AI-driven approach that’s quickly gaining popularity.\n\nInterior AI is a free design mockup app that takes images of your room and then uses Stable Diffusion to superimpose new imagery, complete with furniture and other objects, to show you how your space could look.\n\n\n\nThe above example, while not incredible, already serves a market niche. And given the rate of growth of image generation AI — I mean, we went from blurry, 16x16 cows to completely realistic human faces in just 6 years — similar services will soon outperform human designers on every level.\n\n## How can we take advantage of this?\n\nIn design? There’s a ton of quick money on the table.\n\nLearn how NeRF works, and begin implementing it into your workflow\n\nIn addition to the improved output, create information products (course, ebook, etc) teaching other designers to do the same\n\nAlternatively: in architecture or real estate? You’re about to get a lot more efficient.\n\n- Use NeRF to quickly create 3D models of properties\n\n- Automate the ideation process with instant render AI\n\n- Generate models of what a space could look like, then send to a designer for touchups\n\nYou don’t have to be on the receiving end of major disruptions to your industry. Plan ahead, make some changes to your workflow, and profit.\n\n## 3. AI Texture Generation Will Soon Give Companies Like Quixel A Run For Their Money\n\nSpeaking of 3D: AI texture generation has made massive leaps and bounds in the past few years. And it’s about to give companies like Quixel, who create and sell 3D textures, a run for their money.\n\nFor those not in the know, Quixel creates 3D textures that are used in video games, movies, and other CGI.\n\nBut these textures take a ton of time and money to create — photographers have to travel to remote locations to zoom in on real-world objects and take pictures of them at different angles to create a comprehensive texture library.\n\nNow? AI can do all of that work in a fraction of the time, and for a fraction of the cost.\n\nRunway.ml recently released a cutting-edge texture generation feature to helps designers, artists, and 3D professionals make textures in a tenth of the time. And while it’s not quite on par with Quixel’s patented Megascan library yet, it’s getting close — and fast.\n\nPlus (and this is very important) it can generate an infinite variety of textures that don’t exist in the real world.\n\n## What does this mean?\n\nThe 3D mapping and modelling industry is worth approximately $13B, according to Mordor Intelligence.\n\nBut in conjunction with Stable Diffusion 3D models, texture generators will almost certainly unemploy vast swathes of this industry in the very near future. An entire industry is poised to disappear virtually overnight.\n\n## How can we take advantage of this?\n\nLuckily, if you’re a forward-thinker, there’s plenty of time to prepare and make a splash.\n\nFirst, learn how to use Stable Diffusion to generate your own textures (or use a pre-made solution like Runway.ml)\n\nCreate a pipeline that generates & upscales high quality 3D textures\n\nBefore they go bust, sell as many as you can on marketplaces like CGTrader. When sales start slowing down (and they will), pitch the pipeline itself for extra runway\n\nCreate information products that teach CGI professionals how to begin working with AI\n\nWhile it’s always sad to see a creative industry get automated, there’s no denying the economic potential. And what’s more: AI 3D asset generation will have tremendous (positive) impacts on media, storytelling, and our culture. At least we’ll have something to watch when we’re unemployed laying on the couch.\n\nEnjoyed this? Consider sharing with someone you know. And if you’re reading this because someone you know sent you this, get the next newsletter by signing up here.\n\nSee you next week.\n\n– Nick",
+              "role": "assistant"
+            },
+            {
+              "content": "={{ $json.choices[0].message.content }}"
+            }
+          ]
+        },
+        "simplify": false,
+        "options": {
+          "frequency_penalty": 0.6,
+          "maxTokens": 4096,
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1480,
+        240
+      ],
+      "id": "3cd10d74-5123-4722-8fca-2032d52c8da4",
+      "name": "Bullet Point -> Blog",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "openAiApi": {
+          "id": "a2xwb5PX9qEfwIVL",
+          "name": "santi@pulpsense.com (26 Jan 25)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are a helpful, intelligent writing assistant.Tone of voice: 50% spartan, casual.\n\nAdditionally, in the final outline, include a few descriptive placeholders to indicate where bullet points or numbered lists should be used. For example:\n\n(Insert bullet list of 3–5 key takeaways here)\n(Include a numbered list of 5 practical steps here)\nBe sure these placeholders appear in relevant sections, so that when the outline is later expanded, the lists are clearly incorporated.",
+              "role": "system"
+            },
+            {
+              "content": "Your task is to rewrite a title. Retain the topic and the purpose of the title, but write it in different words. Your output should be only the rewritten title—nothing else."
+            },
+            {
+              "content": "={{ $('Apify - Get Dataset Items').item.json.title }}"
+            }
+          ]
+        },
+        "simplify": false,
+        "options": {
+          "frequency_penalty": 0.6,
+          "maxTokens": 4096,
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1860,
+        240
+      ],
+      "id": "246ef8a6-6432-45e7-9357-aaadb97183db",
+      "name": "Rewrite Title",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "openAiApi": {
+          "id": "a2xwb5PX9qEfwIVL",
+          "name": "santi@pulpsense.com (26 Jan 25)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "folderId": "1Y_m-8IbIxmBO6iC2hloz8McYCBfmN5gS",
+        "title": "={{ $json.choices[0].message.content }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        2220,
+        240
+      ],
+      "id": "25d725f9-ea9e-44da-bc14-b06b31c24695",
+      "name": "Create Doc",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "acuCWoPucEkLXwnz",
+          "name": "santi@pulpsense.com (1 Mar 25)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "markdownToHtml",
+        "markdown": "={{ $('Bullet Point -> Blog').item.json.choices[0].message.content }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        2420,
+        240
+      ],
+      "id": "01cd4c73-a8e3-44a7-bae4-50d81729b0a2",
+      "name": "Blog to HTML"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://www.googleapis.com/upload/drive/v3/files/{{ $('Create Doc').item.json.id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDocsOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "uploadType",
+              "value": "media"
+            },
+            {
+              "name": "supportsAllDrives",
+              "value": "true"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "body": "={{ $json.data }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2680,
+        240
+      ],
+      "id": "ebc8d971-1411-40fd-911d-dbc240698853",
+      "name": "Upload Blog to Doc",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "acuCWoPucEkLXwnz",
+          "name": "santi@pulpsense.com (1 Mar 25)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1IapaTC2dPE0ILLU38RgGedZPZVD_Yo5L6JnWw_wT9Wk",
+          "mode": "list",
+          "cachedResultName": "Test - Nick Parasite Medium SEO",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1IapaTC2dPE0ILLU38RgGedZPZVD_Yo5L6JnWw_wT9Wk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1350146603,
+          "mode": "list",
+          "cachedResultName": "Sheet 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1IapaTC2dPE0ILLU38RgGedZPZVD_Yo5L6JnWw_wT9Wk/edit#gid=1350146603"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date Scraped": "={{ $now }}",
+            "Original Title": "={{ $('Apify - Get Dataset Items').item.json.title }}",
+            "Original URL": "={{ $('Apify - Get Dataset Items').item.json.url }}",
+            "Author": "={{ $('Apify - Get Dataset Items').item.json.author }}",
+            "Author URL": "={{ $('Apify - Get Dataset Items').item.json.author_url }}",
+            "Published At": "={{ $('Apify - Get Dataset Items').item.json.published_at }}",
+            "Raw Article": "={{ $('Apify - Get Dataset Items').item.json.raw_article }}",
+            "Parasite Title": "={{ $('Rewrite Title').item.json.choices[0].message.content }}",
+            "Parasite Article": "=https://docs.google.com/document/d/{{ $json.id }}/preview"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date Scraped",
+              "displayName": "Date Scraped",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Original Title",
+              "displayName": "Original Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Original URL",
+              "displayName": "Original URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Author",
+              "displayName": "Author",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Author URL",
+              "displayName": "Author URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Published At",
+              "displayName": "Published At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Raw Article",
+              "displayName": "Raw Article",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Parasite Title",
+              "displayName": "Parasite Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Parasite Article",
+              "displayName": "Parasite Article",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2900,
+        240
+      ],
+      "id": "68f6e269-4f0d-4f27-8ddf-3a3c1a1183af",
+      "name": "Update Campaign Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xqwkTMJv8ZrYhqaW",
+          "name": "santi@pulpsense.com (1 Mar 25)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/qpayre~medium-scraper/runs",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "webhooks",
+              "value": "={{ `[ { \"eventTypes\": [\"ACTOR.RUN.SUCCEEDED\"], \"requestUrl\": \"${$execution.resumeUrl}\" } ]`.base64Encode() }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer <your_key>"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"article_content\": true,\n  \"limit\": 1,\n  \"author\": \"garyvee\"\n}",
+        "options": {
+          "response": {}
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        240
+      ],
+      "id": "0dc564d5-cf29-4328-9123-5aa7bfa3c28c",
+      "name": "Run Apify Actor"
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "httpMethod": "POST",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        220,
+        240
+      ],
+      "id": "326cdc13-76ee-4838-a959-1aa57cacff04",
+      "name": "Wait Run Succeded",
+      "webhookId": "8a4742ef-b18e-4837-a402-67a4f2330784"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -220,
+        240
+      ],
+      "id": "01e682f0-eaa4-430f-8448-c0982db3967a",
+      "name": "When clicking ‘Test workflow’"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Apify - Get Dataset Items": {
+      "main": [
+        [
+          {
+            "node": "Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Markdown": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Blog -> Bullet Point",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Blog -> Bullet Point": {
+      "main": [
+        [
+          {
+            "node": "Bullet Point -> Blog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bullet Point -> Blog": {
+      "main": [
+        [
+          {
+            "node": "Rewrite Title",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rewrite Title": {
+      "main": [
+        [
+          {
+            "node": "Create Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Doc": {
+      "main": [
+        [
+          {
+            "node": "Blog to HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Blog to HTML": {
+      "main": [
+        [
+          {
+            "node": "Upload Blog to Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Blog to Doc": {
+      "main": [
+        [
+          {
+            "node": "Update Campaign Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Apify Actor": {
+      "main": [
+        [
+          {
+            "node": "Wait Run Succeded",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Run Succeded": {
+      "main": [
+        [
+          {
+            "node": "Apify - Get Dataset Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Run Apify Actor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f1c841e3-30e4-492a-a7ae-629e921c9112",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b0dcdc2a61168afbc3bb8907befe60a34408308859f86b899e8ba57a64038046"
+  },
+  "id": "Y0gLo6DzJc7JwJFR",
+  "tags": [
+    {
+      "createdAt": "2025-02-25T16:53:08.138Z",
+      "updatedAt": "2025-02-25T16:53:08.138Z",
+      "id": "987WX9PvnYkGNzpl",
+      "name": "Nick n8n"
+    }
+  ]
+}
