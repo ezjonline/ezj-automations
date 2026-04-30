@@ -1,0 +1,269 @@
+{
+  "name": "Email Categorization System",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailReadImap",
+      "typeVersion": 2,
+      "position": [
+        -340,
+        -240
+      ],
+      "id": "e58aa6a7-dd8b-451e-9a14-b0366ba47096",
+      "name": "Email Trigger (IMAP)",
+      "credentials": {
+        "imap": {
+          "id": "W94jQzMnOZu5xTmv",
+          "name": "Juan - PulpSense"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are my helpful, intelligent administrative assistant.",
+              "role": "system"
+            },
+            {
+              "content": "=Your task is to categorize incoming emails into the following labels:\n\nSponsorship Requests\nPeople Selling Me Stuff\nInvoices & Receipts\nWorthwhile\n\nReturn your answer in JSON as follows:\n\n{\"category\":\"category goes here\"}\n\nRules:\n- I am a well-known AI consultant. I have dozens of people reaching out to me every day. I am looking to label and categorize emails to make my life easier, and to avoid having to rife through sponsorship requests/salespeople on a daily basis.\n- So if somebody is reaching out about a sponsorship/affiliate partnership, categorize it as Sponsorship Requests.\n- And if somebody is reaching out to try and sell me (they're pitching me something) categorize it as People Selling Me Stuff.\n- If it's a receipt for something, categorize it as \"Invoices & Receipts\"\n- If the email doesn't fit into the above three categories, categorize it as \"Worthwhile\". These are ones I will actually look at."
+            },
+            {
+              "content": "Let’s Collaborate with AI SEO Agent That Saves Time and Costs\n\nHey Nick,\n\nI’m Ifra from AllAboutAI.com, where we're passionate about the transformative impact of AI on digital marketing and content strategies.\n\nI came across your video on “How to Build a Website AI Agent in 13 Min”, and I love how you simplify automation and provide actionable strategies for building online businesses. Just as you help creators leverage AI to scale efficiently, KIVA is redefining SEO with AI-powered keyword research and automated content insights, helping digital entrepreneurs, content creators, and businesses boost search visibility and streamline SEO workflows.\nWe have recently launched KIVA, an innovative AI SEO Agent designed to simplify and optimize SEO workflows. It’s already helping creators and professionals save time, enhance content relevance, and adapt to evolving multi-platform strategies.\n\nHere’s what KIVA offers:\n\nSaves up to 80% of time on keyword research.\nProvides actionable insights through GSC integration and UserVoice.\nOptimizes visibility across traditional search engines and AI platforms.\nBuilds tailored content outlines for streamlined execution.\nChatRadar – Track your brand’s presence in LLMs like ChatGPT, identifying who’s being cited, which brands dominate, and uncovering actionable content opportunities.\nI’d love to explore a potential collaboration with you to showcase KIVA to your audience. Let me know if this resonates and I’d be happy to share more details.\n\nLet me know if you’d like to discuss more or set up a quick chat to explore opportunities. Looking forward to your thoughts and create something impactful.\n\nBest regards,"
+            },
+            {
+              "content": "{\"category\":\"Sponsorship Requests\"}",
+              "role": "assistant"
+            },
+            {
+              "content": "For the attention of Nick Saraev\n\nHi Nick, I hope you’re having a great day so far!\n\nI love the look & feel of your Channel. Your content is great.\n\nMy team and I have taken a look at your Social media and we are very confident we can help you get 15-20 High-Ticket Coaching clients signed, every single month.\n\nThe best part is…. if we don’t deliver, you don’t pay! We work on a 100% pay on results basis, so if you don’t get results, we don’t get paid.\n\nBy the way, this isn’t an automated message. I’m a real human! I recorded a quick video to introduce myself and so you can see I'm not blasting you from some software.\n\n\nnicksaraev 2-1 - Watch Video\n\n\n\n\n\n\n \nWe’ve already helped other Coaches add $30k-$40K per month, sometimes even getting them to $100k/mo.\n\nI would love the opportunity to learn more about your business, challenges and goals to see if there’s a fit.\n\nWould you be interested in having a call this week so we can discuss?\n\nThanks,\nAndrew\n\np.s. - when I say pay on results, I really mean it! No performance = no money out of your pocket.\n"
+            },
+            {
+              "content": "{\"category\":\"People Selling Me Stuff\"}",
+              "role": "assistant"
+            },
+            {
+              "content": "Amazing Videos\n\nThanks for the reply Nick, \n\nI’ve been diving into your videos and find your school truly amazing. I genuinely believe this is exactly what I've been searching for. My plan is to follow your guidance step by step, and I'm hopeful that it will lead to success.\n\nMy children live across the country in Newfoundland, and the high cost of travel has made it difficult to see them as often as I'd like. My goal is to build a sustainable online income that allows me to work from my laptop and strengthen my relationship with them.\n\nI'm incredibly grateful for individuals like you who dedicate their time to helping others succeed. I look forward to the opportunity to connect in the future, and I hope to share some major wins with you when that time comes.\n\nThank you again for everything.\n\nBest regards,\n\nEric"
+            },
+            {
+              "content": "{\"category\":\"Worthwhile\"}",
+              "role": "assistant"
+            },
+            {
+              "content": "=subject: {{ $json.subject }}\n\ntext: {{ $json.textPlain }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -120,
+        -240
+      ],
+      "id": "b8109a66-fb6b-4093-be6b-4e045ec653bc",
+      "name": "Categorize Email",
+      "credentials": {
+        "openAiApi": {
+          "id": "a2xwb5PX9qEfwIVL",
+          "name": "santi@pulpsense.com (26 Jan 25)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "fe013229-2567-4904-b321-fce8844aec93",
+              "leftValue": "={{ $json.message.content.category }}",
+              "rightValue": "Worthwhile",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        260,
+        -240
+      ],
+      "id": "e741f442-da65-4ecc-ad3a-69f3302242af",
+      "name": "Not Worthwhile"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "filters": {
+          "q": "=subject:\"{{ $('Email Trigger (IMAP)').item.json.subject }}\" ",
+          "sender": "={{ $('Email Trigger (IMAP)').item.json.from }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        480,
+        -240
+      ],
+      "id": "21c36463-053d-4ffd-97a0-71e4aed9c876",
+      "name": "Get Email",
+      "webhookId": "daab69ad-1720-4912-b39c-ac9eb3c4dcec",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "pEiaDciKXdOpa3NW",
+          "name": "Juan - PulpSense"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": "={{ $if(\n    $('Categorize Email').item.json.message.content.category = \"People Selling Me Stuff\",\n    \"Label_4787983829258945830\",\n    $if(\n        $('Categorize Email').item.json.message.content.category = \"Sponsorship Requests\",\n        \"Label_3826966585958192942\",\n        \"Label_8395077687002259879\"\n    )\n) }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        920,
+        -240
+      ],
+      "id": "fbf01656-9411-4888-adb4-624df3127b3a",
+      "name": "Add to folder",
+      "webhookId": "d8da9cad-f412-4e98-97e1-dcdd47df9711",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "pEiaDciKXdOpa3NW",
+          "name": "SAnti"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "removeLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "INBOX"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        700,
+        -240
+      ],
+      "id": "bda28220-d883-4cae-a754-8ff4c18b42ac",
+      "name": "Remove from Inbox",
+      "webhookId": "d8da9cad-f412-4e98-97e1-dcdd47df9711",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "pEiaDciKXdOpa3NW",
+          "name": "Juan - PulpSense"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Email Trigger (IMAP)": {
+      "main": [
+        [
+          {
+            "node": "Categorize Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Categorize Email": {
+      "main": [
+        [
+          {
+            "node": "Not Worthwhile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Not Worthwhile": {
+      "main": [
+        [
+          {
+            "node": "Get Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Email": {
+      "main": [
+        [
+          {
+            "node": "Remove from Inbox",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add to folder": {
+      "main": [
+        []
+      ]
+    },
+    "Remove from Inbox": {
+      "main": [
+        [
+          {
+            "node": "Add to folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d73b0652-cb73-4f4f-9a50-fd0a4f454c0d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b0dcdc2a61168afbc3bb8907befe60a34408308859f86b899e8ba57a64038046"
+  },
+  "id": "keoKngqmIl0JF8cy",
+  "tags": [
+    {
+      "createdAt": "2025-02-25T16:53:08.138Z",
+      "updatedAt": "2025-02-25T16:53:08.138Z",
+      "id": "987WX9PvnYkGNzpl",
+      "name": "Nick n8n"
+    }
+  ]
+}

@@ -1,0 +1,2643 @@
+{
+  "name": "Upwork Scraper",
+  "nodes": [
+    {
+      "parameters": {
+        "resume": "webhook",
+        "httpMethod": "POST",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        -80
+      ],
+      "id": "e5466d3e-e669-42c6-8c65-da41a5ced722",
+      "name": "Wait",
+      "webhookId": "f75923ff-61db-43a6-96e2-44f9a095cb3d"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/matthewjames~upwork-job-scraper/runs",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "webhooks",
+              "value": "={{ `[ { \"eventTypes\": [\"ACTOR.RUN.SUCCEEDED\"], \"requestUrl\": \"${$execution.resumeUrl}\" } ]`.base64Encode() }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"jobsPerPage\": \"10\",\n  \"scrapePages\": 6,\n  \"startUrls\": \"https://www.upwork.com/nx/search/jobs?&proposals=0-4,5-9,10-14&q=(automation%20OR%20automate)&t=0,1\",\n  \"paymentVerified\": \"Yes\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        20,
+        -80
+      ],
+      "id": "610b8445-ef7c-4e38-9aa8-1d58289df8bd",
+      "name": "Scrape UW Jobs Apify",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "mJKaZl4HnPjEya81",
+          "name": "Apify Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.apify.com/v2/datasets/ugqRchsoWDdHXUtrF/items",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "format",
+              "value": "json"
+            },
+            {
+              "name": "limit",
+              "value": "100"
+            },
+            {
+              "name": "clean",
+              "value": "true"
+            },
+            {
+              "name": "simplified",
+              "value": "false"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        -80
+      ],
+      "id": "3854cb8a-3fdc-446c-b976-60e2a571be97",
+      "name": "Get Dataset Items Apify",
+      "alwaysOutputData": false,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "mJKaZl4HnPjEya81",
+          "name": "Apify Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=We're an operations agency that builds outreach systems, CRM systems, project management systems, no-code systems, and integrations.\n\nBelow is a job description. Filter it for relevance (true or false) in JSON. Some of the platforms we use include Airtable, ClickUp, ChatGPT, Make, Monday, Zapier, LinkedIn, Google Sheets. If relevant, write a short introductory icebreaker. If a job post mentions other platforms, that's fine, as long as it's not part of the list of platforms we explicitly don't use.\n\nNote:\n- API integrations are good, since we can develop them using no-code. \n- We don't develop full-stack apps.\n- Platforms we explicitly don't use: Python, Telegram, Whatsapp, Facebook, Bubble.io, Softr, Google Apps scripts, or chatbots\n- We're not VAs/virtual assistants,\n- We don't work on very tiny projects (like integrations that will take less than 10 minutes to do) or those that require extremely fast, same-day or 24hr delivery.\n\nExample client projects:\n- End to end project management for a $1M/yr copywriting agency\n- Outbound acquisition system that grew a content company from $10K/mo to $90K/mo in 12 mo\n- Monday.com CRM and PM for a recruiting company doing >$1M/yr\n- Automated content generation system for an SEO agency doing >$10M/yr\n- ClickUp CRM build for a marketing company doing $1M/yr\n\n---\n\nProduct Review Writer\n\nSee attached doc before responding. I need an excellent writer to do 2 product reviews 600-800 words each. I'll provide the products/sites to review.\n\nProduct 1: https://trycortexi.com/\nProduct 2: https://quietumplus.com/\n\nBudget: $300\nPosted On: April 11, 2023 22:07 UTC\nCategory: Product Reviews\nSkills: Writing, English, Proofreading, Content Writing, Review, Creative Writing\nCountry: United States"
+            },
+            {
+              "content": "{\"result\":\"false\", \"reason\": \"This is about writing. Nothing to do with systems.\", \"icebreaker\":\"\"}",
+              "role": "assistant"
+            },
+            {
+              "content": "TikTok Media Buyer\n\nWe're looking for a media buyer to specialize in running TikTok ads and other social media platforms.\n\nYou need to be proficient in English.\n\nBudget: $200"
+            },
+            {
+              "content": "{\"result\":\"false\", \"reason\": \"Focuses on social media marketing—not ops.\", \"icebreaker\":\"\"}",
+              "role": "assistant"
+            },
+            {
+              "content": "Airtable Expert Needed\n\nNeed help linking things in Airtable and using interfaces for my company. Content is already in Airtable, just need help maximizing what Airtable can do and organizing it so it's easier to manage. \n\nHourly Range: $30.00-$60.00"
+            },
+            {
+              "content": "{\"result\":\"true\", \"reason\": \"Involves automating Airtable, which aligns with our expertise in systems and no-code tools.\", \"icebreaker\":\"Confident I'm the man you're looking for. I use Airtable to manage a copywriting company that does ~$1M/yr. We make heavy use of interfaces & some less known Airtable features. I also routinely build Airtable flows, databases, etc.\"}",
+              "role": "assistant"
+            },
+            {
+              "content": "={{ $('Get Dataset Items Apify').item.json.Title }}\n\n{{ $('Get Dataset Items Apify').item.json.Description }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "maxTokens": 350,
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1700,
+        0
+      ],
+      "id": "890e2fcd-af18-4b21-9bcf-888ca373a1e0",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "a2xwb5PX9qEfwIVL",
+          "name": "santi@pulpsense.com (26 Jan 25)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appQtB2YjpaJGU7AF",
+          "mode": "list",
+          "cachedResultName": "Upwork Jobs Board (Copy)",
+          "cachedResultUrl": "https://airtable.com/appQtB2YjpaJGU7AF"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblZ2rTagN3HCsGxc",
+          "mode": "list",
+          "cachedResultName": "Upwork Scraper",
+          "cachedResultUrl": "https://airtable.com/appQtB2YjpaJGU7AF/tblZ2rTagN3HCsGxc"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Title": "={{ $('Get Dataset Items Apify').item.json.Title }}",
+            "Description": "={{ $('Get Dataset Items Apify').item.json.Description }}",
+            "URL": "={{ $('Get Dataset Items Apify').item.json.URL }}",
+            "Status": "Intake",
+            "Date Posted": "={{ $('Set Vars 3').item.json.timePosted }}",
+            "Country": "={{ $('Get Dataset Items Apify').item.json.Location }}",
+            "Project Type": "={{ $('Get Dataset Items Apify').item.json[\"Project Payment Type\"] }}",
+            "Budget Estimate": "={{ $('Set Vars 3').item.json.projectBudget || null}}",
+            "Min Budget": "={{ $('Set Vars 3').item.json.hourlyMin || null }}",
+            "Max Budget": "={{ $('Set Vars 3').item.json.hourlyMax || null }}",
+            "Icebreaker": "={{ $json.message.content.icebreaker }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Id",
+              "displayName": "Id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Date Added",
+              "displayName": "Date Added",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "URL",
+              "displayName": "URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Aplied",
+                  "value": "Aplied"
+                },
+                {
+                  "name": "Intake",
+                  "value": "Intake"
+                },
+                {
+                  "name": "Not relevant",
+                  "value": "Not relevant"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Date Posted",
+              "displayName": "Date Posted",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Country",
+              "displayName": "Country",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Project Type",
+              "displayName": "Project Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Hourly",
+                  "value": "Hourly"
+                },
+                {
+                  "name": "Project",
+                  "value": "Project"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Budget Estimate",
+              "displayName": "Budget Estimate",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Min Budget",
+              "displayName": "Min Budget",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Max Budget",
+              "displayName": "Max Budget",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Hours since posted",
+              "displayName": "Hours since posted",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Copyable Message",
+              "displayName": "Copyable Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Icebreaker",
+              "displayName": "Icebreaker",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Loom URL",
+              "displayName": "Loom URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Application Template",
+              "displayName": "Application Template",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2260,
+        0
+      ],
+      "id": "db34bf60-ed7d-4720-8486-e11231a61c6b",
+      "name": "Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "Vjy8qfKJLFnmDUKH",
+          "name": "santi@pulpsense.com (13 Mar 25)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1480,
+        0
+      ],
+      "id": "1ad7b7ef-a08e-443d-a60e-76973aaf7f82",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3076072e-6741-48f5-a35d-d485999caa68",
+              "name": "project",
+              "value": "={{ $json.Budget.indexOf(\"-\") === -1 }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        860,
+        0
+      ],
+      "id": "a2cc402a-4ebc-45b4-b311-5c4f7372848d",
+      "name": "Set Vars 1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "715d4289-cdd3-4ba0-a741-9538ef0ab5e4",
+              "name": "timePosted",
+              "value": "={{ $now.minus($json.amountAgo, $json.unitAgo) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1240,
+        0
+      ],
+      "id": "8473ce58-5339-4ab7-a1c0-2d4c869ccfbe",
+      "name": "Set Vars 3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c74e13ef-6f97-413f-950b-8ba89b18218b",
+              "name": "amountAgo",
+              "value": "={{ $json[\"Time Posted\"].split(\" \")[1] }}",
+              "type": "string"
+            },
+            {
+              "id": "9505c427-6ffc-47e2-a84c-1b94d1405315",
+              "name": "unitAgo",
+              "value": "={{ $json[\"Time Posted\"].split(\" \")[2] }}",
+              "type": "string"
+            },
+            {
+              "id": "fe0750f0-1f12-4cda-bcd1-9a7d7953a215",
+              "name": "projectBudget",
+              "value": "={{ ($json.project ? $('Get Dataset Items Apify').item.json.Budget : null)  }}",
+              "type": "number"
+            },
+            {
+              "id": "5fe7ca6e-c77e-4d32-bef6-c9ddc312abf6",
+              "name": "hourlyMin",
+              "value": "={{ $json.project ? null : $json.Budget.split(\"-\")[0].replaceAll(\"$\", \"\").split(\".\")[0] }}",
+              "type": "number"
+            },
+            {
+              "id": "11ce8a91-8d35-4bd6-9ee1-4d9117b085fe",
+              "name": "hourlyMax",
+              "value": "={{ $json.project ? null : $json.Budget.split(\"-\")[1].replaceAll(\"$\", \"\").split(\".\")[0] }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {
+          "ignoreConversionErrors": true
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1060,
+        0
+      ],
+      "id": "5bf7f053-5d95-4d39-b09f-b72cc3193174",
+      "name": "Set Vars 2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b4acbcab-fad5-45f2-a2a6-299a5744e4b6",
+              "leftValue": "={{ $json.message.content.result.toBoolean() }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2060,
+        0
+      ],
+      "id": "e781d578-fce4-4e69-83ca-9786e547419a",
+      "name": "Relevant?"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appQtB2YjpaJGU7AF",
+          "mode": "list",
+          "cachedResultName": "Upwork Jobs Board (Copy)",
+          "cachedResultUrl": "https://airtable.com/appQtB2YjpaJGU7AF"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblZ2rTagN3HCsGxc",
+          "mode": "list",
+          "cachedResultName": "Upwork Scraper",
+          "cachedResultUrl": "https://airtable.com/appQtB2YjpaJGU7AF/tblZ2rTagN3HCsGxc"
+        },
+        "filterByFormula": "{Status} = \"Intake\"",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        440,
+        120
+      ],
+      "id": "cc75dbf8-1f44-42f1-9656-8e60c98e937b",
+      "name": "Get Jobs",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "Vjy8qfKJLFnmDUKH",
+          "name": "santi@pulpsense.com (13 Mar 25)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "advanced": true,
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "Job ID",
+              "field2": "Job ID"
+            }
+          ]
+        },
+        "joinMode": "keepNonMatches",
+        "outputDataFrom": "input1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        680,
+        0
+      ],
+      "id": "f82bb81a-3bab-40d2-929d-00a1d46da8e4",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -200,
+        -80
+      ],
+      "id": "44db8538-ada0-46d4-bf48-eb9af1829cee",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "pinData": {
+    "Scrape UW Jobs Apify": [
+      {
+        "json": {
+          "data": {
+            "id": "HnDXIR0pIV04cBfwc",
+            "actId": "EtzoOfl1pDuNR2PxK",
+            "userId": "Whm3eYcdlY09aGIkE",
+            "startedAt": "2025-03-13T15:44:04.526Z",
+            "finishedAt": null,
+            "status": "READY",
+            "meta": {
+              "origin": "API",
+              "userAgent": "axios/1.7.4"
+            },
+            "stats": {
+              "inputBodyLen": 174,
+              "rebootCount": 0,
+              "restartCount": 0,
+              "resurrectCount": 0,
+              "computeUnits": 0
+            },
+            "options": {
+              "build": "latest",
+              "timeoutSecs": 3600,
+              "memoryMbytes": 2048,
+              "diskMbytes": 4096
+            },
+            "buildId": "yyU1lpJrb9AvxmvTA",
+            "defaultKeyValueStoreId": "iyllgWakVcBFWRoII",
+            "defaultDatasetId": "1ZfJkuo8SNRfSP0jQ",
+            "defaultRequestQueueId": "UkGioWpsQgpW2dyxG",
+            "pricingInfo": {
+              "pricingModel": "FLAT_PRICE_PER_MONTH",
+              "reasonForChange": null,
+              "pricePerUnitUsd": 10,
+              "trialMinutes": 120,
+              "createdAt": "2024-12-18T14:37:36.968Z",
+              "startedAt": "2024-12-18T14:37:36.968Z",
+              "apifyMarginPercentage": 0.2,
+              "notifiedAboutChangeAt": "2024-12-19T10:09:18.648Z"
+            },
+            "buildNumber": "2.0.5",
+            "containerUrl": "https://nltycqx2ycog.runs.apify.net",
+            "usage": {
+              "ACTOR_COMPUTE_UNITS": 0,
+              "DATASET_READS": 0,
+              "DATASET_WRITES": 0,
+              "KEY_VALUE_STORE_READS": 0,
+              "KEY_VALUE_STORE_WRITES": 1,
+              "KEY_VALUE_STORE_LISTS": 0,
+              "REQUEST_QUEUE_READS": 0,
+              "REQUEST_QUEUE_WRITES": 0,
+              "DATA_TRANSFER_INTERNAL_GBYTES": 0,
+              "DATA_TRANSFER_EXTERNAL_GBYTES": 0,
+              "PROXY_RESIDENTIAL_TRANSFER_GBYTES": 0,
+              "PROXY_SERPS": 0
+            },
+            "usageTotalUsd": 0.00005,
+            "usageUsd": {
+              "ACTOR_COMPUTE_UNITS": 0,
+              "DATASET_READS": 0,
+              "DATASET_WRITES": 0,
+              "KEY_VALUE_STORE_READS": 0,
+              "KEY_VALUE_STORE_WRITES": 0.00005,
+              "KEY_VALUE_STORE_LISTS": 0,
+              "REQUEST_QUEUE_READS": 0,
+              "REQUEST_QUEUE_WRITES": 0,
+              "DATA_TRANSFER_INTERNAL_GBYTES": 0,
+              "DATA_TRANSFER_EXTERNAL_GBYTES": 0,
+              "PROXY_RESIDENTIAL_TRANSFER_GBYTES": 0,
+              "PROXY_SERPS": 0
+            }
+          }
+        }
+      }
+    ],
+    "Wait": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.pulpsense.com",
+            "user-agent": "axios/1.7.9",
+            "content-length": "2616",
+            "accept": "application/json, text/plain, */*",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1",
+            "cf-connecting-ip": "13.216.80.7",
+            "cf-ipcountry": "US",
+            "cf-ray": "91fca7b0e90d6911-IAD",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "content-type": "application/json",
+            "x-apify-request-origin": "WEBHOOK",
+            "x-apify-webhook": "yo",
+            "x-apify-webhook-dispatch-id": "IDcYnkdwufRudplO0",
+            "x-apify-workflow-key": "e0jvds5ij6eu",
+            "x-forwarded-for": "172.71.194.30",
+            "x-forwarded-host": "n8n.pulpsense.com",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "7ba1fcbf2052",
+            "x-real-ip": "172.71.194.30"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "userId": "Whm3eYcdlY09aGIkE",
+            "createdAt": "2025-03-13T15:44:51.270Z",
+            "eventType": "ACTOR.RUN.SUCCEEDED",
+            "eventData": {
+              "actorId": "EtzoOfl1pDuNR2PxK",
+              "actorRunId": "HnDXIR0pIV04cBfwc"
+            },
+            "resource": {
+              "id": "HnDXIR0pIV04cBfwc",
+              "actId": "EtzoOfl1pDuNR2PxK",
+              "userId": "Whm3eYcdlY09aGIkE",
+              "startedAt": "2025-03-13T15:44:04.526Z",
+              "finishedAt": "2025-03-13T15:44:45.194Z",
+              "status": "SUCCEEDED",
+              "statusMessage": "Finished! Total 6 requests: 6 succeeded, 0 failed.",
+              "isStatusMessageTerminal": true,
+              "meta": {
+                "origin": "API",
+                "userAgent": "axios/1.7.4"
+              },
+              "stats": {
+                "inputBodyLen": 174,
+                "rebootCount": 0,
+                "restartCount": 0,
+                "durationMillis": 29879,
+                "resurrectCount": 0,
+                "runTimeSecs": 29.879,
+                "metamorph": 0,
+                "computeUnits": 0.016599444444444444,
+                "memAvgBytes": 123406039.88428208,
+                "memMaxBytes": 390512640,
+                "memCurrentBytes": 0,
+                "cpuAvgUsage": 14.612057661179897,
+                "cpuMaxUsage": 96.86009950248756,
+                "cpuCurrentUsage": 0,
+                "netRxBytes": 818733,
+                "netTxBytes": 107215
+              },
+              "options": {
+                "build": "latest",
+                "timeoutSecs": 3600,
+                "memoryMbytes": 2048,
+                "diskMbytes": 4096
+              },
+              "buildId": "yyU1lpJrb9AvxmvTA",
+              "exitCode": 0,
+              "defaultKeyValueStoreId": "iyllgWakVcBFWRoII",
+              "defaultDatasetId": "1ZfJkuo8SNRfSP0jQ",
+              "defaultRequestQueueId": "UkGioWpsQgpW2dyxG",
+              "pricingInfo": {
+                "pricingModel": "FLAT_PRICE_PER_MONTH",
+                "reasonForChange": null,
+                "pricePerUnitUsd": 10,
+                "trialMinutes": 120,
+                "createdAt": "2024-12-18T14:37:36.968Z",
+                "startedAt": "2024-12-18T14:37:36.968Z",
+                "apifyMarginPercentage": 0.2,
+                "notifiedAboutChangeAt": "2024-12-19T10:09:18.648Z"
+              },
+              "buildNumber": "2.0.5",
+              "containerUrl": "https://nltycqx2ycog.runs.apify.net",
+              "usage": {
+                "ACTOR_COMPUTE_UNITS": 0.016599444444444444,
+                "DATASET_READS": 0,
+                "DATASET_WRITES": 60,
+                "KEY_VALUE_STORE_READS": 1,
+                "KEY_VALUE_STORE_WRITES": 5,
+                "KEY_VALUE_STORE_LISTS": 0,
+                "REQUEST_QUEUE_READS": 6,
+                "REQUEST_QUEUE_WRITES": 24,
+                "DATA_TRANSFER_INTERNAL_GBYTES": 0.0007866136729717255,
+                "DATA_TRANSFER_EXTERNAL_GBYTES": 0.00006065890192985535,
+                "PROXY_RESIDENTIAL_TRANSFER_GBYTES": 0,
+                "PROXY_SERPS": 0
+              },
+              "usageTotalUsd": 0.007750240241812336,
+              "usageUsd": {
+                "ACTOR_COMPUTE_UNITS": 0.006639777777777778,
+                "DATASET_READS": 0,
+                "DATASET_WRITES": 0.00030000000000000003,
+                "KEY_VALUE_STORE_READS": 0.000005,
+                "KEY_VALUE_STORE_WRITES": 0.00025,
+                "KEY_VALUE_STORE_LISTS": 0,
+                "REQUEST_QUEUE_READS": 0.000024,
+                "REQUEST_QUEUE_WRITES": 0.00048000000000000007,
+                "DATA_TRANSFER_INTERNAL_GBYTES": 0.00003933068364858627,
+                "DATA_TRANSFER_EXTERNAL_GBYTES": 0.00001213178038597107,
+                "PROXY_RESIDENTIAL_TRANSFER_GBYTES": 0,
+                "PROXY_SERPS": 0
+              },
+              "links": {
+                "publicRunUrl": "https://console.apify.com/view/runs/HnDXIR0pIV04cBfwc",
+                "consoleRunUrl": "https://console.apify.com/actors/EtzoOfl1pDuNR2PxK/runs/HnDXIR0pIV04cBfwc",
+                "apiRunUrl": "https://api.apify.com/v2/actor-runs/HnDXIR0pIV04cBfwc"
+              }
+            }
+          },
+          "webhookUrl": "https://n8n.pulpsense.com/webhook/",
+          "executionMode": "production"
+        }
+      }
+    ],
+    "Get Dataset Items Apify": [
+      {
+        "json": {
+          "Job ID": "1900146178250570085",
+          "Time Posted": "Posted 29 minutes ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$8.00 - $15.00",
+          "Skill Level": "Intermediate",
+          "Title": "Social Media Marketing Specialist for Raw Land Promotion",
+          "URL": "https://www.upwork.com/jobs/Social-Media-Marketing-Specialist-for-Raw-Land-Promotion_~021900146178250570085/?referrer_url_path=/nx/search/jobs/",
+          "Description": "We are seeking a skilled individual to assist in marketing raw land and managing our social media presence. The ideal candidate will develop engaging content, implement marketing strategies, and help increase visibility and sales of our land listings. Experience in real estate marketing and social media management is essential. If you are proactive, creative, and familiar with various social media platforms, we would love to hear from you!",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "1 to 3 months",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "Facebook",
+            "Social Media Marketing",
+            "Instagram",
+            "Marketing Strategy",
+            "Social Media Content Creation",
+            "Facebook Advertising",
+            "Google Ads",
+            "Internet Marketing",
+            "Lead Generation",
+            "Twitter/X Marketing"
+          ],
+          "Date Scraped": "2025-03-13T14:54:47.827Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900189400531667035",
+          "Time Posted": "Posted 30 minutes ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$20.00 - $30.00",
+          "Skill Level": "Expert",
+          "Title": "Cold Calling Survey or Telephone Sales Professional for Business Manager Survey (Not Sales)",
+          "URL": "https://www.upwork.com/jobs/Cold-Calling-Survey-Telephone-Sales-Professional-for-Business-Manager-Survey-Not-Sales_~021900189400531667035/?referrer_url_path=/nx/search/jobs/",
+          "Description": "Our company is looking for an experienced telephone sales or telephone survey professional to conduct survey of business location managers. We specialize in conducting surveys and gathering data to help businesses make informed decisions and improve their products and services. We are seeking enthusiastic and dedicated Survey Phone Interviewers to join our team. This is an excellent opportunity for individuals who are outgoing, persistent, and enjoy engaging with people over the phone. Your primary responsibility will be to make outbound calls and administer surveys to participants, record their responses accurately, and upload them to Google Drive. You would be contacting businesses from a list and asking managers they would be willing to participate in a brief (3-5 minute) survey. Some lists can be more difficult than others and we are totally aware of that. You will also have a seasoned phone interviewer at your fingertips for help, tips and tricks. We anticipate 10-20 hours per week during normal business hours.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "Less than 1 month",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "B2B Marketing",
+            "Data Entry",
+            "Online Research",
+            "Direct Marketing",
+            "Cold Calling",
+            "List Building",
+            "Sales",
+            "Telemarketing",
+            "Market Research",
+            "Phone Communication",
+            "Survey",
+            "Opinion Survey",
+            "Research Interviews"
+          ],
+          "Date Scraped": "2025-03-13T14:54:47.827Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900191181273771576",
+          "Time Posted": "Posted 30 minutes ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$15.00 - $35.00",
+          "Skill Level": "Intermediate",
+          "Title": "Logo Design for Medical Group",
+          "URL": "https://www.upwork.com/jobs/Logo-Design-for-Medical-Group_~021900191181273771576/?referrer_url_path=/nx/search/jobs/",
+          "Description": "We are seeking a talented graphic designer to create a professional and modern logo for our medical group. The logo should reflect our commitment to healthcare excellence and convey trust and reliability. Ideal candidates should have experience in designing logos for healthcare or medical-related businesses. Please provide a portfolio of your previous work along with your proposal. We are looking for unique and innovative designs that will make a lasting impression.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "Less than 1 month",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "Logo Design",
+            "Graphic Design",
+            "Adobe Illustrator",
+            "Adobe Photoshop"
+          ],
+          "Date Scraped": "2025-03-13T14:54:47.827Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900190432166873179",
+          "Time Posted": "Posted 33 minutes ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$35.00 - $70.00",
+          "Skill Level": "Intermediate",
+          "Title": "Teacher Curriculum Developer",
+          "URL": "https://www.upwork.com/jobs/Teacher-Curriculum-Developer_~021900190432166873179/?referrer_url_path=/nx/search/jobs/",
+          "Description": "We are seeking a Curriculum Developer to design and develop engaging, standards-aligned lesson plans and materials for elementary school students, specifically starting with Kindergarten. A strong understanding of Kindergarten Common Core standards and child development is essential. The ideal candidate has experience in curriculum design, a passion for child-centered learning, and a creative approach to lesson planning. Key Responsibilities • Develop engaging and age-appropriate lesson plans, activities, and assessments for elementary students.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "Less than 1 month",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "Academic Content Development",
+            "Curriculum Development",
+            "Curriculum Design",
+            "Program Curriculum"
+          ],
+          "Date Scraped": "2025-03-13T14:54:47.827Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900189689041713509",
+          "Time Posted": "Posted 36 minutes ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "Hourly",
+          "Skill Level": "Intermediate",
+          "Title": "Video Editor - Short & Long Form",
+          "URL": "https://www.upwork.com/jobs/Video-Editor-Short-Long-Form_~021900189689041713509/?referrer_url_path=/nx/search/jobs/",
+          "Description": "Position: Video Editor Location: Remote/Flexible Are you a versatile and dynamic video editor who loves working on a variety of creative projects? Hunch Studios is looking for an editor who can seamlessly switch between editing trendy TikTok videos, polished short-form content with overlays and effects, and long-form YouTube videos in the style of The Cut. No two days are the same here—one day, you might be crafting a viral meme cutdown, and the next, you're shaping a brand-new YouTube show. If you thrive in a fast-paced, ever-evolving creative space, we want to hear from you! What You’ll Be Editing: 🎥 Man-on-the-street interviews (e.g., @WannaPlayTV on TitkTok) 😂 Meme-style cutdowns (e.g., @tagsomeonewho on IG) 📺 Long-form YouTube storytelling (e.g., The Cut) What We’re Looking For: ✅ Experience editing both short-form and long-form content ✅ Strong storytelling and pacing skills ✅ Proficiency in editing software (Premiere Pro, Final Cut, or equivalent) ✅ Ability to adapt to different styles and tones ✅ A keen eye for social media trends and viral content How to Apply: 📌 Phase One: Submit your portfolio, including at least one short-form and one long-form video that showcase your skills. 📌 Phase Two (Paid Trial): Selected candidates will edit two short-form videos: 🎭 A man-on-the-street edit (WannaPlayTV style) 🎬 A cutdown from a long-form video If you're ready to edit for a studio where every day is something new, send your portfolio and why you’d be a perfect fit for this role . Let’s create something awesome together! 🚀",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "3 to 6 months",
+          "Weekly Hours": "30+ hrs/week",
+          "Skills": [
+            "TikTok Video",
+            "Video Editing",
+            "Adobe Premiere Pro"
+          ],
+          "Date Scraped": "2025-03-13T14:54:47.827Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900189349035680225",
+          "Time Posted": "Posted 37 minutes ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$5.00 - $5.00",
+          "Skill Level": "Expert",
+          "Title": "Commission-Based Sales Rep / VA for Luxury Design Studio",
+          "URL": "https://www.upwork.com/jobs/Commission-Based-Sales-Rep-for-Luxury-Design-Studio_~021900189349035680225/?referrer_url_path=/nx/search/jobs/",
+          "Description": "🔥 High-Ticket Sales Opportunity – No Earning Cap 🚀 I’m looking for a driven, money-motivated sales expert to help grow my luxury design brand. This is an opportunity to close massive deals and build a high-paying career in high-end sales. Who We Are: I founded Wise Owl Concepts in 2019, initially designing residential furniture and decorative accents. Today, we’ve evolved into a full-scale luxury design studio, creating custom furniture, architectural installations, and full-scale commercial design buildouts for hotels, restaurants, casinos, banks, and more. What You’ll Be Selling: ✅ Custom Interior & Exterior Doors – High-end barn doors, statement front doors, and massive pivot doors. ✅ Luxury Kitchen Range Hoods – Sought-after by high-end kitchen designers. ✅ Architectural Staircases & Railings – Custom fabricated for architects and designers. ✅ Bespoke Dining Tables – Sold to homeowners, designers, and luxury restaurants. ✅ Executive Conference Tables – Perfect for law firms, high-end offices, and corporate spaces. ✅ Custom Fabricated Wood & Metal Designs – Unique statement pieces that elevate any space. What You’ll Be Doing: Using my LinkedIn (4,000+ connections) to engage with interior designers, architects, and commercial developers. Leveraging our 65,000+ Instagram followers to build credibility and spark interest. Sending personalized outreach emails (as me) to generate leads and secure high-ticket deals. Connecting with luxury homeowners, developers, and business owners who are investing in premium, custom-built spaces. Closing deals on custom furniture, doors, and architectural installations with average sales of $18,000+ per piece, with full-furnishing contracts easily exceeding $100,000+. Building long-term relationships with high-net-worth clients who return for multiple projects. 💰 Compensation – Earn What You’re Worth 💵 Base Rate: $5/hr (to get started) 💵 Commission: 10% per sale (with an average deal size of $18,200+) 💵 Realistic earnings: $1,000 – $3,000+ per closed deal 💵 No earning cap – your hustle = your income Who I’m Looking For: ✔️ A self-starter who is hungry to make real money ✔️ Confident, persuasive, and strong in sales & communication ✔️ Driven to network, build relationships, and close high-ticket deals ✔️ Experience in sales, lead generation, or luxury markets is a huge plus ✔️ Understands high-end clientele or is eager to learn fast This is NOT a 9-5 job—this is an opportunity to build a six-figure income in high-end luxury sales. If you have the drive, the confidence, and the hunger to succeed, apply now and let’s make",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "More than 6 months",
+          "Weekly Hours": "30+ hrs/week",
+          "Skills": [
+            "LinkedIn Sales Navigator",
+            "Lead Generation",
+            "Sales",
+            "Email Communication",
+            "Cold Calling",
+            "Scheduling",
+            "LinkedIn Lead Generation"
+          ],
+          "Date Scraped": "2025-03-13T14:54:47.827Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900189188218089797",
+          "Time Posted": "Posted 38 minutes ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$40.00 - $60.00",
+          "Skill Level": "Expert",
+          "Title": "Expert Shopify and Wordpress Developer With Technical A/B Testing Experience",
+          "URL": "https://www.upwork.com/jobs/Expert-Shopify-and-Wordpress-Developer-With-Technical-Testing-Experience_~021900189188218089797/?referrer_url_path=/nx/search/jobs/",
+          "Description": "I'm looking to hire a CMS Developer who is proficient in Shopify Plus and Wordpress, that can handle everything from site speed updates, theme upgrades, custom app building abilities, and more for a variety of online brands my company works with. For some additional context, I also am running a lot of A/B tests for clients on tools like Convert.com, which requires some CSS & javascript knowledge. This is a major aspect of the development we do and we need someone who has done this before that can hop right into our A/B testing workflow. My team is globally distributed and we NEED a USA-timezone developer to help with daily tasks on the PST/EST timezone. I'm looking for an independent freelancer (no agencies). Only USA-based applicants welcome to apply. Requirements: - Shopify Plus development - Wordpress development - Proven experience with A/B testing tools - Javascript & CSS knowledge - Strong communication and collaboration skills. Excellent problem-solving skills and attention to detail. - USA ONLY and Independent Contractors ONLY (No Agencies) Thanks for your time! Expected hours: 20 – 40 per week PS - I won't hire you if you're outside of the USA using a VPN to try and fool us. Nor will I hire you if you are working as an agency or sub-contracting the work to someone else. We need someone reliable that works directly with us.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "More than 6 months",
+          "Weekly Hours": "30+ hrs/week",
+          "Skills": [
+            "Shopify Templates",
+            "Shopify",
+            "Web Development",
+            "Ecommerce Website Development",
+            "Shopify Apps",
+            "Shopify Theme",
+            "WordPress",
+            "JavaScript",
+            "WooCommerce"
+          ],
+          "Date Scraped": "2025-03-13T14:54:47.827Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900189105702107494",
+          "Time Posted": "Posted 38 minutes ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "Hourly",
+          "Skill Level": "Intermediate",
+          "Title": "YouTube Channel Video Editor",
+          "URL": "https://www.upwork.com/jobs/YouTube-Channel-Video-Editor_~021900189105702107494/?referrer_url_path=/nx/search/jobs/",
+          "Description": "Looking for an editor to help cut/merge podcast style video for new YouTube Channel. Similar to what you would see on a Podcast.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "Less than 1 month",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "Explainer Video",
+            "Video Editing",
+            "Adobe Premiere Pro",
+            "Video Post-Editing",
+            "Video Intro & Outro",
+            "YouTube Development"
+          ],
+          "Date Scraped": "2025-03-13T14:54:47.827Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900188526908475484",
+          "Time Posted": "Posted 41 minutes ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$30.00 - $150.00",
+          "Skill Level": "Expert",
+          "Title": "Digital Advertising (META/Google) Infrastructure & Setup",
+          "URL": "https://www.upwork.com/jobs/Digital-Advertising-META-Google-Infrastructure-Setup_~021900188526908475484/?referrer_url_path=/nx/search/jobs/",
+          "Description": "Experienced Digital Advertising Infrastructure & Setup Specialist to audit, optimize, and create a high-performance digital advertising foundation for our business. This is ideal for someone who understands the technical backbone and implementation for the infrastructure of META and Google Advertisement accounts.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "Less than 1 month",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "Google Ads",
+            "SEO Keyword Research",
+            "Search Engine Marketing",
+            "Marketing Audit",
+            "Campaign Optimization",
+            "Facebook"
+          ],
+          "Date Scraped": "2025-03-13T14:54:47.827Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900186213202456901",
+          "Time Posted": "Posted 50 minutes ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$65.00 - $115.00",
+          "Skill Level": "Expert",
+          "Title": "ArcGIS Developer and Data Pipeline Engineer",
+          "URL": "https://www.upwork.com/jobs/ArcGIS-Developer-and-Data-Pipeline-Engineer_~021900186213202456901/?referrer_url_path=/nx/search/jobs/",
+          "Description": "Calling all ArcGIS wizards! 🧙‍♂️ MSS is developing cutting-edge emergency management tools designed to provide real-time situational awareness and rapid damage assessment during critical events. We're looking for a highly skilled ArcGIS Developer to join our team and lead the charge in building dynamic online dashboards and automating complex data pipelines. You'll be: - Integrating and automating data from damage assessment surveys, live weather feeds, live traffic systems, live status of public infrastructure (IoT), and Emergency Operations Centers (EOCs). - Developing interactive and intuitive online dashboards for real-time visualization. - Leveraging the latest ArcGIS technologies to create robust and scalable solutions. If you have a passion for using geospatial technology to make a real difference and possess a deep understanding of ArcGIS development and integration with real-time data, we want to hear from you! Please DM any resumes and portfolio work!",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "3 to 6 months",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "Data Visualization",
+            "ArcGIS",
+            "ETL Pipeline",
+            "GIS",
+            "Database",
+            "Data Engineering"
+          ],
+          "Date Scraped": "2025-03-13T14:54:47.827Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900197959290007096",
+          "Time Posted": "Posted 3 minutes ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$30.00 - $45.00",
+          "Skill Level": "Intermediate",
+          "Title": "Facebook ad set up account",
+          "URL": "https://www.upwork.com/jobs/Facebook-set-account_~021900197959290007096/?referrer_url_path=/nx/search/jobs/",
+          "Description": "i need to set up me facebook ad. I need to set up my Facebook ads account. I have an issue over there from some reason I have three users and every time I'm trying to do some ads I cannot change them cannot play with them cannot do nothing I need from you to fix that for me and create me three campaign my only one condition it's to do it in a shared screen with me to give me the opportunity to learn how you do it.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "Less than 1 month",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "Google Tag Manager",
+            "Facebook",
+            "Marketing Strategy",
+            "Google Ads",
+            "YouTube",
+            "Paid Social",
+            "YouTube Marketing",
+            "Advertising Strategy",
+            "Ahrefs",
+            "Social Media Account Setup",
+            "Facebook Ads Manager",
+            "Google Analytics 4",
+            "Google Ads Account Management",
+            "Google Ads Audit"
+          ],
+          "Date Scraped": "2025-03-13T14:54:47.872Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900197676365312325",
+          "Time Posted": "Posted 4 minutes ago",
+          "Project Payment Type": "Project",
+          "Budget": "$3,000.00",
+          "Skill Level": "Intermediate",
+          "Title": "Wlv-Reeves Bauder, Pc Obesity & Metabolic Health Genetic Marker Study Grant Proposal",
+          "URL": "https://www.upwork.com/jobs/Wlv-Reeves-Bauder-Obesity-Metabolic-Health-Genetic-Marker-Study-Grant-Proposal_~021900197676365312325/?referrer_url_path=/nx/search/jobs/",
+          "Description": "We need an experienced grant writer to prepare an NIH SBIR Phase I (PA-23-231) application, due April 5, 2025, for Reeves Bauder, PC. The project, WLV-Reeves Bauder, PC Obesity & Metabolic Health Genetic Marker Study, is a single-arm clinical trial optimizing GLP-1RA therapy with genetic insights at Weight Loss & Vitality clinics ($132,500 budget). Tasks include adapting an existing draft into NIH format (SF424, 6-page Research Strategy, budget, human subjects) and guiding SAM.gov/eRA Commons registration. Deliverables: completed proposal by April 5, 2025. Fixed cost: $3,000 ($1,500 now, $1,500 at submission); $3,000 success fee if awarded. Requires NIH SBIR and clinical trial expertise. Start March 13, 2025.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": null,
+          "Weekly Hours": null,
+          "Skills": [
+            "Business Analysis",
+            "Business Plan",
+            "Editing & Proofreading",
+            "Business Writing",
+            "Proposal Writing",
+            "Scientific Research",
+            "Technical Writing",
+            "Nanotechnology",
+            "Grant Writing",
+            "Business Proposal Writing",
+            "Startup Consulting",
+            "Commercialization",
+            "Biotechnology",
+            "Medical Device"
+          ],
+          "Date Scraped": "2025-03-13T14:54:47.872Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900196992949612869",
+          "Time Posted": "Posted 7 minutes ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$35.00 - $55.00",
+          "Skill Level": "Intermediate",
+          "Title": "CAD Designer needed to convert .pdf drawings to .dxf files",
+          "URL": "https://www.upwork.com/jobs/CAD-Designer-needed-convert-pdf-drawings-dxf-files_~021900196992949612869/?referrer_url_path=/nx/search/jobs/",
+          "Description": "We are looking for an experienced CAD Designer with an Engineering background to take existing .pdf versions of prints and or Solidworks files and create .dxf files out of them to be used in a 2Kw fiber laser. These prints would need to be dimensionally correct so as to cut the blanks (not necessarily the finished part) on the laser.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "Less than 1 month",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "Mechanical Engineering",
+            "CAD & CAM Software",
+            "SolidWorks",
+            "Drafting",
+            "2D Design"
+          ],
+          "Date Scraped": "2025-03-13T14:54:47.872Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900195520883126597",
+          "Time Posted": "Posted 10 minutes ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$12.00 - $38.00",
+          "Skill Level": "Intermediate",
+          "Title": "Fashion Content Creator Needed",
+          "URL": "https://www.upwork.com/jobs/Fashion-Content-Creator-Needed_~021900195520883126597/?referrer_url_path=/nx/search/jobs/",
+          "Description": "We are seeking a creative content creator to generate high-quality fashion content for our brand. The ideal candidate will have a keen eye for trends, excellent storytelling skills, and the ability to produce engaging visuals and written content. You will be responsible for creating posts for our social media platforms, blog articles, and promotional materials that resonate with our audience. If you have a passion for fashion and a portfolio showcasing your work, we would love to hear from you!",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "1 to 3 months",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "Content Writing",
+            "Blog Content",
+            "Creative Writing",
+            "Article Writing"
+          ],
+          "Date Scraped": "2025-03-13T14:54:47.872Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900195979737892955",
+          "Time Posted": "Posted 11 minutes ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$20.00 - $150.00",
+          "Skill Level": "Intermediate",
+          "Title": "Professional PowerPoint Pitch Presentation Design",
+          "URL": "https://www.upwork.com/jobs/Professional-PowerPoint-Pitch-Presentation-Design_~021900195979737892955/?referrer_url_path=/nx/search/jobs/",
+          "Description": "We are seeking a skilled freelancer to create a professional and engaging PowerPoint pitch presentation. The ideal candidate will have a knack for storytelling through slides and a strong design aesthetic. You will be required to gather content, structure it effectively, and design impactful visuals that resonate with our audience. If you have experience in creating presentations for business pitches, we want to hear from you!",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "1 to 3 months",
+          "Weekly Hours": "Hours to be determined",
+          "Skills": [
+            "Microsoft PowerPoint",
+            "Business Presentation",
+            "Pitchbook",
+            "Presentation Design"
+          ],
+          "Date Scraped": "2025-03-13T14:54:47.872Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900195936693842245",
+          "Time Posted": "Posted 11 minutes ago",
+          "Project Payment Type": "Project",
+          "Budget": "$100.00",
+          "Skill Level": "Intermediate",
+          "Title": "Graphic Designer Needed: Course Series Flyer (Deadline: Monday 3/17)",
+          "URL": "https://www.upwork.com/jobs/Graphic-Designer-Needed-Course-Series-Flyer-Deadline-Monday_~021900195936693842245/?referrer_url_path=/nx/search/jobs/",
+          "Description": "We’re looking for a skilled graphic designer to create a professional and visually appealing flyer that promotes our dental education course series. The flyer should effectively convey key course details, including multiple course dates by location, while maintaining a polished and cohesive look. What We Provide: ✅ Brand Style Guide – Ensures consistency with our existing marketing materials ✅ High-Quality Imagery – Includes faculty photos and course visuals ✅ Website for Reference – Provides course descriptions, dates, and other essential details What We Need From You: A print and digital-friendly flyer design A clear and easy-to-read layout that highlights course locations and dates Professional yet engaging typography and design elements A fast turnaround – Must be completed by Monday of next week Ideal Candidate: • Experienced in marketing materials, course/event flyers, or professional education design • Strong sense of layout, typography, and branding • Can work quickly and efficiently while maintaining high quality Next Steps: If interested, please submit: • Portfolio samples (especially event/course flyers) Looking forward to finding a great designer to collaborate with for a potential long-term project.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": null,
+          "Weekly Hours": null,
+          "Skills": [
+            "Graphic Design",
+            "Adobe Illustrator",
+            "Print Design",
+            "Brochure",
+            "Layout Design"
+          ],
+          "Date Scraped": "2025-03-13T14:54:47.872Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900195769511639397",
+          "Time Posted": "Posted 12 minutes ago",
+          "Project Payment Type": "Project",
+          "Budget": "$100.00",
+          "Skill Level": "Intermediate",
+          "Title": "Full Stack Developer Needed for API Bug Fix",
+          "URL": "https://www.upwork.com/jobs/Full-Stack-Developer-Needed-for-API-Bug-Fix_~021900195769511639397/?referrer_url_path=/nx/search/jobs/",
+          "Description": "Job Description I'm looking for a Full Stack Developer to fix a bug in my web application's API. The issue involves incorrect data being returned from the API when fetching user details. Bug Details - Backend: Python Django API. - Issue: Some API endpoints return null or incorrect values for user data. - Possible Cause: Might be related to database queries, serialization, or caching. Requirements - Experience with Python (Django). - Strong debugging and problem-solving skills. - Familiarity with RESTful APIs, PostgreSQL/MySQL, and caching mechanisms. - Ability to fix the issue quickly. This is a small task, but if you do well, there might be more work in the future. Let me know if you're available!",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": null,
+          "Weekly Hours": null,
+          "Skills": [
+            "Python",
+            "Django",
+            "PostgreSQL",
+            "Docker",
+            "GraphQL"
+          ],
+          "Date Scraped": "2025-03-13T14:54:47.872Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900195421380213093",
+          "Time Posted": "Posted 13 minutes ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$20.00 - $30.00",
+          "Skill Level": "Intermediate",
+          "Title": "North American BDR Needed for New Services Platform",
+          "URL": "https://www.upwork.com/jobs/North-American-BDR-Needed-for-New-Services-Platform_~021900195421380213093/?referrer_url_path=/nx/search/jobs/",
+          "Description": "Job Title: Business Development Representative (BDR) – Lead Generation Expert for Home Services Platform Job Description: We are Lynx, a fast-growing startup revolutionizing the home services industry by connecting customers with reliable, vetted service providers. We’re launching in the Dallas/Fort Worth area and are seeking a highly motivated and skilled Business Development Representative (BDR) to drive our initial growth by onboarding top-quality service providers. As one of our first BDRs, you will play a crucial role in refining our outreach process and onboarding strategy. Once the system is proven in DFW, this process will be scaled to other large markets in Texas and eventually nationwide. You will be instrumental in documenting and teaching the process to new hires as we expand. Key Responsibilities: • Lead Generation: Research and identify potential service providers in the Dallas/Fort Worth area. • Outreach: Conduct cold calls, send cold emails, and leverage platforms like LinkedIn to connect with prospects. • Pitching: Communicate the value of Lynx to service providers, emphasizing benefits such as access to real jobs (not just leads), no commission fees, and tools for success. • CRM Management: Input leads and track outreach efforts in Zoho CRM, ensuring accurate and up-to-date records. • Follow-Up: Build relationships with prospects through consistent follow-ups to maximize conversions. • Onboarding Support: Guide service providers through the onboarding process, ensuring they meet all platform requirements (e.g., licenses, insurance, certifications). • Process Refinement: Work closely with leadership to refine and document the outreach and onboarding process for scalability. Requirements: • Proven experience in sales, lead generation, or business development (experience in a startup or SaaS environment is a plus). • Exceptional verbal and written communication skills. • Strong ability to pitch a platform to prospective clients and handle objections with confidence. • Familiarity with CRM tools (e.g., Zoho) and outreach automation tools. • Highly organized, with attention to detail for managing leads and follow-ups. • Self-starter mentality with a high level of motivation, adaptability, and eagerness to grow with a startup. • Interest in contributing to a scalable business model that has plans for rapid nationwide expansion. • Knowledge of the home services industry (e.g., HVAC, plumbing) is a bonus but not required. What We Offer: • The chance to join a high-potential startup with ambitious plans for growth and global expansion. • Remote work flexibility, allowing you to work from wherever you are most productive. • Opportunities for professional growth and development in a fast-paced, innovative environment. Hiring Process: As part of our hiring process, we will: 1. Conduct a brief video chat to get to know you better and discuss the role. 2. Check 2-3 professional references to ensure a strong fit for the position. If you’re ready to make a significant impact in a growing company and want to be part of an exciting journey, submit your proposal and tell us why you’re the ideal candidate for Lynx.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "More than 6 months",
+          "Weekly Hours": "30+ hrs/week",
+          "Skills": [
+            "Lead Generation",
+            "Zoho CRM",
+            "Relationship Management",
+            "Market Research",
+            "Startup Company",
+            "Cold Calling",
+            "Appointment Scheduling",
+            "New Member Onboarding",
+            "Communication Skills"
+          ],
+          "Date Scraped": "2025-03-13T14:54:47.872Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900148811193513110",
+          "Time Posted": "Posted 18 minutes ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$20.00 - $35.00",
+          "Skill Level": "Entry Level",
+          "Title": "Customer Service Representative Position",
+          "URL": "https://www.upwork.com/jobs/Customer-Service-Representative-Position_~021900148811193513110/?referrer_url_path=/nx/search/jobs/",
+          "Description": "Hello, We are hiring a customer service representative to manage customer queries and complaints. You will also be asked to process orders, modifications, and escalate complaints across a number of communication channels. To do well in this role you need to be able to remain calm when customers are frustrated and have experience working with computers. NOTE: FOR YOUR SAFETY NO PERSONAL INFORMATION, & ONLY PROPOSALS WITH RESUME/CV ATTACHED WILL BE CONSIDERD. Key Responsibilities: 1, Maintaining a positive, empathetic, and professional attitude toward customers at all times. 2, Responding promptly to customer inquiries. 3, Communicating with customers through various channels. 4, Acknowledging and resolving customer complaints. 5, Knowing our products inside and out so that you can answer questions. 6, Processing orders, forms, applications, and requests. 7, Keeping records of customer interactions, transactions, comments, and complaints. 8, Communicating and coordinating with colleagues as necessary. 9, Providing feedback on the efficiency of the customer service process. 10, Managing a team of junior customer service representatives.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "3 to 6 months",
+          "Weekly Hours": "30+ hrs/week",
+          "Skills": [
+            "Customer Service",
+            "Product Knowledge",
+            "Email Support",
+            "Customer Support"
+          ],
+          "Date Scraped": "2025-03-13T14:54:47.872Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900192989327783061",
+          "Time Posted": "Posted 23 minutes ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$15.00 - $150.00",
+          "Skill Level": "Intermediate",
+          "Title": "WordPress Pricing Qualifier Page Development",
+          "URL": "https://www.upwork.com/jobs/WordPress-Pricing-Qualifier-Page-Development_~021900192989327783061/?referrer_url_path=/nx/search/jobs/",
+          "Description": "I need a developer to help build us a more intuitive and informative pricing page to help entice and qualify potential leads. Think typeform, I want a few steps and options sequences that calculate an estimate on pricing and take them to a contact page if they qualify. I can send examples. About us: - We're an accounting firm. - We specialize in MId-market accounting outsourcing. - Our website is currently on Wordpress with the BeTheme theme. Can you please tell me your favorite beverage too? Thanks, T",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "1 to 3 months",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "WordPress",
+            "Web Development",
+            "Web Design",
+            "WooCommerce",
+            "CSS"
+          ],
+          "Date Scraped": "2025-03-13T14:54:47.872Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900185611035341973",
+          "Time Posted": "Posted 52 minutes ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$20.00 - $75.00",
+          "Skill Level": "Expert",
+          "Title": "Financial Reporting Coach Needed for Admin Team",
+          "URL": "https://www.upwork.com/jobs/Financial-Reporting-Coach-Needed-for-Admin-Team_~021900185611035341973/?referrer_url_path=/nx/search/jobs/",
+          "Description": "We are seeking an experienced controller or CFO to coach our administrative team in understanding and utilizing financial reports effectively. The ideal candidate must be an expert in QuickBooks Online and possess strong communication skills to train and empower our team. This is an opportunity to enhance our financial literacy and improve decision-making through effective financial reporting. If you have a proven track record in financial coaching, we would love to hear from you.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "1 to 3 months",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "Google Sheets",
+            "Microsoft Excel",
+            "Data Entry",
+            "Administrative Support",
+            "Accounting",
+            "Bookkeeping"
+          ],
+          "Date Scraped": "2025-03-13T14:54:49.627Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900183239416476821",
+          "Time Posted": "Posted 54 minutes ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$12.00 - $16.00",
+          "Skill Level": "Intermediate",
+          "Title": "Part-Time Customer Support and QuickBooks Online Assistant",
+          "URL": "https://www.upwork.com/jobs/Part-Time-Customer-Support-and-QuickBooks-Online-Assistant_~021900183239416476821/?referrer_url_path=/nx/search/jobs/",
+          "Description": "We are seeking a reliable part-time assistant to handle customer inquiries via phone and email. The ideal candidate will also perform tasks in QuickBooks Online and assist with WooCommerce operations. If you're organized, detail-oriented, and have experience with customer service and basic accounting, we want to hear from you! Our business is a family farm in South Carolina producing pasture raised meats and eggs. We deliver our products in our delivery vans to customers in 4 different markets in North and South Carolina each week. As we grow we are needing more help in answering customer questions and performing some entry-level accounting tasks in Quickbooks Online.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "More than 6 months",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "Food & Beverage",
+            "Zendesk",
+            "Business with 1-9 Employees",
+            "Customer Service",
+            "Data Entry",
+            "Administrative Support",
+            "Email Communication",
+            "Customer Support",
+            "Bookkeeping"
+          ],
+          "Date Scraped": "2025-03-13T14:54:49.627Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900184829369806072",
+          "Time Posted": "Posted 55 minutes ago",
+          "Project Payment Type": "Project",
+          "Budget": "$500.00",
+          "Skill Level": "Intermediate",
+          "Title": "Photographer Needed for 50-Person Birthday Party",
+          "URL": "https://www.upwork.com/jobs/Photographer-Needed-for-Person-Birthday-Party_~021900184829369806072/?referrer_url_path=/nx/search/jobs/",
+          "Description": "I am planning a surprise 70th birthday party for my mom on June 28th from 5pm-9pm with around 50 guests. I would like a skilled photographer to capture the special moments, people, etc. The event will include decorations, food, and dancing, and I would love for it all to be documented. The ideal candidate should have experience with event photography and be able to deliver high-quality images. Please provide examples of your previous work and any relevant experience in similar settings.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": null,
+          "Weekly Hours": null,
+          "Skills": [
+            "Event Photography",
+            "People",
+            "Photography",
+            "Photo Editing",
+            "Family"
+          ],
+          "Date Scraped": "2025-03-13T14:54:49.627Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900184152048728421",
+          "Time Posted": "Posted 58 minutes ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "Hourly",
+          "Skill Level": "Expert",
+          "Title": "Use illustrated pages to create a book to publish on Amazon",
+          "URL": "https://www.upwork.com/jobs/Use-illustrated-pages-create-book-publish-Amazon_~021900184152048728421/?referrer_url_path=/nx/search/jobs/",
+          "Description": "I have pages completed for a childrens book including a cover. I am a few pages short to publish on Amazon so I need someone to take my existing pages, add a couple either blanks or dedications or something and lay it out ready to publish.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "Less than 1 month",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "Publication Design",
+            "Children's Literature",
+            "Formatting",
+            "Ebook",
+            "Ebook Design",
+            "Book",
+            "Layout Design"
+          ],
+          "Date Scraped": "2025-03-13T14:54:49.627Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900182897631032469",
+          "Time Posted": "Posted 1 hour ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$40.00 - $75.00",
+          "Skill Level": "Expert",
+          "Title": "Financial Advisor for Weekly Market Insights (Zoom Meetings + Written Column)",
+          "URL": "https://www.upwork.com/jobs/Financial-Advisor-for-Weekly-Market-Insights-Zoom-Meetings-Written-Column_~021900182897631032469/?referrer_url_path=/nx/search/jobs/",
+          "Description": "We are seeking a highly knowledgeable and engaging Financial Advisor to join our team on a freelance basis. This role involves two key responsibilities: hosting a live Zoom meeting for our subscribers and writing a weekly market insights column. The ideal candidate is an expert in financial markets, stocks, and the broader economy, with a passion for sharing original, actionable insights in an articulate and compelling way. Responsibilities: Monday Morning Zoom Meeting (Live): Host a 30-60 minute Zoom call every Monday morning with our subscriber base. Provide an expert overview of what to watch in the markets for the week ahead, including key trends, stock movements, economic indicators, and potential opportunities or risks. Engage the audience with clear, confident, and dynamic communication—think of this as a mix of market analysis and storytelling. Answer basic audience questions as time permits (Q&A facilitation may be supported by our team). Weekly Market Column: Write a 500-800 word original column each week, delivering fresh perspectives on the financial markets, economy, or specific stocks/sectors. Content should be insightful, well-researched, and accessible to an audience of intermediate-to-advanced investors. Submit the draft by [e.g., Friday EOD] for review and publication the following week. Requirements: Proven expertise in financial markets, stocks, and economic trends (e.g., CFA, Series 65, or equivalent experience preferred). Exceptional verbal communication skills—articulate, energetic, and comfortable speaking live to an audience. Strong writing skills with the ability to craft original, thought-provoking content. Deep understanding of current market events and the ability to anticipate what’s next. Reliable, professional, and able to meet weekly deadlines. Comfortable with Zoom and basic virtual meeting tech. Nice-to-Haves: Prior experience hosting webinars, podcasts, or live market commentary. A unique perspective or niche expertise (e.g., tech stocks, macroeconomics, options trading). Existing following or credibility in the financial community (e.g., published articles, social media presence).",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "More than 6 months",
+          "Weekly Hours": "30+ hrs/week",
+          "Skills": [
+            "Financial Consulting"
+          ],
+          "Date Scraped": "2025-03-13T14:54:49.627Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900182671496513627",
+          "Time Posted": "Posted 1 hour ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$20.00 - $40.00",
+          "Skill Level": "Intermediate",
+          "Title": "Architectural Drafting using Chief Architect",
+          "URL": "https://www.upwork.com/jobs/Architectural-Drafting-using-Chief-Architect_~021900182671496513627/?referrer_url_path=/nx/search/jobs/",
+          "Description": "We are seeking a skilled architectural draftsman to create precise and detailed plans using Chief Architect software. The ideal candidate will have experience in residential architecture, specifically in remodeling, and possess a keen eye for detail. You will be responsible for translating initial concepts into structured drawings, ensuring compliance with building codes and regulations for projects in the State of Illinoi. If you have a passion for architecture and proficiency in Chief Architect, we would love to hear from you.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "More than 6 months",
+          "Weekly Hours": "30+ hrs/week",
+          "Skills": [
+            "Chief Architect",
+            "Construction Document Preparation",
+            "Architectural Design",
+            "Drafting",
+            "2D Design & Drawings",
+            "3D Architectural Rendering"
+          ],
+          "Date Scraped": "2025-03-13T14:54:49.627Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900181739103385957",
+          "Time Posted": "Posted 1 hour ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$32.00 - $55.00",
+          "Skill Level": "Intermediate",
+          "Title": "Project Manager For Creative Agency",
+          "URL": "https://www.upwork.com/jobs/Project-Manager-For-Creative-Agency_~021900181739103385957/?referrer_url_path=/nx/search/jobs/",
+          "Description": "We are seeking a highly organized and proactive Project Manager to oversee project planning, execution, and delivery. The ideal candidate will coordinate cross-functional teams, manage timelines and budgets, and ensure successful project completion. Responsibilities include defining project scope, setting goals, tracking progress, mitigating risks, and maintaining clear communication with stakeholders. Strong leadership, problem-solving, and time-management skills are essential. Experience with project management tools and methodologies is a plus. Requirements: Proven experience in project management Excellent organizational and communication skills Ability to manage multiple projects simultaneously Proficiency in project management software (e.g., Slack, Monday.com) PMP or similar certification is a plus Ready to take charge of exciting projects? Apply today!",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "More than 6 months",
+          "Weekly Hours": "30+ hrs/week",
+          "Skills": [
+            "Project Scheduling",
+            "Project Management",
+            "Decision Making",
+            "Milestones"
+          ],
+          "Date Scraped": "2025-03-13T14:54:49.627Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900179874508114011",
+          "Time Posted": "Posted 1 hour ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$40.00 - $74.00",
+          "Skill Level": "Entry Level",
+          "Title": "Survey Monkey Expert for Comparative Organizational Assessment Report",
+          "URL": "https://www.upwork.com/jobs/Survey-Monkey-Expert-for-Comparative-Organizational-Assessment-Report_~021900179874508114011/?referrer_url_path=/nx/search/jobs/",
+          "Description": "We are seeking a skilled professional with expertise in Survey Monkey to assist in generating one report that analyzes and compares two organizational assessment surveys. The ideal candidate will have a strong background in survey design, data analysis, and report generation using Survey Monkey tools. Key Responsibilities: Utilize Survey Monkey to extract and analyze data from two distinct organizational assessment surveys. Generate a comparative report that highlights similarities, differences, and key insights. Present findings in clear, visually engaging, and actionable formats (charts, graphs, summaries, etc.).",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "Less than 1 month",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "SurveyMonkey",
+            "Data Analysis"
+          ],
+          "Date Scraped": "2025-03-13T14:54:49.627Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900180490410193221",
+          "Time Posted": "Posted 1 hour ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "Hourly",
+          "Skill Level": "Entry Level",
+          "Title": "A day in the life of DC ops",
+          "URL": "https://www.upwork.com/jobs/day-the-life-ops_~021900180490410193221/?referrer_url_path=/nx/search/jobs/",
+          "Description": "Looking to create video content for social media, certain shots that coincide with a predefined scripted voiceover. length 2 minutes. (no editing required, just gathering the raw footage to send to our team who will handle editing.) will need the shots to be taken at 1325 Tracy ave (Patmos Datacenter), Patmos Pavillion (former KC Star bldg, downtown) and on the streets of the Power and Light district. Along with your pay rate, you will get credit at the end as well.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "Less than 1 month",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "Adobe After Effects",
+            "Animation",
+            "Videography",
+            "Special Effects",
+            "YouTube",
+            "Video Post-Editing",
+            "Audio Editing",
+            "Motion Graphics",
+            "Article",
+            "Editing & Proofreading",
+            "Grammar"
+          ],
+          "Date Scraped": "2025-03-13T14:54:49.627Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900177787297266021",
+          "Time Posted": "Posted 1 hour ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$20.00 - $50.00",
+          "Skill Level": "Entry Level",
+          "Title": "Video Editor",
+          "URL": "https://www.upwork.com/jobs/Video-Editor_~021900177787297266021/?referrer_url_path=/nx/search/jobs/",
+          "Description": "We are looking for a skilled Video Editor to create high-quality, engaging content. Responsibilities include editing footage, adding effects, enhancing visuals, and ensuring brand consistency. Must be proficient in video editing software and have a keen eye for storytelling and detail.(SUBMIT YOUR RESUME)",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "More than 6 months",
+          "Weekly Hours": "30+ hrs/week",
+          "Skills": [
+            "Video Editing",
+            "Adobe Premiere Pro",
+            "Video Post-Editing",
+            "Adobe After Effects",
+            "Video Production",
+            "Video Commercial"
+          ],
+          "Date Scraped": "2025-03-13T14:54:49.627Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900179523371462981",
+          "Time Posted": "Posted 1 hour ago",
+          "Project Payment Type": "Project",
+          "Budget": "$5,600.00",
+          "Skill Level": "Expert",
+          "Title": "Million$ Unlimited Potential!! Area Sales Manager/Healthcare - Excellent Support Infrastructure",
+          "URL": "https://www.upwork.com/jobs/Million-Unlimited-Potential-Area-Sales-Manager-Healthcare-Excellent-Support-Infrastructure_~021900179523371462981/?referrer_url_path=/nx/search/jobs/",
+          "Description": "Sales Manager, Healthcare Services Ideal position for individuals with a background in healthcare administration or professional services sales! Metropolitan Healthcare Services is seeking an experienced health care professional with sales and marketing abilities for the position of Sales Manager located in the Washington DC metropolitan area. This is an “internal” and “external” position that will focus on professional healthcare sales development. The position of Sales Manager will be responsible for developing and maintaining referral relationships in the community and converting referrals to meet and exceed current budgeted census goals the organization. The efforts of this position will work in tandem with the strategic business plan, as well as the leadership team, in the facility. Responsibilities of the position include, but are not limited to: • Call on existing and potential customers to introduce, demonstrate, sell and service MHS’ products while supporting MHS’ overall sales effort. Must qualify potential customers. • Implement and achieve quarterly and yearly sales plan. • Maintain expert level of knowledge regarding MHS’ and competitors product lines. • Attend trade shows. • Provide field intelligence on competitor activity, changes in markets, distribution and pricing as well as input on customer preferences and product features. • An expert level of knowledge is required in: o Sales, Negotiation, and Service o Communication and Interpersonal Skills o Organizational and Technical Skills • This job requires the ability to communicate readily with high profile hospital executives, purchasing/procurement, administration and technical personnel. This is a field-based position requiring travel. The ideal candidate for the Sales Manager position will come from a healthcare or professional service related field, preferably hospital services similar those that provide patient care, maintain records and ensure that the hospital is able to deliver care to patients., Previous sales and marketing experience preferred. Candidates must be enthusiastic and willing to learn and execute the long term sales process. Basic computer literacy and excellent communication skills, both written and verbal, are a must. This is a full time, salaried position.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": null,
+          "Weekly Hours": null,
+          "Skills": [
+            "Corporate Strategy",
+            "Allied Healthcare",
+            "Healthcare Management",
+            "Sales",
+            "Lead Generation",
+            "Cold Calling",
+            "Communications",
+            "Customer Service",
+            "Relationship Management",
+            "Scheduling"
+          ],
+          "Date Scraped": "2025-03-13T14:54:49.833Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900179408441247835",
+          "Time Posted": "Posted 1 hour ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$20.00 - $200.00",
+          "Skill Level": "Expert",
+          "Title": "100% Commission Sales Agent – Restaurant Partnerships (Smart Dining)",
+          "URL": "https://www.upwork.com/jobs/100-Commission-Sales-Agent-Restaurant-Partnerships-Smart-Dining_~021900179408441247835/?referrer_url_path=/nx/search/jobs/",
+          "Description": "100% Commission Sales Agent – Restaurant Partnerships (Smart Dining) Location: Remote / Local Market-Based Compensation: 100% Commission-Based Industry: Restaurant Technology / Hospitality Solutions About Smart Dining Smart Dining is an innovative platform revolutionizing restaurant reservations and guest management across United States of America and Worldwide. We provide cutting-edge solutions that help restaurants streamline operations, increase reservations, and enhance customer experiences. We are seeking dynamic, self-motivated sales agents to expand our restaurant partnerships. This is a 100% commission-based role, offering unlimited earning potential for top performers. Key Responsibilities Prospect & Outreach: Identify and engage with local restaurants, cafes, and hospitality businesses to introduce them to Smart Dining's innovative solutions. Consultative Selling: Present tailored demonstrations of our platform, highlighting benefits that align with each restaurant's unique needs. Relationship Building: Establish and nurture long-term partnerships with restaurant owners and managers, serving as a trusted advisor to help them optimize their operations. Achieve Sales Targets: Consistently meet and exceed monthly and quarterly sales goals, driving revenue growth for both the clients and Smart Dining. Market Insight: Stay informed about industry trends, competitor offerings, and local market dynamics to effectively position Smart Dining's value proposition. Qualifications Proven Sales Experience: Demonstrated success in B2B sales, preferably within restaurant technology, SaaS, or hospitality sectors. Consultative Approach: Ability to understand client needs deeply and offer tailored solutions that drive mutual success. Excellent Communication: Strong verbal and written skills, with the ability to present complex concepts clearly and persuasively. Industry Knowledge: Familiarity with restaurant operations and challenges, enabling effective dialogue with potential clients. Self-Driven: Highly motivated, with a proactive approach to identifying opportunities and closing deals. What We Offer Unlimited Earning Potential: A pure commission structure that rewards your success—your income grows with your performance. Flexible Work Environment: Autonomy to manage your schedule and approach, focusing on results rather than processes. Growth Opportunities: As Smart Dining expands, top performers will have pathways to leadership roles and increased responsibilities. Comprehensive Support: Access to marketing materials, product training, and a supportive team committed to your success. Why Join Smart Dining? Innovative Product: Offer a solution that provides clear, tangible benefits to restaurants, making it a compelling sell. Entrepreneurial Culture: Be part of a forward-thinking company where your ideas and contributions can shape the future. Impactful Work: Help restaurants enhance their operations and customer experiences, making a real difference in the hospitality industry. If you're passionate about sales and the restaurant industry, and you're ready to take control of your earnings, we want to hear from you! To Apply: Submit your resume along with a brief cover letter detailing your relevant experience and why you're a great fit for this role.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "More than 6 months",
+          "Weekly Hours": "30+ hrs/week",
+          "Skills": [
+            "Food & Beverage",
+            "Sales & Marketing",
+            "Sales",
+            "Relationship Management",
+            "Lead Generation",
+            "Cold Calling",
+            "Partnership Development"
+          ],
+          "Date Scraped": "2025-03-13T14:54:49.833Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900179373859211355",
+          "Time Posted": "Posted 1 hour ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$75.00 - $100.00",
+          "Skill Level": "Intermediate",
+          "Title": "Healthcare Compliance Attorney",
+          "URL": "https://www.upwork.com/jobs/Healthcare-Compliance-Attorney_~021900179373859211355/?referrer_url_path=/nx/search/jobs/",
+          "Description": "We are looking for an experienced Healthcare Compliance Attorney to draft a customized Business Associate Agreement (BAA) that we can use with any downstream partners (e.g., subcontractors, staff, or freelancers) who provide services to our healthcare clients on our behalf. The attorney will ensure that our agreement protects our company’s interests, limits liability, and maintains regulatory compliance when handling protected health information (PHI) or providing IT-related services in the healthcare industry. Key Responsibilities • Draft a comprehensive BAA that clearly defines obligations, responsibilities, and liabilities for third parties who work with our healthcare clients. • Ensure HIPAA compliance by incorporating necessary safeguards, breach notification requirements, and PHI handling policies. • Define subcontractor and vendor responsibilities to ensure proper data security, confidentiality, and compliance measures. • Limit our liability and mitigate risks associated with third-party service providers handling sensitive client information. • Advise on contract structure to ensure enforceability and clarity in our business relationships. • Provide recommendations on legal risk management related to our engagement with subcontractors and freelancers in the healthcare IT space.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "1 to 3 months",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "Contract Drafting",
+            "Tech & IT",
+            "Health & Wellness",
+            "Partnership Agreement",
+            "Contract Law"
+          ],
+          "Date Scraped": "2025-03-13T14:54:49.833Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900178473400862811",
+          "Time Posted": "Posted 1 hour ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$12.00 - $15.00",
+          "Skill Level": "Intermediate",
+          "Title": "Excel Data Analysis and Report",
+          "URL": "https://www.upwork.com/jobs/Excel-Data-Analysis-and-Report_~021900178473400862811/?referrer_url_path=/nx/search/jobs/",
+          "Description": "-Provide a report for each contract which indicates total amount of sales, top 20 line items sold, mode for each of those 20 top selling items, indicate set aside if any for each contract. -Develop tutorial for owner to be able to replicate the process using AI prompts if possible.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "Less than 1 month",
+          "Weekly Hours": "Not sure",
+          "Skills": [
+            "Microsoft Excel"
+          ],
+          "Date Scraped": "2025-03-13T14:54:49.833Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900174974135332088",
+          "Time Posted": "Posted 1 hour ago",
+          "Project Payment Type": "Project",
+          "Budget": "$300.00",
+          "Skill Level": "Intermediate",
+          "Title": "Regain Access to Meta Business Parent Account Facebook",
+          "URL": "https://www.upwork.com/jobs/Regain-Access-Meta-Business-Parent-Account-Facebook_~021900174974135332088/?referrer_url_path=/nx/search/jobs/",
+          "Description": "Looking to regain access to my meta business suite account. We lost access to the parent account, but have access to all of the individual accounts underneath.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": null,
+          "Weekly Hours": null,
+          "Skills": [
+            "Facebook"
+          ],
+          "Date Scraped": "2025-03-13T14:54:49.833Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900174618237379041",
+          "Time Posted": "Posted 1 hour ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$25.00 - $60.00",
+          "Skill Level": "Intermediate",
+          "Title": "Temporary Full-Time HR Generalist Needed",
+          "URL": "https://www.upwork.com/jobs/Temporary-Full-Time-Generalist-Needed_~021900174618237379041/?referrer_url_path=/nx/search/jobs/",
+          "Description": "We are looking for a temporary, full-time HR Generalist with mid-to-senior level expertise to join our team. The ideal candidate will have experience in various HR functions, including recruitment, employee relations, onboarding, HRIS management and policy development. You will play a critical role in supporting the HR department and ensuring smooth operational processes. If you have a proven track record in HR and are ready to make an immediate impact, we want to hear from you!",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "1 to 3 months",
+          "Weekly Hours": "30+ hrs/week",
+          "Skills": [
+            "Communications",
+            "Administrative Support",
+            "Human Resource Management",
+            "Data Entry",
+            "Microsoft Excel",
+            "Microsoft Word",
+            "Google Docs"
+          ],
+          "Date Scraped": "2025-03-13T14:54:49.833Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900173222409078875",
+          "Time Posted": "Posted 1 hour ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$50.00 - $65.00",
+          "Skill Level": "Expert",
+          "Title": "Integrate Payment Gateway into Existing .NET Core & React Website",
+          "URL": "https://www.upwork.com/jobs/Integrate-Payment-Gateway-into-Existing-NET-Core-React-Website_~021900173222409078875/?referrer_url_path=/nx/search/jobs/",
+          "Description": "We are looking for an experienced full-stack developer to integrate a payment gateway into our existing web application. The application is built using .NET Core for the backend, React for the frontend, and PostgreSQL as the database. It is hosted on AWS. Project Scope: • Integrate a payment gateway (e.g., Stripe, PayPal, Authorize.Net, or another provider) into our existing system. • Implement secure payment processing with proper encryption and tokenization. • Ensure seamless integration with our .NET Core REST API and React frontend. • Store and manage transaction data in the PostgreSQL database. • Implement webhooks to handle payment confirmations, refunds, and subscription management. • Ensure compliance with PCI DSS standards. • Test the integration thoroughly to ensure smooth user experience and security. Requirements: • Proficiency in .NET Core (C#) and building REST APIs. • Strong experience with React.js. • Knowledge of PostgreSQL database management. • Experience with AWS services such as S3, Lambda, or EC2. • Prior experience integrating payment gateways (Stripe, PayPal, etc.). • Strong understanding of security best practices in payment processing. • Ability to work independently and meet deadlines. Deliverables: • Fully integrated payment gateway with a working checkout flow. • Secure API endpoints for handling transactions. • Database updates to store transaction details. • Documentation for maintaining and troubleshooting the integration. If you have experience with payment gateway integration and are confident in handling this project, please apply with details of your past relevant work.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "Less than 1 month",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "PostgreSQL",
+            "React",
+            "API",
+            "Web Development",
+            "API Integration",
+            "HTML",
+            "CSS",
+            ".NET Framework",
+            "ASP.NET"
+          ],
+          "Date Scraped": "2025-03-13T14:54:49.833Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900173077155671842",
+          "Time Posted": "Posted 1 hour ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$20.00 - $200.00",
+          "Skill Level": "Expert",
+          "Title": "100% Commission Sales Agent – Restaurant Partnerships (Smart Dining)",
+          "URL": "https://www.upwork.com/jobs/100-Commission-Sales-Agent-Restaurant-Partnerships-Smart-Dining_~021900173077155671842/?referrer_url_path=/nx/search/jobs/",
+          "Description": "100% Commission Sales Agent – Restaurant Partnerships (Smart Dining) Location: Remote / Local Market-Based Compensation: 100% Commission-Based Industry: Restaurant Technology / Hospitality Solutions About Smart Dining Smart Dining is an innovative platform revolutionizing restaurant reservations and guest management across United States of America and Worldwide. We provide cutting-edge solutions that help restaurants streamline operations, increase reservations, and enhance customer experiences. We are seeking dynamic, self-motivated sales agents to expand our restaurant partnerships. This is a 100% commission-based role, offering unlimited earning potential for top performers. Key Responsibilities Prospect & Outreach: Identify and engage with local restaurants, cafes, and hospitality businesses to introduce them to Smart Dining's innovative solutions. Consultative Selling: Present tailored demonstrations of our platform, highlighting benefits that align with each restaurant's unique needs. Relationship Building: Establish and nurture long-term partnerships with restaurant owners and managers, serving as a trusted advisor to help them optimize their operations. Achieve Sales Targets: Consistently meet and exceed monthly and quarterly sales goals, driving revenue growth for both the clients and Smart Dining. Market Insight: Stay informed about industry trends, competitor offerings, and local market dynamics to effectively position Smart Dining's value proposition. Qualifications Proven Sales Experience: Demonstrated success in B2B sales, preferably within restaurant technology, SaaS, or hospitality sectors. Consultative Approach: Ability to understand client needs deeply and offer tailored solutions that drive mutual success. Excellent Communication: Strong verbal and written skills, with the ability to present complex concepts clearly and persuasively. Industry Knowledge: Familiarity with restaurant operations and challenges, enabling effective dialogue with potential clients. Self-Driven: Highly motivated, with a proactive approach to identifying opportunities and closing deals. What We Offer Unlimited Earning Potential: A pure commission structure that rewards your success—your income grows with your performance. Flexible Work Environment: Autonomy to manage your schedule and approach, focusing on results rather than processes. Growth Opportunities: As Smart Dining expands, top performers will have pathways to leadership roles and increased responsibilities. Comprehensive Support: Access to marketing materials, product training, and a supportive team committed to your success. Why Join Smart Dining? Innovative Product: Offer a solution that provides clear, tangible benefits to restaurants, making it a compelling sell. Entrepreneurial Culture: Be part of a forward-thinking company where your ideas and contributions can shape the future. Impactful Work: Help restaurants enhance their operations and customer experiences, making a real difference in the hospitality industry. If you're passionate about sales and the restaurant industry, and you're ready to take control of your earnings, we want to hear from you! To Apply: Submit your resume along with a brief cover letter detailing your relevant experience and why you're a great fit for this role.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "More than 6 months",
+          "Weekly Hours": "30+ hrs/week",
+          "Skills": [
+            "Food & Beverage",
+            "Sales & Marketing",
+            "Sales",
+            "Relationship Management",
+            "Lead Generation",
+            "Cold Calling",
+            "Partnership Development"
+          ],
+          "Date Scraped": "2025-03-13T14:54:49.833Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900172959889682757",
+          "Time Posted": "Posted 1 hour ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$40.00 - $50.00",
+          "Skill Level": "Intermediate",
+          "Title": "WordPress Helpdesk Assistant - Associate",
+          "URL": "https://www.upwork.com/jobs/WordPress-Helpdesk-Assistant-Associate_~021900172959889682757/?referrer_url_path=/nx/search/jobs/",
+          "Description": "Our team is need of a customer support agent who can troubleshoot common/basic issues with WordPress / Elementor websites. Need 5-15 hours a week availability for now may increase based on growth. Perform regular WordPress updates (themes, plugins, core) while ensuring site stability. Monitor and maintain backups for all client sites. Address basic website support requests, such as minor content updates, formatting adjustments, or plugin installations. Troubleshoot and fix minor WordPress issues, such as layout problems, broken links, and plugin conflicts. Assist with security and performance monitoring, ensuring all sites remain fast and secure. Respond to client inquiries related to site maintenance and content edits. Work with our internal team to escalate complex technical issues as needed.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "3 to 6 months",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "Elementor",
+            "WordPress",
+            "Customer Service",
+            "Web Development",
+            "Virtual Assistance",
+            "Email Communication",
+            "CSS"
+          ],
+          "Date Scraped": "2025-03-13T14:54:49.833Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900172619205258808",
+          "Time Posted": "Posted 1 hour ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$20.00 - $23.00",
+          "Skill Level": "Intermediate",
+          "Title": "Cold Calling BDR – Paid Training | Long-Term Role",
+          "URL": "https://www.upwork.com/jobs/Cold-Calling-BDR-Paid-Training-Long-Term-Role_~021900172619205258808/?referrer_url_path=/nx/search/jobs/",
+          "Description": "We are an 8-figure marketing agency with the goal of adding an additional $2m per year. We specialize in high-level attribution and digital advertising, making our service a compelling solution for businesses looking to track and optimize their marketing ROI. Unlike traditional cold calling roles, we provide a structured, high-quality environment with: Pre-Qualified Leads – No prospecting required; all leads are provided and organized. Built-In Dialing System – Log in and start calling with our streamlined platform. Dedicated Sales Team – Your role is focused solely on lead generation; our team handles follow-ups and closing. Paid Training Program – A four-day paid training to ensure you are fully prepared before making live calls. Long-Term Opportunity – We are looking for committed team members who want a stable, long-term position, not a short-term or temporary gig. Growth Potential – Our outbound team is a new initiative, offering opportunities for advancement within the company. Aggressive Growth Goals – Our company is on a mission to increase annual sales by an additional $2 million each year, and this role plays a critical part in achieving that goal. Industries We Work With Our clients are primarily in the following sectors: Financial services (banks, lenders, wealth management firms) Insurance (independent agencies and larger firms) Marketing agencies (firms looking for high-quality attribution solutions) Law firms (practices that benefit from data-driven marketing strategies) Position Overview We are looking for experienced Business Development Representatives (BDRs) to engage business decision-makers, introduce them to our services, and schedule meetings for our sales team. This role offers $20 per hour plus a $75 bonus for every completed meeting where the client attends. This is an excellent opportunity for individuals with strong communication skills, a proven background in cold calling, and a results-driven mindset. Key Responsibilities Make outbound cold calls to business prospects. Engage decision-makers, introduce our service, and schedule meetings. Follow up to confirm attendance and ensure a high show rate. Maintain accurate call records in our system. Qualifications Proven experience in B2B cold calling or appointment setting. Strong English communication skills with a neutral or American accent. Ability to handle objections and build rapport quickly. Reliable internet connection and a quiet work environment. Self-motivated and results-oriented. Compensation and Career Growth $20 per hour base pay. $75 bonus per completed meeting where the client shows up. Four-day paid training program to ensure success. Opportunities for career growth as the outbound team expands. Stable, long-term position with a growing company.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "More than 6 months",
+          "Weekly Hours": "30+ hrs/week",
+          "Skills": [
+            "Travel & Hospitality",
+            "Sales & Marketing",
+            "Finance & Accounting",
+            "Business with 10-99 Employees",
+            "Business with 100-999 Employees",
+            "Cold Calling",
+            "Lead Generation",
+            "Outbound Sales",
+            "Sales"
+          ],
+          "Date Scraped": "2025-03-13T14:54:49.833Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900171946413731384",
+          "Time Posted": "Posted 1 hour ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$80.00 - $120.00",
+          "Skill Level": "Expert",
+          "Title": "Quick Data Analysis Project",
+          "URL": "https://www.upwork.com/jobs/Quick-Data-Analysis-Project_~021900171946413731384/?referrer_url_path=/nx/search/jobs/",
+          "Description": "I have some data that I need crunched for a possible contract negotiation. I have tabulated the data into a Google Sheet but I am stuck on how to go about best analyzing it and visualizing it. I need an expert data analyst to spend a few hours on this to produce a nice set of visuals to tell a story. I don't know how long this will take but I suspect it would be maybe 4-5 hours.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "Less than 1 month",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "Microsoft Excel"
+          ],
+          "Date Scraped": "2025-03-13T14:54:51.796Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900171670492084582",
+          "Time Posted": "Posted 1 hour ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$40.00 - $70.00",
+          "Skill Level": "Intermediate",
+          "Title": "Swift Developer - 3 month project",
+          "URL": "https://www.upwork.com/jobs/Swift-Developer-month-project_~021900171670492084582/?referrer_url_path=/nx/search/jobs/",
+          "Description": "I am looking for a Swift developer with experience in polishing and refining iOS apps to ensure a smooth user experience. The ideal candidate will have expertise in: ✅ App Polishing & Optimization: Streamlining onboarding, improving loading times, and optimizing API call handlers. ✅ Code Review & Best Practices – Conducting thorough code reviews, refactoring where needed, and implementing maintainable, scalable Swift code. ✅ CI/CD & Deployment: Experience with Codemagic and GitHub Actions for automated deployment. ✅ Monetization Setup: Implementing RevenueCat for subscription management. Requirements: Strong Swift experience Code review expertise – ability to audit and improve code quality Familiarity with Codemagic, CI/CD pipelines, and GitHub Actions Experience with RevenueCat integration for in-app purchases Ability to optimize app performance and fix existing UX issues Ability to code",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "1 to 3 months",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "Swift",
+            "iOS"
+          ],
+          "Date Scraped": "2025-03-13T14:54:51.796Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900170436961300805",
+          "Time Posted": "Posted 1 hour ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$40.00 - $60.00",
+          "Skill Level": "Expert",
+          "Title": "Graphic designer needed for ongoing projects",
+          "URL": "https://www.upwork.com/jobs/Graphic-designer-needed-for-ongoing-projects_~021900170436961300805/?referrer_url_path=/nx/search/jobs/",
+          "Description": "We are looking to collaborate with a talented freelance graphic designer to work with on an ongoing basis for upcoming projects. Projects include projects currently in the pipeline and upcoming projects for 2025. These could include: Client booklet cover design Holiday cards Webinar and other promotional graphics Skills & Requirements: -Proven experience in graphic design, with a strong portfolio of relevant work. - Expertise in using design software such as Adobe Creative Suite (Photoshop, Illustrator, InDesign, etc.). - Ability to create a wide variety of designs, including print and digital media. - Strong communication skills to collaborate with remote managers. - Attention to detail and the ability to prioritize and manage multiple projects.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "3 to 6 months",
+          "Weekly Hours": "Not sure",
+          "Skills": [
+            "Graphic Design",
+            "Print Design",
+            "Web Design"
+          ],
+          "Date Scraped": "2025-03-13T14:54:51.796Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900169869243385947",
+          "Time Posted": "Posted 1 hour ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$6.00 - $50.00",
+          "Skill Level": "Intermediate",
+          "Title": "Outbound Caller for Realtor Outreach",
+          "URL": "https://www.upwork.com/jobs/Outbound-Caller-for-Realtor-Outreach_~021900169869243385947/?referrer_url_path=/nx/search/jobs/",
+          "Description": "We are seeking a motivated individual to conduct outbound calls to a list of realtors for a specific event. Your role will be to call realtors on the list and ask them if they want to attend. The ideal candidate should have excellent communication skills, a friendly demeanor, and the ability to follow a script while adapting to conversations. If you're comfortable engaging with real estate professionals and can manage call logs, we want to hear from you. Join us in building valuable relationships in the real estate market!",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "1 to 3 months",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "Cold Calling",
+            "Scheduling",
+            "Lead Generation",
+            "List Building",
+            "Communications"
+          ],
+          "Date Scraped": "2025-03-13T14:54:51.796Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900169695686815522",
+          "Time Posted": "Posted 1 hour ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$30.00 - $65.00",
+          "Skill Level": "Expert",
+          "Title": "Course builder needed to create a management training course",
+          "URL": "https://www.upwork.com/jobs/Course-builder-needed-create-management-training-course_~021900169695686815522/?referrer_url_path=/nx/search/jobs/",
+          "Description": "We need someone to help us create a management training course that can be used online, as well as in presentation and workbook form. All of the information will be spoken by our leaders, and then will need to be sorted and put into presentation format. This individual needs to be able to create an online course as well as put it into workbook format for classroom training. They need to have experience putting something like this together. This needs to be extremely professional as it will be used for top tier management training at large organizations. This person needs to be able to listen to the information being taught and described and then build it into a meaningful course.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "1 to 3 months",
+          "Weekly Hours": "Hours to be determined",
+          "Skills": [
+            "Course",
+            "Curriculum Development",
+            "Leadership Training"
+          ],
+          "Date Scraped": "2025-03-13T14:54:51.796Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900169515251135637",
+          "Time Posted": "Posted 1 hour ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$35.00 - $45.00",
+          "Skill Level": "Intermediate",
+          "Title": "Collaboration Inquiry: Packaging Design",
+          "URL": "https://www.upwork.com/jobs/Collaboration-Inquiry-Packaging-Design_~021900169515251135637/?referrer_url_path=/nx/search/jobs/",
+          "Description": "Project Overview: We’re seeking a talented packaging designer to collaborate on two distinct projects: 1️⃣ Disposable Face Towels (Beauty & Skincare Category) Focus: Eco-friendly/plant-based materials, \"deep clean\" skincare messaging, and hygiene-centric visuals for the North American market. Goal: Design that balances sustainability with premium aesthetics. 2️⃣ Swedish Candy (Confectionery & Chocolate Category) Focus: Playful yet elegant Nordic-inspired design, emphasizing natural ingredients and Swedish heritage. Goal: Packaging that stands out on shelves while appealing to both kids and adults. Key Requirements: - Visually Impactful: Designs must align with brand identity and target audience (see brief). - Print-Ready Files: Provide CMYK-ready artwork with bleed, trim lines, and Pantone references. - Sustainability Focus: Priority on eco-friendly materials (e.g., recyclable/biodegradable finishes for face towels). - Market Adaptability: Ensure designs comply with North American labeling regulations (e.g., FDA for skincare). What We Provide? - Detailed Project Brief: Includes brand guidelines, product specs, reference files, and competitor analysis. - Assets: High-res logos, product photos, and material certifications. - Flexible Collaboration: Open to your creative input! Deliverables: - Final print-ready files (AI/PSD + PDF). - 3D mockups for both products. - Source files with layered design elements. Ideal Candidate: - Proven experience in beauty/skincare and food/beverage packaging design. - Portfolio showcasing sustainable/material-focused projects. - Familiarity with North American/EU packaging regulations is a plus. Why Work With Us? - Clear communication and prompt feedback. - Opportunity for long-term collaboration. Final Notes This is a two-project package – please indicate if you’re interested in both or one.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "Less than 1 month",
+          "Weekly Hours": "Hours to be determined",
+          "Skills": [
+            "Packaging Design",
+            "Label & Packaging Design",
+            "Food Packaging",
+            "Logo Design",
+            "Branding",
+            "Poster",
+            "Illustration",
+            "Affinity Designer",
+            "Poster Design",
+            "T-Shirt Design",
+            "Graphic Design",
+            "Sticker Design"
+          ],
+          "Date Scraped": "2025-03-13T14:54:51.796Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900169286948161627",
+          "Time Posted": "Posted 1 hour ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$45.00 - $65.00",
+          "Skill Level": "Expert",
+          "Title": "Direct Response Copywriter - Editor needed for Rewrites & Proofreading -",
+          "URL": "https://www.upwork.com/jobs/Direct-Response-Copywriter-Editor-needed-for-Rewrites-Proofreading_~021900169286948161627/?referrer_url_path=/nx/search/jobs/",
+          "Description": "Re-Writes, Proof reader and editors needed website content and sales pages for the digital marketing industry. Project A - 65 pages with 2,500 words each. For Consideration please sent before and after edited docs completed. On going work for a portfolio of 75 websites",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "More than 6 months",
+          "Weekly Hours": "Hours to be determined",
+          "Skills": [
+            "Copywriting",
+            "Sales Letter",
+            "Sales Writing",
+            "Proofreading",
+            "Error Detection",
+            "English"
+          ],
+          "Date Scraped": "2025-03-13T14:54:51.796Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900168710197807195",
+          "Time Posted": "Posted 1 hour ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$50.00 - $200.00",
+          "Skill Level": "Expert",
+          "Title": "Market/Industry/Market Share Analysis & Research (oral surgical supply)",
+          "URL": "https://www.upwork.com/jobs/Market-Industry-Market-Share-Analysis-Research-oral-surgical-supply_~021900168710197807195/?referrer_url_path=/nx/search/jobs/",
+          "Description": "Hi! I own/manage a very small oral surgical supply company. We sell a single, very niche product to Oral Surgeons all across the domestic US. We have approx. 1,500 unique oral surgeons/oral surgery practices who have ordered from us within the last 18 months. What I need: 1. Determination/Approximation of our current domestic market share. 2. General market analysis revolving around our specific type of product. 3. Analysis of the handful of our competitors who also sell similar products to ours. I need someone who can be creative in finding public (or paid) data sets that will assist in determining our market share. I have the exact dental insurance code for the specific procedure that utilizes our product. Perhaps we could use that in some way. If not, there must be other ways of figuring out a rough % of market share we currently have in the domestic US for this particular product. Also, I want someone skilled in conducting general market research, and research/analysis of our competitors. I can provide the names/brands/etc of our competitors in this product category as a starting point. Desired work product on this: A clear report with as much data and insights as possible about our estimated market share in the domestic US, as well as any data/insights on our competitors and the industry in general. I'd love to schedule a 5 minute call to explain things further!",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "Less than 1 month",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "Competitive Analysis",
+            "Market Segmentation Research",
+            "Business with 1-9 Employees",
+            "Market Analysis",
+            "Business Analysis",
+            "Market Research",
+            "Data Analysis",
+            "Qualitative Research"
+          ],
+          "Date Scraped": "2025-03-13T14:54:51.796Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900167258320597317",
+          "Time Posted": "Posted 2 hours ago",
+          "Project Payment Type": "Project",
+          "Budget": "$300.00",
+          "Skill Level": "Intermediate",
+          "Title": "LinkedIn Ads Set Up",
+          "URL": "https://www.upwork.com/jobs/LinkedIn-Ads-Set_~021900167258320597317/?referrer_url_path=/nx/search/jobs/",
+          "Description": "Super easy, and straightforward job. I need template campaigns made so I can plug posts in as needed to increase brand awareness and also to convert. I don't have time to go through the learning curve so I need someone who can create two or three basic campaigns.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": null,
+          "Weekly Hours": null,
+          "Skills": [
+            "LinkedIn",
+            "Lead Generation",
+            "LinkedIn Campaign Manager",
+            "Campaign Management"
+          ],
+          "Date Scraped": "2025-03-13T14:54:51.796Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900162979642538341",
+          "Time Posted": "Posted 2 hours ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "Hourly",
+          "Skill Level": "Intermediate",
+          "Title": "Freelance Graphic Designer",
+          "URL": "https://www.upwork.com/jobs/Freelance-Graphic-Designer_~021900162979642538341/?referrer_url_path=/nx/search/jobs/",
+          "Description": "Looking for someone to optimize our PowerPoint presentations for TREALITY SVS in Xenia, OH.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "Less than 1 month",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "Cover Art Design",
+            "Adobe Photoshop",
+            "Vector Art",
+            "T-Shirt Design",
+            "Graphic Design",
+            "Comic Art",
+            "Creative Direction",
+            "Book Cover",
+            "Digital Illustration",
+            "Voice-Over",
+            "Game Art",
+            "Album Cover Design",
+            "NFT Art",
+            "Playful Tone",
+            "Contemporary Style"
+          ],
+          "Date Scraped": "2025-03-13T14:54:51.796Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900116497600214165",
+          "Time Posted": "Posted 2 hours ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$40.00 - $70.00",
+          "Skill Level": "Entry Level",
+          "Title": "Data Security Analyst Needed for Comprehensive Risk Assessment",
+          "URL": "https://www.upwork.com/jobs/Data-Security-Analyst-Needed-for-Comprehensive-Risk-Assessment_~021900116497600214165/?referrer_url_path=/nx/search/jobs/",
+          "Description": "We are seeking a skilled Data Security Analyst to evaluate our current data protection strategies and identify potential vulnerabilities. The ideal candidate will conduct a thorough risk assessment, recommend improvements, and assist in implementing security measures to safeguard our sensitive information. Experience with data encryption, intrusion detection systems, and compliance with data protection regulations is essential. Join us in enhancing our data security framework and ensure the integrity of our data management processes.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "1 to 3 months",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "Information Security",
+            "Vulnerability Assessment",
+            "Security Analysis",
+            "Microsoft Excel",
+            "ISO 27001"
+          ],
+          "Date Scraped": "2025-03-13T14:54:52.048Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900152430082328667",
+          "Time Posted": "Posted 3 hours ago",
+          "Project Payment Type": "Project",
+          "Budget": "$240,000.00",
+          "Skill Level": "Intermediate",
+          "Title": "Big Ticker Closer",
+          "URL": "https://www.upwork.com/jobs/Big-Ticker-Closer_~021900152430082328667/?referrer_url_path=/nx/search/jobs/",
+          "Description": "We provide the leads, the CRM, the sales process, and student funding. The Financial Advisor Training Institute’s (FATI) mission is to restock a depleting talent pool of qualified Financial Advisors in the United States by creating a consistent learning environment that teaches: • Professionalism • High ethical standards • Sophisticated investment and insurance knowledge • Proper sales and client interaction skills The Institute will train 250,000 new Financial Advisors over the next 15 years. Our intent is not to save a for-profit industry but rather to keep a profession critical to the financial well-being of the U.S. economy and the American public at large thriving because future generations deserve sound financial advice. We generate more than 1000 leads monthly from email, digital, and SEO. Experience with Go High Level Candidate Tracking System is helpful but not required. Our expectation is that leads are contacted within minutes during normal business hours. We are looking for one enrollment counselor/closer in Pacific time zone. The compensation is 10% of enrollment $ collected per enrollment. Student enrollment fee is $12,720. Earnings are paid to you twice monthly approximately 16 days after enrollment as we have a 15 day terms and conditions period. The Financial Advisor Training Institute, a 501(c)3 public charity, offers an accelerated, online financial advisor program that prepares students to become a financial advisor in as little as 14 weeks, while they have one year to complete the program. The only online financial advisor training program in the United States, our certification program equips students with industry insights and essential skills needed to not only pass professional exams required but also business building skills to become a successful financial advisor. Whether students want to pursue financial advisor career paths in investments, insurance, or planning, they’ll be ready for wherever their future takes them. Our online financial advisor certification program guarantees job placement upon coursework completion and certification.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": null,
+          "Weekly Hours": null,
+          "Skills": [
+            "High-Ticket Closing",
+            "Sales",
+            "Product Offering"
+          ],
+          "Date Scraped": "2025-03-13T14:54:52.048Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900139496925624677",
+          "Time Posted": "Posted 3 hours ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$30.00 - $60.00",
+          "Skill Level": "Intermediate",
+          "Title": "Pinterest",
+          "URL": "https://www.upwork.com/jobs/Pinterest_~021900139496925624677/?referrer_url_path=/nx/search/jobs/",
+          "Description": "Install SSL certificate in website code. SEO ideas.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "Less than 1 month",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "SSL Certificate"
+          ],
+          "Date Scraped": "2025-03-13T14:54:52.048Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1898920610644569066",
+          "Time Posted": "Posted 3 days ago",
+          "Project Payment Type": "Project",
+          "Budget": "$750.00",
+          "Skill Level": "Intermediate",
+          "Title": "Social Media Marketing Expert for Book Promotion",
+          "URL": "https://www.upwork.com/jobs/Social-Media-Marketing-Expert-for-Book-Promotion_~021898920610644569066/?referrer_url_path=/nx/search/jobs/",
+          "Description": "I am seeking a skilled social media marketing expert to create and execute a comprehensive strategy to promote my book Gnats, Humidity and Murder on Amazon. The goal is to increase sales through Amazon platform. The ideal candidate will have experience in book marketing and a proven track record of increasing visibility and engagement through social media channels. Your responsibilities will include content creation, campaign management, and audience engagement. If you are passionate about literature and have a creative approach to marketing, I would love to hear from you!",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": null,
+          "Weekly Hours": null,
+          "Skills": [
+            "Facebook",
+            "Social Media Marketing",
+            "Instagram",
+            "Social Media Content Creation"
+          ],
+          "Date Scraped": "2025-03-13T14:54:52.048Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900144515628166392",
+          "Time Posted": "Posted 3 hours ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$18.00 - $50.00",
+          "Skill Level": "Entry Level",
+          "Title": "Social Media Assistant Coordinator Needed for Remote Support",
+          "URL": "https://www.upwork.com/jobs/Social-Media-Assistant-Coordinator-Needed-for-Remote-Support_~021900144515628166392/?referrer_url_path=/nx/search/jobs/",
+          "Description": "We are seeking a reliable and detail-oriented Social Media Assistant Coordinator who can help manage our online presence. This role involves coordinating content scheduling, engaging with our audience, and analyzing performance metrics to ensure our social media strategy is effective. The ideal candidate is a self-starter who thrives in a dynamic environment and is looking for stability in their work. If you are passionate about social media and want to be part of a growing team, we would love to hear from you!",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "1 to 3 months",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "Virtual Assistance",
+            "Administrative Support",
+            "Customer Service",
+            "Email Communication"
+          ],
+          "Date Scraped": "2025-03-13T14:54:52.048Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900147684369968696",
+          "Time Posted": "Posted 3 hours ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "Hourly",
+          "Skill Level": "Intermediate",
+          "Title": "Experienced WordPress Webmaster for Ongoing Website Management & Maintenance",
+          "URL": "https://www.upwork.com/jobs/Experienced-WordPress-Webmaster-for-Ongoing-Website-Management-Maintenance_~021900147684369968696/?referrer_url_path=/nx/search/jobs/",
+          "Description": "We are seeking a reliable and experienced WordPress Webmaster to manage and maintain our two business websites. This is a long-term, part-time role that requires monthly maintenance, updates, and occasional page edits to ensure optimal website performance and security. Responsibilities: • Perform monthly WordPress maintenance, including updates to core files, themes, and plugins. Monitor website performance, uptime, and security vulnerabilities. • Troubleshoot and resolve any website issues, including broken links, slow loading speeds, or plugin conflicts. • Implement minor design and content updates (e.g., adding blog posts, updating images, refining page layouts). • Ensure websites remain mobile-friendly, SEO-optimized, and secure. • Maintain website backups and restore data if needed. • Collaborate with our team on any new website features, integrations, or improvements. • Provide monthly reports on website health, performance, and any recommended updates. Requirements: • Proven experience managing and maintaining WordPress websites. • Strong understanding of WordPress, Elementor (preferred), WPBakery, or other page builders. • Familiarity with SEO best practices, security measures, and website optimization. • Experience with Google Analytics, Search Console, and performance monitoring tools. • Ability to make basic design edits (experience with Canva, Photoshop, or similar tools is a plus). • Strong troubleshooting skills and attention to detail. • Excellent communication and ability to provide timely updates. Preferred Qualifications: • Experience managing business and cybersecurity-related websites. • Knowledge of hosting management, cPanel, and DNS settings. • Familiarity with email marketing integrations and CRM connections. Project Scope & Payment: • This is a long-term, ongoing position with a monthly retainer for maintenance. • Additional paid tasks may be requested for major updates or new features. If you are a proactive and detail-oriented WordPress expert looking for a steady, ongoing opportunity, we’d love to hear from you! Please include examples of websites you have managed and your monthly retainer rate in your proposal.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "3 to 6 months",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "WordPress",
+            "HTML",
+            "WordPress Development",
+            "Web Design"
+          ],
+          "Date Scraped": "2025-03-13T14:54:52.048Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900147389873910933",
+          "Time Posted": "Posted 3 hours ago",
+          "Project Payment Type": "Project",
+          "Budget": "$200.00",
+          "Skill Level": "Intermediate",
+          "Title": "Podcast preroll for podcast endurance dad",
+          "URL": "https://www.upwork.com/jobs/Podcast-preroll-for-podcast-endurance-dad_~021900147389873910933/?referrer_url_path=/nx/search/jobs/",
+          "Description": "I’m looking for someone to create a podcast preroll introduction for my podcast “endurance dad”. It needs to be motivating and captivating.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": null,
+          "Weekly Hours": null,
+          "Skills": [
+            "Podcast",
+            "Audio Production",
+            "Podcast Production"
+          ],
+          "Date Scraped": "2025-03-13T14:54:52.048Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900146217309368645",
+          "Time Posted": "Posted 3 hours ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "Hourly",
+          "Skill Level": "Intermediate",
+          "Title": "Fractional Facility Security Officer (FSO)",
+          "URL": "https://www.upwork.com/jobs/Fractional-Facility-Security-Officer-FSO_~021900146217309368645/?referrer_url_path=/nx/search/jobs/",
+          "Description": "We are seeking an experienced Fractional Facility Security Officer (FSO) to support our company’s compliance with National Industrial Security Program (NISP) requirements. The ideal candidate will be responsible for overseeing security procedures, maintaining security clearances, and ensuring compliance with Defense Counterintelligence and Security Agency (DCSA) regulations. This is a part-time (fractional) role, ideal for a seasoned FSO who can provide strategic oversight and hands-on support as needed. Key Responsibilities: ✅ Oversee and manage the company’s NISPOM compliance and security program. ✅ Maintain security clearances and personnel records in DISS, NISS, and e-QIP. ✅ Submit and track personnel security clearance applications and periodic reinvestigations. ✅ Conduct security education and awareness training for employees. ✅ Prepare for and support DCSA audits, self-inspections, and facility clearance reviews. ✅ Maintain and update facility security policies and procedures. ✅ Investigate and report security incidents, violations, or potential threats. ✅ Advise senior leadership on industrial security best practices and risk management. Qualifications: 🔹 Active FSO certification and experience managing DCSA-compliant security programs. 🔹 Proficiency with DISS, NISS, e-QIP, and other security clearance systems. 🔹 Strong knowledge of NISPOM, DFARS 7012, and CMMC compliance is preferred. 🔹 Ability to work independently and communicate security requirements effectively. 🔹 Prior experience as an FSO, AFSO, or security manager in a government contracting environment. Additional Details: 📌 Commitment: Estimated 10-20 hours per month, with flexibility based on needs. 📌 Location: Remote with occasional on-site visits (if required). 📌 Compensation: Competitive hourly rate based on experience. How to Apply: If you are a skilled Fractional FSO with a strong track record in government contracting security compliance, we’d love to hear from you. Please submit your resume, hourly rate, and a brief overview of your experience.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "3 to 6 months",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "Information Security",
+            "Administrative Support",
+            "Personnel Records"
+          ],
+          "Date Scraped": "2025-03-13T14:54:52.048Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900099553023095957",
+          "Time Posted": "Posted 3 hours ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$40.00 - $74.00",
+          "Skill Level": "Entry Level",
+          "Title": "Data Analyst – Strategic Insights & Predictive Analytics Specialist for Business Optimization",
+          "URL": "https://www.upwork.com/jobs/Data-Analyst-Strategic-Insights-Predictive-Analytics-Specialist-for-Business-Optimization_~021900099553023095957/?referrer_url_path=/nx/search/jobs/",
+          "Description": "We are seeking a highly skilled Data Analyst – Strategic Insights & Predictive Analytics Specialist to join our dynamic team. This role is ideal for a detail-oriented professional with a passion for transforming complex data into actionable business insights. You will leverage advanced statistical techniques, data visualization tools, and predictive modeling to optimize business processes, improve decision-making, and drive growth. Collaborating closely with cross-functional teams, you will analyze large datasets, identify trends, and develop data-driven strategies to enhance operational efficiency. If you have a strong analytical mindset, proficiency in SQL, Python, and data visualization tools like Tableau or Power BI, and a knack for storytelling through data, we invite you to apply and make a meaningful impact!",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "1 to 3 months",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "Data Analysis",
+            "Analytics",
+            "Google Analytics",
+            "Marketing Analytics"
+          ],
+          "Date Scraped": "2025-03-13T14:54:52.048Z"
+        }
+      },
+      {
+        "json": {
+          "Job ID": "1900098121498030405",
+          "Time Posted": "Posted 3 hours ago",
+          "Project Payment Type": "Hourly",
+          "Budget": "$25.00 - $45.00",
+          "Skill Level": "Entry Level",
+          "Title": "Junior UX Marketing Designer",
+          "URL": "https://www.upwork.com/jobs/Junior-Marketing-Designer_~021900098121498030405/?referrer_url_path=/nx/search/jobs/",
+          "Description": "We are looking for a self-starter who can create powerful visual designs from scratch. We need an independent thinker who enjoys working in a highly collaborative team environment. With this role, we are looking for someone who is passionate about design. In this role, you will be doing some project work as well as sharing your expertise with the team and demonstrating UX leadership abilities. You should be experienced working with a team and directly with the business. You should be big on process and an advocate for design- from concept to launch. This person should be able to work on and meet project timelines as well as be able to negotiate technology limitations, always striving to meet business goals and optimization. The ideal candidate should be passionate about UX and digital design and you should have a focus towards solving problems and coming up with solutions to achieve customer satisfaction. Qualified candidates must have a strong user-experience design portfolio that clearly demonstrates consumer-oriented user experience design solutions for complex problems. You’ll combine an innovative spirit, strategic vision and creative insight to deliver compelling digital experiences. We are seeking a talented graphic designer to join our UX team. In this role, you will be responsible for creating visually appealing and effective landing pages & banners for our website. Responsibilities: Design visually appealing and effective landing pages & banners. Meet tight deadlines and work efficiently to keep up with fast turnaround schedule when necessary. Collaborate with Creative Lead to ensure that designs align with brand guidelines & UX standards. Requirements: Strong Photoshop skills Strong Figma Skills Proficiency in graphic design and layout Experience with online design & layout platforms (such as Wix, Ceros) Experience with banner ad design Attention to detail If you have a strong portfolio of Landing pages & banner ad designs and are excited to join a dynamic team, we encourage you to apply for this position. We are an Equal Opportunity Employer. All persons shall have the opportunity to be considered for employment without regard to their race, color, religion, national origin, ancestry, alienage or citizenship status, age, disability or handicap, sex or gender, marital status, veteran status, sexual orientation, arrest record, or any other characteristic protected by applicable federal, state or local laws.",
+          "Location": null,
+          "Total Spent": null,
+          "Feedback": null,
+          "Proposals": null,
+          "Project Length": "3 to 6 months",
+          "Weekly Hours": "Less than 30 hrs/week",
+          "Skills": [
+            "Web Design",
+            "Web Development",
+            "Graphic Design",
+            "Adobe InDesign",
+            "User Experience Design",
+            "Logo Design"
+          ],
+          "Date Scraped": "2025-03-13T14:54:52.048Z"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Scrape UW Jobs Apify": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get Dataset Items Apify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Dataset Items Apify": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Relevant?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Vars 1": {
+      "main": [
+        [
+          {
+            "node": "Set Vars 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Vars 3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Vars 2": {
+      "main": [
+        [
+          {
+            "node": "Set Vars 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Relevant?": {
+      "main": [
+        [
+          {
+            "node": "Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Jobs": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Set Vars 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Scrape UW Jobs Apify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": -1
+  },
+  "versionId": "670a097c-ec51-4ade-96bd-4e7ab8006221",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b0dcdc2a61168afbc3bb8907befe60a34408308859f86b899e8ba57a64038046"
+  },
+  "id": "lc2TuQc34x2262pK",
+  "tags": [
+    {
+      "createdAt": "2025-02-25T16:53:08.138Z",
+      "updatedAt": "2025-02-25T16:53:08.138Z",
+      "id": "987WX9PvnYkGNzpl",
+      "name": "Nick n8n"
+    }
+  ]
+}
