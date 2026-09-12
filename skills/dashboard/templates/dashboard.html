@@ -1,0 +1,790 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revenue Overview</title>
+<!--
+  STARTER DASHBOARD TEMPLATE
+  Self contained. No build step, no dependencies. Open it with a double click.
+
+  To make it yours:
+    1. Replace the four --accent lines in :root. That is the whole rebrand.
+    2. Replace the JSON in <script id="report-data">. Keep the shape.
+    3. Delete the sections you do not need. Nothing is coupled.
+
+  The sample payload below is SAMPLE DATA and is labelled as such on the page.
+  Replace it before showing this to anyone. Never ship invented numbers.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:dark;
+
+  /* Surfaces: a ladder of elevation, not a palette. */
+  --page:#000; --surface:#101010; --surface-2:#181818; --surface-3:#222;
+
+  /* Ink: three levels. Do not invent a fourth. */
+  --ink:#fff; --ink-2:#cfcfcf; --muted:#969696;
+
+  --border:#2a2a2a; --border-2:#1e1e1e; --border-hi:#3a3a3a; --track:#262626;
+
+  /* ONE accent. Change these four lines to rebrand the entire dashboard. */
+  --accent:#F47C20;
+  --accent-deep:#f8944c;
+  --accent-soft:rgba(244,124,32,.14);
+  --accent-line:rgba(244,124,32,.35);
+
+  /* Status is its own system and never borrows the accent. */
+  --good:#22c55e; --good-soft:rgba(34,197,94,.16);
+  --bad:#ef4444;  --bad-soft:rgba(239,68,68,.16);
+  --warn:#eab308; --warn-soft:rgba(234,179,8,.16);
+
+  /* Fixed rem scale, ~1.25 ratio. Dashboards want predictable type, not fluid. */
+  --t-xs:.75rem; --t-sm:.8125rem; --t-base:.9375rem; --t-md:1.0625rem;
+  --t-lg:1.375rem; --t-xl:1.75rem; --t-2xl:2.25rem;
+
+  /* 4pt spacing scale, semantic names. */
+  --space-2xs:4px; --space-xs:8px; --space-sm:12px; --space-md:16px;
+  --space-lg:24px; --space-xl:32px; --space-2xl:48px;
+
+  --font-display:"Montserrat",ui-sans-serif,system-ui,sans-serif;
+  --font-body:"Open Sans",ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --font-mono:ui-monospace,"SF Mono",Menlo,monospace;
+
+  --radius:14px; --radius-sm:10px; --radius-lg:18px;
+  --inset-hi:inset 0 1px 0 rgba(255,255,255,.04);
+  --shadow-lift:0 20px 40px -24px rgba(0,0,0,.75);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--page);color:var(--ink);
+  font-family:var(--font-body);font-size:var(--t-base);line-height:1.5}
+
+/* Ambient depth comes from the page, not from shadows on the cards.
+   Two off-axis pools anchored OUTSIDE the viewport, fixed so they do not scroll. */
+body{
+  background-image:
+    radial-gradient(72% 55% at 90% -10%, rgba(244,124,32,.10), transparent 60%),
+    radial-gradient(55% 45% at 0% 108%, rgba(244,124,32,.07), transparent 58%);
+  background-attachment:fixed;background-repeat:no-repeat;
+}
+h1,h2,h3{font-family:var(--font-display);margin:0}
+a{color:inherit;text-decoration:none}
+
+/* Numbers are data. Tabular always. No gradient hero text, ever. */
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
+
+.page{max-width:1180px;margin:0 auto;padding:var(--space-md) var(--space-lg) var(--space-2xl)}
+
+/* ---------- header ---------- */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:var(--space-md);
+  flex-wrap:wrap;margin-bottom:var(--space-lg)}
+.brand{display:flex;align-items:center;gap:10px}
+.brand .mark{width:26px;height:26px;border-radius:8px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-deep));flex:0 0 auto}
+.brand .wm{font-family:var(--font-display);font-weight:800;font-size:13px;letter-spacing:.02em}
+
+.stamp{display:flex;align-items:center;gap:7px;font-size:var(--t-xs);color:var(--muted)}
+.stamp .d{width:7px;height:7px;border-radius:50%;background:var(--good);flex:0 0 auto;
+  box-shadow:0 0 0 0 rgba(34,197,94,.5);animation:livepulse 2.4s infinite}
+.stamp.stale .d{background:var(--warn);animation:none}
+@keyframes livepulse{
+  0%{box-shadow:0 0 0 0 rgba(34,197,94,.45)}
+  70%{box-shadow:0 0 0 7px rgba(34,197,94,0)}
+  100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}
+}
+
+/* Segmented control. Active state is an accent fill with near-black text. */
+.seg{display:flex;background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:3px;gap:2px}
+.seg button{border:0;background:none;color:var(--muted);font-family:var(--font-body);
+  font-size:12px;font-weight:600;padding:6px 13px;border-radius:9px;cursor:pointer;transition:.15s}
+.seg button:hover{color:var(--ink)}
+.seg button.on{background:linear-gradient(100deg,var(--accent),var(--accent-deep));
+  color:#111;font-weight:700}
+
+.report-head{
+  background:radial-gradient(130% 150% at 100% 0%, var(--accent-soft) 0%, transparent 58%), var(--surface);
+  border:1px solid var(--border);border-radius:var(--radius);
+  padding:var(--space-lg);margin-bottom:var(--space-lg)}
+.rh-eyebrow{font-size:var(--t-xs);font-weight:700;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--muted)}
+.rh-title{font-size:var(--t-xl);font-weight:800;letter-spacing:-.02em;margin-top:6px}
+.rh-meta{display:flex;flex-wrap:wrap;gap:var(--space-md);margin-top:10px;
+  font-size:var(--t-xs);color:var(--muted)}
+.rh-meta b{color:var(--ink-2);font-weight:600}
+
+/* A sample-data banner. Delete this along with the sample payload. */
+.samplebar{display:flex;align-items:center;gap:8px;margin-bottom:var(--space-md);
+  padding:9px 13px;border:1px dashed var(--warn);border-radius:var(--radius-sm);
+  background:var(--warn-soft);color:var(--warn);font-size:var(--t-xs);font-weight:650}
+
+/* ---------- card ---------- */
+.card{
+  background:linear-gradient(180deg,rgba(20,20,20,.66),rgba(13,13,13,.66));
+  border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--inset-hi);
+  transition:transform .2s cubic-bezier(.22,.61,.36,1),border-color .2s,box-shadow .2s;
+  padding:var(--space-md) var(--space-md) var(--space-sm)}
+/* Hover lift is opt in. Static cards do not move. */
+.card.tact:hover{transform:translateY(-3px);border-color:var(--border-hi);
+  box-shadow:var(--inset-hi),var(--shadow-lift),0 0 0 1px var(--accent-line)}
+
+/* Card header. Left: tiny tracked label. Right: where the number came from. */
+.ph{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);font-weight:700;margin-bottom:var(--space-sm)}
+.ph .r{text-transform:none;letter-spacing:0;font-weight:600;font-size:11px}
+
+/* ---------- section ---------- */
+.section{margin-top:var(--space-lg);display:flex;flex-direction:column;gap:var(--space-sm)}
+.section-head{display:flex;align-items:baseline;gap:10px;padding:0 2px}
+.section-eyebrow{display:flex;align-items:center;gap:var(--space-2xs);
+  font-size:var(--t-xs);font-weight:700;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--muted)}
+.section-eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.section-note{margin-left:auto;font-size:11px;color:var(--muted)}
+
+/* ---------- grids ---------- */
+.stat-grid{display:grid;gap:var(--space-xs);grid-template-columns:repeat(auto-fit,minmax(168px,1fr))}
+.split{display:grid;gap:var(--space-sm);grid-template-columns:1.35fr 1fr;align-items:start}
+/* Grid children default to min-width:auto, so a wide table would blow out the
+   track on phones. This one line is what keeps .table-scroll able to scroll. */
+.split>*,.stat-grid>*{min-width:0}
+
+/* ---------- KPI tile ---------- */
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:var(--space-sm) var(--space-md);display:flex;flex-direction:column;gap:var(--space-2xs);
+  min-width:0;transition:transform .18s ease,border-color .18s ease}
+.tile:hover{transform:translateY(-2px);border-color:var(--border-hi)}
+/* Hero tile is a border tint and a bigger number. Never a solid accent fill. */
+.tile.hero{border-color:var(--accent-line);
+  background:radial-gradient(130% 150% at 0% 0%,var(--accent-soft),transparent 55%),var(--surface)}
+.tile-label{font-size:var(--t-xs);font-weight:650;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--muted)}
+.tile-value{font-family:var(--font-display);font-size:var(--t-xl);font-weight:800;
+  letter-spacing:-.035em;line-height:1.05;font-variant-numeric:tabular-nums}
+.tile.hero .tile-value{font-size:var(--t-2xl)}
+.tile-foot{display:flex;align-items:center;justify-content:space-between;
+  gap:8px;margin-top:6px;min-height:26px}
+.spark{height:26px;flex:1;min-width:0}
+
+.delta{display:inline-flex;align-items:center;gap:var(--space-2xs);
+  font-size:var(--t-xs);font-weight:700;padding:2px 8px 2px 6px;border-radius:999px;
+  width:fit-content;font-variant-numeric:tabular-nums;white-space:nowrap}
+.delta svg{width:9px;height:9px}
+.delta.good{color:var(--good);background:var(--good-soft)}
+.delta.bad{color:var(--bad);background:var(--bad-soft)}
+.delta.flat{color:var(--muted);background:var(--surface-3)}
+
+.goalbar{height:5px;background:var(--track);border-radius:3px;overflow:hidden;flex:1}
+.goalbar .fill{display:block;height:100%;border-radius:3px;
+  background:linear-gradient(90deg,var(--accent),var(--accent-deep));
+  box-shadow:0 0 10px var(--accent-line);
+  width:0;animation:grow 1s cubic-bezier(.22,1,.36,1) forwards}
+@keyframes grow{to{width:var(--w)}}
+
+/* ---------- charts ---------- */
+.chartwrap{position:relative}
+.chartwrap svg{display:block;overflow:visible}
+/* X labels live in HTML, never inside a preserveAspectRatio="none" SVG,
+   or the date text stretches horizontally with the chart. */
+.chart-x{display:flex;justify-content:space-between;margin-top:2px;padding:0 4px;
+  font-size:10px;color:var(--muted);font-weight:600}
+.tip{position:absolute;pointer-events:none;background:#070707;border:1px solid var(--border-hi);
+  border-radius:10px;padding:7px 11px;line-height:1.45;white-space:nowrap;z-index:6;opacity:0;
+  box-shadow:0 14px 34px -12px rgba(0,0,0,.85);transform:translate(-50%,-118%);transition:opacity .1s}
+.tip .td{color:var(--muted);font-weight:700;font-size:9px;letter-spacing:.06em;text-transform:uppercase}
+.tip .tv{font-family:var(--font-display);font-weight:800;font-size:14px}
+
+.donut-wrap{display:flex;align-items:center;gap:var(--space-lg)}
+.donut-center{position:relative;flex:0 0 auto}
+.donut-center .mid{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.donut-center .cv{font-family:var(--font-display);font-size:22px;font-weight:900;letter-spacing:-.02em}
+.donut-center .cl{font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);font-weight:700;margin-top:3px}
+/* Never set `stroke` here. A CSS declaration beats the inline stroke
+   presentation attribute, which would repaint every segment one flat colour.
+   Segment separation is handled by the 4 unit gap subtracted in donut(). */
+.seg-arc{transition:opacity .15s ease;cursor:default}
+.donut-wrap:hover .seg-arc{opacity:.45}
+.donut-wrap .seg-arc:hover{opacity:1}
+/* The key is a quiet reference, not a second data table. Name and share only. */
+.legend{flex:1;min-width:0;display:flex;flex-direction:column;gap:7px}
+.legend .row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;
+  gap:9px;font-size:12.5px;color:var(--ink-2)}
+.legend .sw{width:8px;height:8px;border-radius:2px}
+.legend .pc{color:var(--muted);font-weight:700;font-variant-numeric:tabular-nums}
+
+.bars{display:flex;flex-direction:column;gap:var(--space-sm)}
+.bar-row{display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:center;font-size:12.5px}
+.bar-name{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-val{font-weight:650;font-variant-numeric:tabular-nums}
+.bar-val .pc{color:var(--muted);font-weight:600;margin-left:7px}
+.bar-track{grid-column:1/-1;height:6px;border-radius:4px;background:var(--track);overflow:hidden}
+/* display:block matters. .bar-fill is a span, and an inline box ignores height,
+   which silently renders every one of these as an empty track. */
+.bar-fill{display:block;height:100%;border-radius:4px;background:var(--accent);
+  width:0;animation:grow 1s cubic-bezier(.22,1,.36,1) forwards}
+
+/* ---------- table ---------- */
+.table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table.data{width:100%;border-collapse:collapse;font-size:var(--t-sm);min-width:520px}
+table.data th{text-align:left;font-size:var(--t-xs);font-weight:700;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--muted);padding:0 var(--space-sm) var(--space-xs);
+  border-bottom:1px solid var(--border);white-space:nowrap}
+table.data td{padding:var(--space-sm);border-bottom:1px solid var(--border-2);
+  color:var(--ink-2);vertical-align:middle;white-space:nowrap}
+table.data tr:last-child td{border-bottom:none}
+table.data .n{text-align:right;font-variant-numeric:tabular-nums}
+table.data td.name{color:var(--ink);font-weight:600}
+/* Left edge accent wash on hover, not a flat background fill. */
+table.data tbody tr:hover td{background:linear-gradient(90deg,var(--accent-soft),transparent 76%)}
+
+.barcell{display:flex;flex-direction:column;gap:5px;align-items:flex-end;min-width:120px}
+.barcell .track{width:100%;height:5px;border-radius:3px;background:var(--track);overflow:hidden}
+.barcell .fill{display:block;height:100%;border-radius:3px}
+
+.chip{display:inline-block;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:999px}
+.chip.good{color:var(--good);background:var(--good-soft)}
+.chip.bad{color:var(--bad);background:var(--bad-soft)}
+.chip.warn{color:var(--warn);background:var(--warn-soft)}
+.chip.neutral{color:var(--muted);background:var(--surface-3)}
+
+/* ---------- states ---------- */
+/* Empty states are sentences that explain how the gap gets filled. Never "No data". */
+.empty{color:var(--muted);font-size:13px;border:1px dashed var(--border);
+  border-radius:var(--radius-sm);padding:22px;text-align:center;line-height:1.6}
+.loading{color:var(--muted);font-size:12px;padding:48px 0;text-align:center}
+.dash{color:var(--muted)}
+
+/* ---------- what's next ---------- */
+.next-list{display:flex;flex-direction:column;gap:var(--space-sm);counter-reset:n}
+.next-item{display:grid;grid-template-columns:auto 1fr;gap:var(--space-sm);align-items:start}
+.next-num{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;
+  background:var(--accent-soft);color:var(--accent-deep);
+  font-size:11px;font-weight:800;font-family:var(--font-display)}
+.next-item .txt{font-size:13px;color:var(--ink-2);line-height:1.55}
+.next-item .txt b{color:var(--ink);font-weight:650}
+
+.foot{margin-top:var(--space-2xl);padding-top:var(--space-md);border-top:1px solid var(--border-2);
+  display:flex;flex-wrap:wrap;gap:var(--space-md);font-size:var(--t-xs);color:var(--muted)}
+
+/* ---------- motion ---------- */
+.reveal{opacity:0;transform:translateY(10px);animation:rise .55s cubic-bezier(.22,.61,.36,1) forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+.d1{animation-delay:.04s}.d2{animation-delay:.10s}.d3{animation-delay:.16s}
+.d4{animation-delay:.22s}.d5{animation-delay:.28s}
+
+/* ---------- responsive ---------- */
+@media(max-width:860px){ .split{grid-template-columns:1fr} .donut-wrap{flex-direction:column} }
+@media(max-width:720px){
+  .page{padding:var(--space-sm) var(--space-sm) var(--space-xl)}
+  /* Two compact columns beat one endless stack of full width tiles. */
+  .stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tile-value{font-size:var(--t-lg)}
+  .tile.hero .tile-value{font-size:var(--t-xl)}
+}
+@media(max-width:600px){
+  /* Rows become cards. data-label on every td carries the header across. */
+  table.data{min-width:0}
+  table.data thead{display:none}
+  table.data,table.data tbody,table.data tr,table.data td{display:block}
+  table.data tr{border:1px solid var(--border-2);border-radius:12px;
+    padding:10px 14px;margin-bottom:10px;background:var(--surface)}
+  table.data td{display:flex;align-items:center;justify-content:space-between;
+    gap:12px;padding:7px 0;border-bottom:1px solid var(--border-2);text-align:right;white-space:normal}
+  table.data tr td:last-child{border-bottom:0}
+  table.data td::before{content:attr(data-label);flex:0 0 auto;
+    font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+  .barcell{min-width:0}
+  .barcell .track{display:none}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms!important;animation-iteration-count:1!important;
+    transition-duration:.01ms!important}
+  .reveal{opacity:1;transform:none}
+  .bar-fill,.goalbar .fill{width:var(--w)}
+}
+@media print{
+  body{background:#fff}
+  .seg,.samplebar{display:none}
+  .card,.tile{box-shadow:none;break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<!-- The build step replaces the contents of this tag with the real payload.
+     Money is integer cents. Labels live in the data, not the template. -->
+<script id="report-data" type="application/json">
+{
+  "__sample__": true,
+  "title": "Revenue Overview",
+  "subject": "Northwind Studio",
+  "generated_at": "2026-09-12T06:00:00Z",
+  "ref_date": "2026-09-11",
+  "goal_cents": 1000000,
+  "window_labels": { "30d": "Last 30 days", "90d": "Last 90 days", "ytd": "Year to date" },
+  "active_window": "90d",
+  "kpis": [
+    { "key": "mrr",      "label": "Recurring revenue", "value_cents": 742000, "prior_cents": 689000, "dir": "up",   "hero": true, "goal_cents": 1000000, "series_key": "mrr" },
+    { "key": "new",      "label": "New this month",    "value_cents": 95000,  "prior_cents": 120000, "dir": "up",   "series_key": "new" },
+    { "key": "churn",    "label": "Churned",           "value_cents": 42000,  "prior_cents": 61000,  "dir": "down", "series_key": "churn" },
+    { "key": "accounts", "label": "Active accounts",   "value": 14,           "prior": 13,           "dir": "up" },
+    { "key": "avg",      "label": "Average account",   "value_cents": 53000,  "prior_cents": 53000,  "dir": "up" }
+  ],
+  "series": {
+    "mrr":   [4120,4380,4550,4710,4680,5020,5300,5480,5710,6040,6380,6620,6890,7040,7180,7420],
+    "new":   [400,520,310,640,280,710,550,480,820,600,440,910,730,580,1200,950],
+    "churn": [120,80,190,60,220,140,90,310,110,180,70,250,130,610,200,420]
+  },
+  "series_labels": ["Jun 1","Jun 15","Jul 1","Jul 15","Aug 1","Aug 15","Sep 1","Sep 11"],
+  "mix": [
+    { "label": "Retainers",  "value_cents": 494000, "color": "#F47C20" },
+    { "label": "Projects",   "value_cents": 158000, "color": "#6fe3ff" },
+    { "label": "Consulting", "value_cents": 62000,  "color": "#9b8cff" },
+    { "label": "Licensing",  "value_cents": 28000,  "color": "#43e0a8" }
+  ],
+  "channels": [
+    { "label": "Referral",   "value_cents": 312000 },
+    { "label": "Inbound",    "value_cents": 208000 },
+    { "label": "Outbound",   "value_cents": 141000 },
+    { "label": "Partner",    "value_cents": 81000 },
+    { "label": "Paid ads",   "value_cents": 0 }
+  ],
+  "accounts": [
+    { "name": "Harbor Dental",     "status": "Active",   "mrr_cents": 180000, "since": "2025-03", "last_paid": "2026-09-02" },
+    { "name": "Vela Interiors",    "status": "Active",   "mrr_cents": 145000, "since": "2025-08", "last_paid": "2026-09-05" },
+    { "name": "Cobalt Fitness",    "status": "At risk",  "mrr_cents": 95000,  "since": "2024-11", "last_paid": "2026-07-28" },
+    { "name": "Northgate Law",     "status": "Active",   "mrr_cents": 88000,  "since": "2026-01", "last_paid": "2026-09-01" },
+    { "name": "Bramble & Co",      "status": "At risk",  "mrr_cents": 62000,  "since": "2025-06", "last_paid": "2026-08-03" },
+    { "name": "Pike Street Auto",  "status": "Churned",  "mrr_cents": 0,      "since": "2025-02", "last_paid": "2026-07-11" }
+  ],
+  "next": [
+    "Call <b>Cobalt Fitness</b> and <b>Bramble & Co</b>. Both are 30+ days past their last payment and together carry $1,570 of monthly revenue.",
+    "Paid ads produced <b>$0</b> this quarter against real spend. Either fix the tracking or cut the channel.",
+    "Referral is 42% of revenue and has no system behind it. That is the cheapest growth lever on this page."
+  ],
+  "notes": { "source": "sample payload, replace before sharing" }
+}
+</script>
+
+<div class="page">
+  <div class="topbar">
+    <div class="brand"><span class="mark"></span><span class="wm" id="brandName">YOUR BRAND</span></div>
+    <div style="display:flex;align-items:center;gap:var(--space-md);flex-wrap:wrap">
+      <span class="stamp" id="stamp"><span class="d"></span><span id="stampText">Live</span></span>
+      <div class="seg" id="windowPills"></div>
+    </div>
+  </div>
+
+  <div id="sampleBar"></div>
+  <div class="report-head reveal" id="reportHead"></div>
+  <main id="report"><div class="loading">reading the numbers</div></main>
+  <footer class="foot" id="foot"></footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ------------------------------------------------------------------ data */
+var DATA = null;
+try { DATA = JSON.parse(document.getElementById("report-data").textContent.trim()); } catch(e){ DATA = null; }
+
+if (!DATA) {
+  document.getElementById("report").innerHTML =
+    '<div class="empty">The report payload could not be read. Re-run the build step to regenerate this file.</div>';
+  return;
+}
+
+/* --------------------------------------------------------------- format */
+/* Two formatters on purpose. Exact in headlines and tables, short on axes. */
+var usd      = function(c){ return "$" + Math.round((c||0)/100).toLocaleString("en-US"); };
+var usdShort = function(c){
+  var v = (c||0)/100, a = Math.abs(v), s = v < 0 ? "-" : "";
+  return a >= 1e6 ? s+"$"+(a/1e6).toFixed(1).replace(/\.0$/,"")+"M"
+       : a >= 1e3 ? s+"$"+(a/1e3).toFixed(1).replace(/\.0$/,"")+"k"
+       : s+"$"+Math.round(a);
+};
+var num = function(n){ return n == null ? '<span class="dash">&mdash;</span>' : Number(n).toLocaleString("en-US"); };
+var esc = function(s){ return String(s == null ? "" : s).replace(/[&<>"]/g, function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); };
+var prettyDate = function(iso){
+  if (!iso) return "";
+  var d = new Date(iso + (iso.length === 10 ? "T00:00:00Z" : ""));
+  return isNaN(d) ? iso : d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric",timeZone:"UTC"});
+};
+
+/* A block is only rendered when it actually has content. Never a fabricated
+   empty table, never a silently dropped section. */
+function valid(b){ return b && (Array.isArray(b) ? b.length > 0 : Object.keys(b).length > 0); }
+
+/* ---------------------------------------------------------------- delta */
+var UP   = '<svg viewBox="0 0 10 10" fill="currentColor"><path d="M5 1l4 6H1z"/></svg>';
+var DOWN = '<svg viewBox="0 0 10 10" fill="currentColor"><path d="M5 9L1 3h8z"/></svg>';
+
+/* dir: "up" = higher is better, "down" = lower is better, "neutral" = no judgement.
+   Colour follows whether the change is GOOD, never whether it is positive. */
+function delta(cur, prior, dir){
+  if (cur == null || prior == null) return "";
+  dir = dir || "up";
+  if (prior === 0) return cur === 0
+    ? '<span class="delta flat">No change</span>'
+    : '<span class="delta flat">New</span>';
+  var pct = (cur - prior) / Math.abs(prior) * 100;
+  var r = Math.round(pct * 10) / 10;
+  if (r === 0) return '<span class="delta flat">0.0%</span>';
+  var improved = dir === "up" ? cur > prior : cur < prior;
+  var cls = dir === "neutral" ? "flat" : (improved ? "good" : "bad");
+  return '<span class="delta ' + cls + '">' + (cur > prior ? UP : DOWN)
+       + (r > 0 ? "+" : "") + r.toFixed(1) + '%</span>';
+}
+
+/* --------------------------------------------------------------- spline */
+/* Catmull-Rom through the points. Straight polylines look like a school project. */
+function spline(p){
+  if (p.length < 2) return p.length ? ("M" + p[0][0] + "," + p[0][1]) : "";
+  var d = "M" + p[0][0].toFixed(1) + "," + p[0][1].toFixed(1);
+  for (var i = 0; i < p.length - 1; i++){
+    var a = p[i-1] || p[i], b = p[i], c = p[i+1], e = p[i+2] || c;
+    d += "C" + (b[0]+(c[0]-a[0])/6).toFixed(1) + "," + (b[1]+(c[1]-a[1])/6).toFixed(1)
+       + " " + (c[0]-(e[0]-b[0])/6).toFixed(1) + "," + (c[1]-(e[1]-b[1])/6).toFixed(1)
+       + " " + c[0].toFixed(1) + "," + c[1].toFixed(1);
+  }
+  return d;
+}
+
+/* ------------------------------------------------------------ sparkline */
+function spark(series, color){
+  /* An empty placeholder of the same size, so tile footers stay aligned. */
+  if (!series || series.length < 2) return '<span class="spark"></span>';
+  var w = 120, h = 26;
+  var max = Math.max.apply(null, series.concat([1]));
+  var min = Math.min.apply(null, series.concat([0]));
+  var X = function(i){ return i/(series.length-1)*w; };
+  var Y = function(v){ return h - 3 - ((v-min)/((max-min)||1))*(h-6); };
+  var pts = series.map(function(v,i){ return [X(i), Y(v)]; });
+  var last = pts[pts.length-1];
+  /* Unique gradient id per instance, or every spark inherits the first one's defs. */
+  var gid = "sp" + Math.random().toString(36).slice(2,7);
+  return '<svg class="spark" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none" style="overflow:visible">'
+    + '<defs><linearGradient id="'+gid+'" x1="0" x2="1">'
+    + '<stop offset="0" stop-color="'+color+'" stop-opacity=".3"/>'
+    + '<stop offset="1" stop-color="'+color+'"/></linearGradient></defs>'
+    + '<path d="'+spline(pts)+'" fill="none" stroke="url(#'+gid+')" stroke-width="2" stroke-linecap="round"/>'
+    + '<circle cx="'+last[0].toFixed(1)+'" cy="'+last[1].toFixed(1)+'" r="2.3" fill="'+color+'"/></svg>';
+}
+
+/* ----------------------------------------------------------- hero chart */
+/* An area chart earns its place here because the question is direction over
+   time on a single measure. The sparklines above answer "which way", this
+   answers "how, and when did it turn". */
+var HERO = null;
+function heroChart(series, labels, id){
+  if (!series || series.length < 2) return '<div class="loading">not enough history for a trend</div>';
+  var w = 680, h = 210, pl = 10, pr = 10, pt = 16, pb = 14;
+  var iw = w - pl - pr, ih = h - pt - pb;
+  var max = Math.max.apply(null, series), min = Math.min.apply(null, series);
+  /* Pad the range so the line is a trajectory, not a flat ribbon at the top. */
+  var pad = (max - min) * 0.18 || 1; max += pad; min = Math.max(0, min - pad);
+  var X = function(i){ return pl + i/(series.length-1)*iw; };
+  var Y = function(v){ return pt + ih - ((v-min)/((max-min)||1))*ih; };
+  var pts  = series.map(function(v,i){ return [X(i), Y(v)]; });
+  var line = spline(pts);
+  var area = line + " L" + X(series.length-1).toFixed(1) + "," + (pt+ih) + " L" + X(0).toFixed(1) + "," + (pt+ih) + " Z";
+
+  /* Dotted gridlines, not dashed. A 1 5 dasharray with a round cap renders as
+     a dot rail that sits behind the data instead of competing with it. */
+  var grid = [0.25,0.5,0.75].map(function(f){
+    var y = (pt + ih*f).toFixed(1);
+    return '<line x1="'+pl+'" x2="'+(w-pr)+'" y1="'+y+'" y2="'+y+'" stroke="var(--border-2)" stroke-width="1" stroke-dasharray="1 5" stroke-linecap="round"/>';
+  }).join("");
+
+  HERO = { xs: pts.map(function(p){return p[0];}), ys: pts.map(function(p){return p[1];}),
+           vals: series, labels: labels, w: w, h: h, pt: pt, ih: ih, id: id };
+
+  var li = [0, Math.floor((labels.length-1)/2), labels.length-1];
+  var xlabs = '<div class="chart-x"><span>'+esc(labels[li[0]])+'</span><span>'
+            + esc(labels[li[1]])+'</span><span>'+esc(labels[li[2]])+'</span></div>';
+
+  return '<div class="chartwrap" id="'+id+'">'
+    + '<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="'+h+'" preserveAspectRatio="none">'
+    + '<defs>'
+    +   '<linearGradient id="hl" x1="0" x2="1"><stop offset="0" stop-color="var(--accent)"/><stop offset="1" stop-color="var(--accent-deep)"/></linearGradient>'
+    +   '<linearGradient id="ha" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--accent)" stop-opacity=".26"/><stop offset="1" stop-color="var(--accent)" stop-opacity="0"/></linearGradient>'
+    +   '<filter id="hg" x="-20%" y="-60%" width="140%" height="220%"><feGaussianBlur stdDeviation="4.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
+    + '</defs>'
+    + grid
+    + '<path d="'+area+'" fill="url(#ha)"/>'
+    + '<path d="'+line+'" fill="none" stroke="url(#hl)" stroke-width="3" stroke-linecap="round" filter="url(#hg)"/>'
+    + '<line class="cross" x1="0" x2="0" y1="'+pt+'" y2="'+(pt+ih)+'" stroke="var(--border-hi)" stroke-dasharray="3 4" opacity="0"/>'
+    + '<circle class="halo" r="10" fill="var(--accent)" opacity="0"/>'
+    + '<circle class="dot" r="4.4" fill="var(--page)" stroke="var(--accent)" stroke-width="2.6" opacity="0"/>'
+    + '</svg>' + xlabs + '<div class="tip"></div></div>';
+}
+
+function wireHero(){
+  if (!HERO) return;
+  var wrap = document.getElementById(HERO.id); if (!wrap) return;
+  var svg = wrap.querySelector("svg"), tip = wrap.querySelector(".tip");
+  var dot = wrap.querySelector(".dot"), halo = wrap.querySelector(".halo"), cross = wrap.querySelector(".cross");
+
+  function show(i){
+    var r = wrap.getBoundingClientRect();
+    dot.setAttribute("cx", HERO.xs[i]);  dot.setAttribute("cy", HERO.ys[i]);  dot.setAttribute("opacity","1");
+    halo.setAttribute("cx", HERO.xs[i]); halo.setAttribute("cy", HERO.ys[i]); halo.setAttribute("opacity",".22");
+    cross.setAttribute("x1", HERO.xs[i]); cross.setAttribute("x2", HERO.xs[i]); cross.setAttribute("opacity","1");
+    var px = (HERO.xs[i]/HERO.w)*r.width, py = (HERO.ys[i]/HERO.h)*r.height;
+    var lab = HERO.labels[Math.round(i/(HERO.vals.length-1)*(HERO.labels.length-1))] || "";
+    tip.innerHTML = '<div class="td">'+esc(lab)+'</div><div class="tv">'+usd(HERO.vals[i]*100)+'</div>';
+    tip.style.left = Math.min(r.width-56, Math.max(56, px)) + "px";
+    /* Flip below the point when the tooltip would clip the top edge. */
+    tip.style.top = (py < 58 ? py + 92 : py) + "px";
+    tip.style.transform = py < 58 ? "translate(-50%,8%)" : "translate(-50%,-118%)";
+    tip.style.opacity = "1";
+  }
+
+  /* Rest on the peak instead of hiding, so the chart always shows a labelled value. */
+  var peak = 0;
+  for (var i = 1; i < HERO.vals.length; i++) if (HERO.vals[i] > HERO.vals[peak]) peak = i;
+  show(peak);
+
+  svg.addEventListener("mousemove", function(e){
+    var r = wrap.getBoundingClientRect();
+    var frac = Math.min(1, Math.max(0, (e.clientX - r.left)/r.width));
+    show(Math.min(HERO.vals.length-1, Math.max(0, Math.round(frac*(HERO.vals.length-1)))));
+  });
+  svg.addEventListener("mouseleave", function(){ show(peak); });
+}
+
+/* ---------------------------------------------------------------- donut */
+/* A donut earns its place here because the question is composition across few
+   categories, and the hole carries the total. The bars beside it stay: the
+   donut answers share, the bars answer magnitude, neither is good at both. */
+function donut(parts, centerLabel){
+  parts = (parts||[]).filter(function(p){ return p.value_cents > 0; });
+  if (!parts.length) return '<div class="empty">No revenue recorded in this window yet.</div>';
+  var tot = parts.reduce(function(a,p){ return a + p.value_cents; }, 0) || 1;
+  var R = 64, C = 2*Math.PI*R, acc = 0;
+  var segs = parts.map(function(p){
+    var f = p.value_cents/tot, gap = parts.length > 1 ? 4 : 0;
+    var s = '<circle class="seg-arc" r="'+R+'" cx="76" cy="76" fill="none" stroke="'+p.color+'" stroke-width="17" '
+      + 'stroke-dasharray="'+Math.max(2, f*C - gap).toFixed(1)+' '+C+'" '
+      + 'stroke-dashoffset="'+(-acc*C).toFixed(1)+'" transform="rotate(-90 76 76)"><title>'
+      + esc(p.label)+': '+usd(p.value_cents)+' ('+Math.round(f*100)+'%)</title></circle>';
+    acc += f; return s;
+  }).join("");
+
+  var legend = parts.map(function(p){
+    return '<div class="row"><span class="sw" style="background:'+p.color+'"></span>'
+      + '<span>'+esc(p.label)+'</span><span class="pc num">'+Math.round(p.value_cents/tot*100)+'%</span></div>';
+  }).join("");
+
+  return '<div class="donut-wrap"><div class="donut-center">'
+    + '<svg width="152" height="152" viewBox="0 0 152 152">'
+    + '<circle r="'+R+'" cx="76" cy="76" fill="none" stroke="var(--border-2)" stroke-width="17"/>'
+    + segs + '</svg>'
+    + '<div class="mid"><div><div class="cv num">'+usdShort(tot)+'</div><div class="cl">'+esc(centerLabel)+'</div></div></div>'
+    + '</div><div class="legend">'+legend+'</div></div>';
+}
+
+/* ------------------------------------------------------------ bar list */
+function barList(rows){
+  if (!valid(rows)) return '<div class="empty">Nothing attributed yet. Tag revenue by source and this fills in automatically.</div>';
+  var tot = rows.reduce(function(a,r){ return a + r.value_cents; }, 0) || 1;
+  var mx  = Math.max.apply(null, rows.map(function(r){ return r.value_cents; }).concat([1]));
+  return '<div class="bars">' + rows.map(function(r){
+    /* Bar width scales to the max, the printed percentage is share of total.
+       Two denominators on purpose: magnitude, then contribution. */
+    var isZero = r.value_cents === 0;
+    return '<div class="bar-row">'
+      + '<span class="bar-name"'+(isZero?' style="color:var(--bad)"':'')+'>'+esc(r.label)+'</span>'
+      + '<span class="bar-val num"'+(isZero?' style="color:var(--bad)"':'')+'>'+usd(r.value_cents)
+      +   '<span class="pc">'+Math.round(r.value_cents/tot*100)+'%</span></span>'
+      + '<span class="bar-track"><span class="bar-fill" style="--w:'+Math.max(1,(r.value_cents/mx*100)).toFixed(0)+'%'
+      +   (isZero?';background:var(--bad)':'')+'"></span></span></div>';
+  }).join("") + '</div>';
+}
+
+/* ---------------------------------------------------------------- table */
+function accountsTable(rows){
+  if (!valid(rows)) return '<div class="empty">No accounts on file. Connect your billing source and they land here.</div>';
+  var mx = Math.max.apply(null, rows.map(function(r){ return r.mrr_cents; }).concat([1]));
+  function chip(s){
+    var k = String(s||"").toLowerCase();
+    var cls = k === "active" ? "good" : k === "at risk" ? "warn" : k === "churned" ? "bad" : "neutral";
+    return '<span class="chip '+cls+'">'+esc(s)+'</span>';
+  }
+  return '<div class="table-scroll"><table class="data"><thead><tr>'
+    + '<th>Account</th><th>Status</th><th class="n">Monthly</th><th>Since</th><th>Last payment</th>'
+    + '</tr></thead><tbody>'
+    + rows.map(function(r){
+        /* color-mix, not hex+alpha concatenation: `var(--accent)66` is not a colour. */
+        var col = r.status === "Churned" ? "var(--bad)" : "var(--accent)";
+        var colSoft = "color-mix(in srgb, " + col + " 42%, transparent)";
+        return '<tr>'
+        + '<td class="name" data-label="Account">'+esc(r.name)+'</td>'
+        + '<td data-label="Status">'+chip(r.status)+'</td>'
+        + '<td class="n" data-label="Monthly"><div class="barcell"><span class="num">'
+        +   (r.mrr_cents ? usd(r.mrr_cents) : '<span class="dash">&mdash;</span>')+'</span>'
+        +   '<span class="track"><span class="fill" style="width:'+(r.mrr_cents/mx*100).toFixed(0)+'%;'
+        +   'background:linear-gradient(90deg,'+colSoft+','+col+')"></span></span></div></td>'
+        + '<td data-label="Since">'+esc(r.since || "")+'</td>'
+        + '<td data-label="Last payment">'+esc(prettyDate(r.last_paid))+'</td>'
+        + '</tr>';
+      }).join("")
+    + '</tbody></table></div>';
+}
+
+/* ----------------------------------------------------------------- shell */
+function section(eyebrow, title, note, body, delayCls){
+  return '<section class="section reveal '+(delayCls||"")+'">'
+    + '<div class="section-head"><span class="section-eyebrow">'+esc(eyebrow)+'</span>'
+    + (note ? '<span class="section-note">'+esc(note)+'</span>' : '')
+    + '</div>' + body + '</section>';
+}
+function card(header, right, body, tact){
+  return '<div class="card'+(tact?" tact":"")+'">'
+    + '<div class="ph"><span>'+esc(header)+'</span>'+(right?'<span class="r">'+esc(right)+'</span>':'')+'</div>'
+    + body + '</div>';
+}
+
+/* ------------------------------------------------------------------ tile */
+function tile(k){
+  var isMoney = k.value_cents != null;
+  var cur   = isMoney ? k.value_cents : k.value;
+  var prior = isMoney ? k.prior_cents : k.prior;
+  var val   = isMoney ? usd(cur) : num(cur);
+  var series = k.series_key && DATA.series ? DATA.series[k.series_key] : null;
+  var sparkColor = k.dir === "down" ? "var(--bad)" : "var(--accent)";
+
+  var foot;
+  if (k.goal_cents) {
+    var pct = Math.min(100, cur / k.goal_cents * 100);
+    foot = '<span class="goalbar"><span class="fill" style="--w:'+pct.toFixed(0)+'%"></span></span>'
+         + '<span class="delta flat">'+usdShort(k.goal_cents - cur)+' to go</span>';
+  } else {
+    foot = spark(series, sparkColor) + delta(cur, prior, k.dir);
+  }
+
+  return '<div class="tile'+(k.hero?" hero":"")+'">'
+    + '<div class="tile-label">'+esc(k.label)+'</div>'
+    + '<div class="tile-value num" data-cu>'+val+'</div>'
+    + '<div class="tile-foot">'+foot+'</div></div>';
+}
+
+/* ----------------------------------------------------------- count up */
+function countUp(){
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  document.querySelectorAll("[data-cu]").forEach(function(el){
+    var txt = el.textContent;
+    var m = txt.match(/^([^0-9-]*)(-?[\d,]+(?:\.\d+)?)(.*)$/);
+    if (!m) return;
+    var pre = m[1], suf = m[3], target = parseFloat(m[2].replace(/,/g,""));
+    var dec = (m[2].split(".")[1] || "").length;
+    var t0 = performance.now(), dur = 650;
+    (function step(t){
+      var p = Math.min(1, (t - t0)/dur), e = 1 - Math.pow(1-p, 3);
+      el.textContent = pre + (target*e).toLocaleString("en-US",
+        { minimumFractionDigits: dec, maximumFractionDigits: dec }) + suf;
+      /* Snap back to the exact formatted string so no rounding drift survives. */
+      if (p < 1) requestAnimationFrame(step); else el.textContent = txt;
+    })(performance.now());
+  });
+}
+
+/* ---------------------------------------------------------------- render */
+function render(){
+  document.title = DATA.title || "Dashboard";
+  document.getElementById("brandName").textContent = (DATA.subject || "Dashboard").toUpperCase();
+
+  if (DATA.__sample__) {
+    document.getElementById("sampleBar").innerHTML =
+      '<div class="samplebar">Sample data. Replace the payload in this file before sharing it with anyone.</div>';
+  }
+
+  /* The freshness stamp changes state rather than lying. */
+  var age = DATA.generated_at ? (Date.now() - Date.parse(DATA.generated_at)) / 36e5 : null;
+  var stale = age == null || age > 36;
+  document.getElementById("stamp").className = "stamp" + (stale ? " stale" : "");
+  document.getElementById("stampText").textContent = stale
+    ? "Data through " + prettyDate(DATA.ref_date)
+    : "Updated " + prettyDate(DATA.ref_date);
+
+  if (valid(DATA.window_labels)) {
+    document.getElementById("windowPills").innerHTML = Object.keys(DATA.window_labels).map(function(k){
+      return '<button data-w="'+esc(k)+'" class="'+(k === DATA.active_window ? "on" : "")+'">'
+           + esc(DATA.window_labels[k]) + '</button>';
+    }).join("");
+  }
+
+  document.getElementById("reportHead").innerHTML =
+      '<div class="rh-eyebrow">'+esc(DATA.title || "Report")+'</div>'
+    + '<h1 class="rh-title">'+esc(DATA.subject || "")+'</h1>'
+    + '<div class="rh-meta">'
+    +   '<span>'+esc((DATA.window_labels||{})[DATA.active_window] || "")+'</span>'
+    +   '<span>Data through <b>'+esc(prettyDate(DATA.ref_date))+'</b></span>'
+    +   '<span>Every figure compares this period to the one before.</span>'
+    + '</div>';
+
+  var html = "";
+
+  html += section("Headline", "", "", '<div class="stat-grid">'
+        + (DATA.kpis||[]).map(tile).join("") + '</div>', "d1");
+
+  html += section("Trend", "", "hover the chart, it rests on the peak",
+        card("Recurring revenue", "16 fortnightly points",
+             heroChart(DATA.series && DATA.series.mrr, DATA.series_labels, "hero"), true), "d2");
+
+  html += section("Breakdown", "", "",
+        '<div class="split">'
+      + card("Revenue mix", "share of total", donut(DATA.mix, "total"), true)
+      + card("By source", "all time, $0 channels shown", barList(DATA.channels), true)
+      + '</div>', "d3");
+
+  html += section("Accounts", "", (DATA.accounts||[]).length + " on file",
+        card("Every account", "live from billing", accountsTable(DATA.accounts), false), "d4");
+
+  if (valid(DATA.next)) {
+    html += section("What's next", "", "",
+      card("Do these three things", "", '<div class="next-list">'
+        + DATA.next.map(function(t,i){
+            /* Trusted authored copy, so limited inline HTML is allowed here. */
+            return '<div class="next-item"><span class="next-num">'+(i+1)+'</span><span class="txt">'+t+'</span></div>';
+          }).join("")
+        + '</div>', false), "d5");
+  }
+
+  document.getElementById("report").innerHTML = html;
+
+  document.getElementById("foot").innerHTML =
+      '<span>'+esc(DATA.subject || "")+'</span>'
+    + '<span>Generated '+esc(prettyDate(DATA.ref_date))+'</span>'
+    + '<span>This report is confidential and intended for the named recipient.</span>';
+
+  wireHero();
+  countUp();
+
+  /* The pills are wired but inert in the template: a real build either
+     ships every window in the payload and re-renders, or fetches on click. */
+  document.querySelectorAll("#windowPills button").forEach(function(b){
+    b.onclick = function(){
+      document.querySelectorAll("#windowPills button").forEach(function(x){ x.classList.remove("on"); });
+      b.classList.add("on");
+      DATA.active_window = b.dataset.w;
+    };
+  });
+}
+
+render();
+})();
+</script>
+</body>
+</html>
