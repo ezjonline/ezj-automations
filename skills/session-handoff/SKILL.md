@@ -26,7 +26,7 @@ This skill produces that doc.
 1. **Output goes in a fenced code block.** The user will copy-paste it. Markdown rendering inside a fenced block is what they want (so `**bold**` shows as literal stars on paste). Wrap the ENTIRE handoff in a single ` ```markdown ` fence.
 2. **Single asterisks for bold, plain numbered lists.** Inside the fence, write `*bold*` not `**bold**` when you want emphasis that survives paste.
 3. **Write the handoff to disk too.** Path: `<project-root>/tasks/handoff_<YYYY-MM-DD>_<HHMM>.md` (use the project's existing `tasks/` dir if present, else create it at the project root). This is insurance against a copy-paste loss.
-4. **Absolute file paths, full IDs, real URLs.** A fresh session has zero context. No "the file we edited", say `/abs/path/to/project/module/dashboard.py:42`. No "the n8n workflow", say workflow ID `Op3gwoDuLr889xIe`.
+4. **Absolute file paths, full IDs, real URLs.** A fresh session has zero context. No "the file we edited", say `/abs/path/to/project/module/dashboard.py:42`. No "the n8n workflow", say workflow ID `AbC123xYz456`.
 5. **No dashes as punctuation.** Periods and commas only. Hyphens in compound words like "white-label" are fine.
 6. **Do not invent.** If you genuinely don't know something (e.g. why a decision was made), say "unclear from session" and let the new session ask.
 7. **Surface uncommitted work.** Run `git status` and `git diff --stat` and list modified/untracked files in the handoff. If a fresh session starts and uncommitted changes get stomped, that's a disaster.
