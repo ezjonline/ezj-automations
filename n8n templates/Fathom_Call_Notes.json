@@ -1,0 +1,638 @@
+{
+  "name": "Fathom Call Notes: Slack recap and Notion CRM notes (TEMPLATE)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# Setup\n**Accounts you need:** Fathom (a plan with webhooks), Notion, Slack, OpenAI.\n\n**1. Notion CRM.** One database for clients with: Name (title), Email (email), Status (status, with options Meeting Booked and Pitching), Project Name (text). Each client page needs an inline database titled exactly **Meetings** with Name (title) and Date (date). Share the CRM with your Notion integration.\n\n**2. Replace placeholders.**\n**Check CRM:** YOUR_NOTION_CRM_DATABASE_ID (the 32 character id in the database link).\n**Send Summary, No CRM Match Alert, Slack: moved to Pitching:** YOUR_SLACK_CHANNEL_ID.\n**Set Client email:** YOUR_EMAIL, YOUR_NAME, YOUR_COMPANY_DOMAIN, so you are never matched as the client.\n**Generate Summary - Slack** (system message): YOUR_NAME, so recaps are titled after the guest.\n\n**3. Connect credentials.**\nNotion API on Check CRM, Get Page Blocks, Create Meeting Page and CRM: Meeting Booked -> Pitching.\nSlack API (bot token with chat:write, bot invited to the channel) on the three Slack nodes.\nOpenAI API on OpenAI Chat Model2.\n\n**4. Point Fathom at it.** Activate, copy the production URL `https://YOUR_N8N_HOST/webhook/fathom/call-complete`, then in Fathom (Settings, API Access) add a webhook to it with transcript, summary and action items included.\n\nAnyone who knows this URL can post to it. Keep it private, or add a check of Fathom's webhook signature right after the Fathom node.",
+        "height": 800,
+        "width": 480,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        440
+      ],
+      "id": "f7414485-13b8-4d22-b428-460e5877124b",
+      "name": "Setup"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "fathom/call-complete",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        80,
+        912
+      ],
+      "name": "Fathom",
+      "id": "421c639d-bb13-45e2-8fc1-cab7a519b6d8",
+      "webhookId": "483ec82f-f3e3-4f7e-97ce-7ed959583777"
+    },
+    {
+      "parameters": {
+        "resource": "block",
+        "operation": "getAll",
+        "blockId": {
+          "__rl": true,
+          "value": "={{ $('Find Lead').item.json.id }}",
+          "mode": "id"
+        },
+        "returnAll": true,
+        "fetchNestedBlocks": true
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1152,
+        816
+      ],
+      "name": "Get Page Blocks",
+      "onError": "continueRegularOutput",
+      "id": "d7b588db-48e7-4e41-9b8d-0285c1e75b99",
+      "credentials": {
+        "notionApi": {
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Find the inline 'Meetings' database on the client's CRM page\nconst blocks = $input.all().map(i => i.json);\n\nconst meetingsDb = blocks.find(b => {\n  if (b.type !== 'child_database') return false;\n  // Handle both simplified ('content') and full ('child_database.title') output shapes\n  const title = (b.content || b.child_database?.title || '').toString().toLowerCase().trim();\n  return title === 'meetings';\n});\n\nif (!meetingsDb) {\n  throw new Error(\"No inline 'Meetings' database found. Available child_database titles: \" +\n    blocks.filter(b => b.type === 'child_database').map(b => b.content || b.child_database?.title).join(', ')\n  );\n}\n\nreturn [{ json: { meetingsDbId: meetingsDb.id } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1328,
+        816
+      ],
+      "name": "Find Meetings DB",
+      "onError": "continueRegularOutput",
+      "id": "42090ca8-da89-45c8-a7db-3a355a2339b5"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build Notion blocks from Fathom's webhook payload\nconst fathom = $('Fathom').first().json.body || {};\n\n// Fathom's actual field paths\nconst summaryMd = (fathom.default_summary?.markdown_formatted || '').toString().trim();\nconst actionItems = Array.isArray(fathom.action_items) ? fathom.action_items : [];\nconst recordingUrl = fathom.share_url || fathom.url || '';\nconst meetingTitle = fathom.meeting_title || fathom.title || 'Meeting';\nconst startTime = fathom.scheduled_start_time || fathom.recording_start_time || '';\n\nconst meetingsDbId = $json.meetingsDbId;\n\nfunction rt(content, opts = {}) {\n  return {\n    type: 'text',\n    text: { content: content.slice(0, 1900), link: opts.link ? { url: opts.link } : null },\n    annotations: {\n      bold: !!opts.bold,\n      italic: !!opts.italic,\n      strikethrough: false,\n      underline: false,\n      code: false,\n      color: 'default'\n    }\n  };\n}\n\nfunction paragraph(richTexts) {\n  return { object: 'block', type: 'paragraph', paragraph: { rich_text: Array.isArray(richTexts) ? richTexts : [rt(richTexts)] } };\n}\n\nfunction heading(textOrRich, level = 2) {\n  const key = `heading_${level}`;\n  const richText = Array.isArray(textOrRich) ? textOrRich : parseInlineLinks(textOrRich);\n  return { object: 'block', type: key, [key]: { rich_text: richText } };\n}\n\nfunction bullet(richTexts) {\n  return { object: 'block', type: 'bulleted_list_item', bulleted_list_item: { rich_text: Array.isArray(richTexts) ? richTexts : [rt(richTexts)] } };\n}\n\nfunction parseInlineLinks(line) {\n  const out = [];\n  // Match either [text](url) OR **text**\n  const re = /\\[([^\\]]+)\\]\\(([^)]+)\\)|\\*\\*([^*]+)\\*\\*/g;\n  let last = 0, m;\n  while ((m = re.exec(line)) !== null) {\n    if (m.index > last) out.push(rt(line.slice(last, m.index)));\n    if (m[1]) {\n      // It's a link [text](url)\n      out.push(rt(m[1], { link: m[2], bold: true }));\n    } else if (m[3]) {\n      // It's bold **text**\n      out.push(rt(m[3], { bold: true }));\n    }\n    last = m.index + m[0].length;\n  }\n  if (last < line.length) out.push(rt(line.slice(last)));\n  return out.length ? out : [rt(line)];\n}\n\nconst blocks = [];\n\nif (recordingUrl) {\n  blocks.push({\n    object: 'block',\n    type: 'callout',\n    callout: {\n      icon: { type: 'emoji', emoji: '☎️' },\n      rich_text: [\n        rt(`${meetingTitle}: `),\n        rt('Watch recording', { link: recordingUrl, bold: true })\n      ]\n    }\n  });\n}\n\nif (summaryMd) {\n  const lines = summaryMd.split(/\\r?\\n/);\n  for (const raw of lines) {\n    const line = raw.trim();\n    if (!line) continue;\n    if (line.startsWith('### ')) blocks.push(heading(line.replace(/^###\\s+/, ''), 3));\n    else if (line.startsWith('## ')) blocks.push(heading(line.replace(/^##\\s+/, ''), 2));\n    else if (line.startsWith('# ')) blocks.push(heading(line.replace(/^#\\s+/, ''), 2));\n    else if (/^[\\*\\-]\\s+/.test(line)) blocks.push(bullet(parseInlineLinks(line.replace(/^[\\*\\-]\\s+/, ''))));\n    else blocks.push(paragraph(parseInlineLinks(line)));\n  }\n}\n\nif (actionItems.length) {\n  blocks.push(heading([rt('Action items')], 2));\n  for (const a of actionItems) {\n    const who = a.assignee?.name ? `${a.assignee.name}: ` : '';\n    const desc = (a.description || '').trim();\n    if (!desc) continue;\n    blocks.push({\n      object: 'block',\n      type: 'to_do',\n      to_do: {\n        rich_text: [rt(`${who}${desc}`)],\n        checked: !!a.completed\n      }\n    });\n  }\n}\n\nconst dt = startTime ? new Date(startTime) : new Date();\nconst isoDate = dt.toISOString().split('T')[0];\n\nreturn [{\n  json: {\n    title: 'Meeting Summary',\n    meetingDate: isoDate,\n    meetingsDbId,\n    blocks\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1504,
+        816
+      ],
+      "name": "Build Meeting Blocks",
+      "onError": "continueRegularOutput",
+      "id": "15bf7133-563e-4908-9569-47156bfa4c71"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/pages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Notion-Version",
+              "value": "2022-06-28"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  parent: { database_id: $json.meetingsDbId },\n  icon: { type: 'emoji', emoji: '☎️' },\n  properties: {\n  Name: { title: [ { text: { content: $json.title } } ] },\n  Date: { date: { start: $json.meetingDate } }\n},\n  children: $json.blocks\n}) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1712,
+        816
+      ],
+      "name": "Create Meeting Page",
+      "onError": "continueRegularOutput",
+      "id": "aa1b469b-1b37-4373-91f0-683e9cab848f",
+      "credentials": {
+        "notionApi": {
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        464,
+        1248
+      ],
+      "name": "OpenAI Chat Model2",
+      "id": "778ad39b-697e-4f81-8551-2d04ebe38f9e",
+      "credentials": {
+        "openAiApi": {
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Code node to combine Fathom transcript segments\n// Place this node immediately after your Fathom webhook\n\n// The webhook data comes in as $json.body\n// The transcript array is at $json.body.transcript\n\nconst transcriptArray = $json.body.transcript || [];\n\n// Combine all transcript segments into one continuous text\nconst fullTranscript = transcriptArray\n  .map(segment => segment.text)\n  .filter(text => text) // Remove any empty segments\n  .join(' ');\n\n// Optional: Also create a formatted version with speaker names and timestamps\nconst formattedTranscript = transcriptArray\n  .map(segment => {\n    const speaker = segment.speaker?.display_name || 'Unknown';\n    const text = segment.text || '';\n    const timestamp = segment.timestamp || '';\n    return `[${timestamp}] ${speaker}: ${text}`;\n  })\n  .join('\\n');\n\n// Return both versions so you can use whichever you prefer\nreturn {\n  json: {\n    fullTranscript: fullTranscript,\n    formattedTranscript: formattedTranscript,\n    transcriptLength: fullTranscript.length,\n    segmentCount: transcriptArray.length\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        912
+      ],
+      "name": "Code in JavaScript",
+      "id": "ef9cd482-cd27-4a9a-a3e3-080f2f943ed9"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ===== SETUP: edit these so you are never matched as the client =====\nconst MY_EMAIL = 'YOUR_EMAIL';                 // the email your Fathom account records with\nconst MY_NAME = 'YOUR_NAME';                   // your name exactly as Fathom shows it in transcripts\nconst INTERNAL_DOMAIN = 'YOUR_COMPANY_DOMAIN'; // e.g. yourcompany.com, emails on it count as your team\n// ======================================================================\n\n// Resolve who the client is on this call.\n// Path 1: the first external calendar invitee's email.\n// Path 2: impromptu calls have no invitees, so also collect every\n// speaker name from the transcript except yours, for a name match downstream.\nconst body = $('Fathom').first().json.body || {};\nconst invitees = body.calendar_invitees || [];\nconst recorder = body.recorded_by || {};\nconst recorderEmail = (recorder.email || MY_EMAIL).toLowerCase();\nconst recorderName = (recorder.name || MY_NAME).trim().toLowerCase();\nconst isInternal = e => !!INTERNAL_DOMAIN && e.toLowerCase().endsWith('@' + INTERNAL_DOMAIN.toLowerCase());\n\nconst ext = invitees.find(i => i.is_external);\nconst externalEmails = invitees\n  .filter(i => i.email && i.email.toLowerCase() !== recorderEmail && (i.is_external || !isInternal(i.email)))\n  .map(i => i.email.toLowerCase());\n\nconst talkShare = {};\nfor (const s of (body.transcript || [])) {\n  const n = ((s.speaker || {}).display_name || '').trim();\n  if (n) talkShare[n] = (talkShare[n] || 0) + 1;\n}\nconst speakers = Object.keys(talkShare).filter(n => n.toLowerCase() !== recorderName);\n\nreturn [{ json: {\n  'Client email': ext ? ext.email : '__no_external_invitee__',\n  externalEmails,\n  speakers,\n  talkShare,\n  crmMatches: body.crm_matches || null,\n  recordingId: body.recording_id || null,\n  meetingTitle: body.meeting_title || body.title || 'Meeting',\n  shareUrl: body.share_url || body.url || '',\n  inviteeCount: invitees.length,\n}}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        816
+      ],
+      "name": "Set Client email",
+      "id": "8fb1d676-41f3-46e6-905a-7337d6fec310"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "YOUR_NOTION_CRM_DATABASE_ID",
+          "mode": "id"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        640,
+        816
+      ],
+      "name": "Check CRM",
+      "id": "805ca380-8025-4fef-91ca-97b3680d5a66",
+      "credentials": {
+        "notionApi": {
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Match the resolved client against every CRM row from Check CRM.\n// Email match first (authoritative, may legitimately return several rows if the CRM has\n// duplicates, same as the old filter). If no email match, fall back to transcript speaker\n// names and require exactly ONE unambiguous CRM row. Anything else emits a _no_match item\n// so the IF node routes it to a Slack alert instead of silently doing nothing.\nconst resolved = $('Set Client email').first().json;\nconst rows = $input.all().map(i => i.json);\nconst norm = s => (s || '').toString().trim().toLowerCase();\nconst tokens = s => norm(s).replace(/[^a-z\\s]/g, ' ').split(/\\s+/).filter(Boolean);\n// Tie-breaks for the name path: the client is the non-host speaker who talks the most,\n// then the row whose CRM status is the most active.\nconst talk = resolved.talkShare || {};\nconst STATUS_RANK = { 'on retainer': 5, 'in progress': 4, 'pitching': 3, 'meeting booked': 3, 'awaiting approval': 3, 'delivered': 2, 'dormant': 1 };\nconst statusRank = r => STATUS_RANK[norm(r.property_status)] || 0;\n\nconst emails = new Set([resolved['Client email'], ...(resolved.externalEmails || [])]\n  .map(norm).filter(e => e && e !== '__no_external_invitee__'));\nlet matches = rows.filter(r => emails.has(norm(r.property_email)));\nlet method = 'email';\nlet candidates = [];\n\nif (!matches.length && (resolved.speakers || []).length) {\n  method = 'speaker-name';\n  const scored = [];\n  for (const r of rows) {\n    const nameTokens = tokens(r.name);\n    const rowTokens = new Set([...nameTokens, ...tokens(r.property_project_name)]);\n    let best = 0, bestTalk = 0;\n    for (const sp of resolved.speakers) {\n      const st = tokens(sp);\n      if (!st.length) continue;\n      const first = st[0], last = st[st.length - 1];\n      const hasFirst = rowTokens.has(first);\n      const hasLast = st.length > 1 && rowTokens.has(last);\n      let score = 0;\n      if (hasFirst && hasLast) score = 3;                       // \"Jane Smith\" vs \"Jane Smith\"\n      else if (hasFirst && nameTokens.length === 1) score = 2;  // \"Jane Smith\" vs CRM row \"Jane\"\n      if (score > best || (score === best && (talk[sp] || 0) > bestTalk)) { best = score; bestTalk = talk[sp] || 0; }\n    }\n    if (best > 0) scored.push({ r, best, talk: bestTalk, status: statusRank(r) });\n  }\n  const top = scored.reduce((m, x) => Math.max(m, x.best), 0);\n  let winners = scored.filter(x => x.best === top);\n  if (winners.length > 1) {                                   // tie-break 1: who talked the most\n    const maxTalk = Math.max(...winners.map(x => x.talk));\n    const loud = winners.filter(x => x.talk === maxTalk);\n    if (loud.length === 1 && maxTalk > 0) winners = loud;\n    else if (loud.length > 1) {                               // tie-break 2: most active CRM status\n      const maxStatus = Math.max(...loud.map(x => x.status));\n      const active = loud.filter(x => x.status === maxStatus);\n      if (active.length === 1) winners = active;\n    }\n  }\n  candidates = scored.map(x => `${x.r.name} (score ${x.best}, segments ${x.talk}, ${x.r.property_status || 'no status'})`);\n  if (winners.length === 1) matches = winners.map(x => x.r);\n}\n\nif (matches.length) {\n  return matches.map(r => ({ json: { ...r, _match_method: method } }));\n}\n\nreturn [{ json: {\n  _no_match: true,\n  _reason: candidates.length > 1 ? 'ambiguous speaker-name match' : 'no email or speaker-name match',\n  _candidates: candidates,\n  _emails: [...emails],\n  _speakers: resolved.speakers || [],\n  _title: resolved.meetingTitle,\n  _recordingId: resolved.recordingId,\n  _shareUrl: resolved.shareUrl,\n}}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        816
+      ],
+      "name": "Find Lead",
+      "id": "5edb8091-f467-4be5-83d9-2850006a77f1"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "YOUR_SLACK_CHANNEL_ID",
+          "mode": "id"
+        },
+        "messageType": "block",
+        "blocksUi": "={{ $json.output }}",
+        "text": "=",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        800,
+        1056
+      ],
+      "name": "Send Summary",
+      "id": "c2b446e7-373b-4553-9cf2-7d7b35a6484a",
+      "webhookId": "a582c6bc-a088-4e4b-8258-6a35a1ea686d",
+      "credentials": {
+        "slackApi": {
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here is the full call transcript:\n\n{{ $json.formattedTranscript }}\n\nPlease generate a Slack-formatted message following the required structure.",
+        "options": {
+          "systemMessage": "=You are an assistant that turns Fathom meeting transcripts into clean internal Slack recaps.\n\nGoals:\n- Make the message easy to scan in Slack.\n- Use simple Slack markdown and a few relevant emojis.\n- Keep it short and focused on what the team actually needs to know.\n\nTITLE RULE (CRITICAL):\nThe header MUST start with \"Meeting with [Name(s)]\", using the name(s) of the external attendee(s) from the meeting, NOT YOUR_NAME or anyone from YOUR_NAME's team. Pull names from the calendar invitees / meeting attendees. The format is:\n\n  Meeting with [First Name]: [Brief topic]\n\nExamples:\n  ✅ \"📹 Meeting with Sam: Website Review\"\n  ✅ \"📊 Meeting with Priya: Q4 Launch Strategy\"\n  ✅ \"🤖 Meeting with Alex: AI Content Workflow\"\n\nIf there are multiple external attendees, list them: \"Meeting with Sam & Jordan: ...\"\nIf you cannot determine the external attendee's name, fall back to: \"Meeting Recap: [Topic]\"\n\nNever put YOUR_NAME, team members, or internal names as the meeting attendee in the title. They are the host, not the attendee.\n\nFormatting rules:\n1. Start with a header block whose text begins with \"Meeting with [Name]\" followed by a colon and a brief topic, prefixed by ONE relevant emoji.\n2. On the next line, add an italic line for the date if provided.\n3. Then create these sections in order if the info exists:\n   - 📝 Overview\n   - 🔍 Main topics\n   - ✅ Decisions\n   - 📌 Action items\n4. Use bullet points under each section. One line per bullet.\n5. If the Fathom summary includes section headings with timestamps and links:\n   - turn them into short bullets under \"Main topics\"\n   - keep the links as-is so the team can jump to the moments in Fathom\n6. Under Action items, phrase each bullet as \"Owner: task\".\n7. Mask anything that looks like a secret (tokens, API keys, passwords) with ****.\n8. Do not repeat the raw markdown. Rewrite it more compactly.\n9. Do not include any explanation of what you are doing. Output only the Slack message.\n\nSTRUCTURE the message in Slack blocks. Make it intuitive and aesthetically pleasing using different block elements (header, section, divider) for visual hierarchy.\n\nEXAMPLE OUTPUT:\n{\n  \"blocks\": [\n    {\n      \"type\": \"header\",\n      \"text\": {\n        \"type\": \"plain_text\",\n        \"text\": \"📊 Meeting with Priya: Q4 Launch Strategy\"\n      }\n    },\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*Date:* May 1, 2026\\n\\n*📝 Overview*\\n• Reviewed the current funnel and agreed to test a new lead magnet.\\n• Goal: book 20 more sales calls a month before scaling ad spend.\\n• Next check in set for two weeks out.\"\n      }\n    },\n    {\n      \"type\": \"divider\"\n    },\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*🔍 Main Topics*\\n• <https://fathom.video/share/...|Current funnel review @3:40>\\n• <https://fathom.video/share/...|Lead magnet options @7:30>\\n• <https://fathom.video/share/...|Tools and timeline @20:00>\"\n      }\n    },\n    {\n      \"type\": \"divider\"\n    },\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*✅ Decisions*\\n• Launch the new lead magnet next month.\\n• Keep the current email platform for now.\"\n      }\n    },\n    {\n      \"type\": \"divider\"\n    },\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*📌 Action Items*\\n• *Host:* Draft the funnel map and lead magnet outline.\\n• *Priya:* Send brand assets and past email stats.\\n• *Both:* Review two competitor funnels before the next call.\"\n      }\n    }\n  ]\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        464,
+        1056
+      ],
+      "name": "Generate Summary - Slack",
+      "id": "5fc5044b-edd9-4eaa-8566-61ba3295391e"
+    },
+    {
+      "parameters": {
+        "content": "## Post Call: Meeting Summary\nTurns the Fathom transcript into a Slack recap and adds meeting notes to the client's page in your Notion CRM.\n\n**Matching:** invitee email first, then an unambiguous transcript speaker name (impromptu calls have no invitees). Zero or ambiguous matches go to **No CRM Match Alert** in Slack instead of silently skipping Notion.",
+        "height": 752,
+        "width": 1680,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        48,
+        640
+      ],
+      "name": "Sticky Note1",
+      "id": "20accebc-ff70-4b86-b05e-9f064b9ea4fe"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "19fcc801-e522-4d3a-b005-23b7d5aa68df",
+              "leftValue": "={{ $json._no_match !== true && !!$json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        976,
+        816
+      ],
+      "name": "CRM matched?",
+      "id": "67f81572-497a-4691-8072-ef8f11ca95de"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "YOUR_SLACK_CHANNEL_ID",
+          "mode": "id"
+        },
+        "text": "=:warning: No CRM match for *{{ $json._title }}* (Fathom {{ $json._recordingId }}). Notion meeting page NOT created.\nReason: {{ $json._reason }}\nInvitee emails: {{ ($json._emails || []).join(', ') || 'none' }}\nSpeakers: {{ ($json._speakers || []).join(', ') || 'none' }}\nCandidates: {{ ($json._candidates || []).join(', ') || 'none' }}\nRecording: {{ $json._shareUrl }}\nBackfill: add the person's email or full name to their CRM project, then replay this recording to the webhook.",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1152,
+        1000
+      ],
+      "name": "No CRM Match Alert",
+      "id": "7a928ec0-e493-4e84-8357-1b45a8ba5a5d",
+      "webhookId": "d26d6848-4205-4920-8a40-7a1fbc024b42",
+      "credentials": {
+        "slackApi": {
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "fde02591-2c88-41cc-bb78-7370371e153c",
+              "leftValue": "={{ $json.property_status }}",
+              "rightValue": "Meeting Booked",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "13ab99af-ba56-45fb-9ad7-046caed8fd4c",
+              "leftValue": "={{ ($('Set Client email').first().json.speakers || []).filter(n => (($('Set Client email').first().json.talkShare || {})[n] || 0) >= 5).length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1152,
+        620
+      ],
+      "name": "Lead in Meeting Booked?",
+      "id": "b1350f37-fe66-415e-9f8a-b310fbdc11b6"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://api.notion.com/v1/pages/{{ $json.id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Notion-Version",
+              "value": "2022-06-28"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ properties: { Status: { status: { name: 'Pitching' } } } }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1392,
+        620
+      ],
+      "name": "CRM: Meeting Booked -> Pitching",
+      "onError": "continueRegularOutput",
+      "id": "966f1019-8ab7-438a-a06e-60d6f9d8e0ff",
+      "credentials": {
+        "notionApi": {
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "width": 520,
+        "height": 150,
+        "color": 4,
+        "content": "## CRM status: Meeting Booked to Pitching\nOnly fires when the matched CRM row is sitting in Meeting Booked AND someone other than you actually talked (5 or more transcript segments), so a no-show never advances the deal. Every other status is left alone."
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        440
+      ],
+      "name": "Sticky Note2",
+      "id": "1b50fd0f-8d2b-430f-a414-fe8b98849d85"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "YOUR_SLACK_CHANNEL_ID",
+          "mode": "id"
+        },
+        "text": "=:dart: *{{ $('Find Lead').first().json.name }}* moved *Meeting Booked* to *Pitching* after {{ $('Set Client email').first().json.meetingTitle }}.\n<{{ $json.url }}|Open the CRM card>  |  <{{ $('Set Client email').first().json.shareUrl }}|Recording>",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1632,
+        620
+      ],
+      "name": "Slack: moved to Pitching",
+      "onError": "continueRegularOutput",
+      "id": "13b7f7ba-d6bd-4e81-bde5-3e0803922c44",
+      "credentials": {
+        "slackApi": {
+          "name": "Slack account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Fathom": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Page Blocks": {
+      "main": [
+        [
+          {
+            "node": "Find Meetings DB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Meetings DB": {
+      "main": [
+        [
+          {
+            "node": "Build Meeting Blocks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Meeting Blocks": {
+      "main": [
+        [
+          {
+            "node": "Create Meeting Page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate Summary - Slack",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Set Client email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generate Summary - Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Client email": {
+      "main": [
+        [
+          {
+            "node": "Check CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check CRM": {
+      "main": [
+        [
+          {
+            "node": "Find Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Lead": {
+      "main": [
+        [
+          {
+            "node": "CRM matched?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Summary - Slack": {
+      "main": [
+        [
+          {
+            "node": "Send Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CRM matched?": {
+      "main": [
+        [
+          {
+            "node": "Get Page Blocks",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Lead in Meeting Booked?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No CRM Match Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lead in Meeting Booked?": {
+      "main": [
+        [
+          {
+            "node": "CRM: Meeting Booked -> Pitching",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "CRM: Meeting Booked -> Pitching": {
+      "main": [
+        [
+          {
+            "node": "Slack: moved to Pitching",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {},
+  "tags": []
+}

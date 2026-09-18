@@ -1,0 +1,388 @@
+{
+  "name": "Save To Content OS: Instagram saves to Airtable (TEMPLATE)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# Setup\n**Accounts you need:** n8n, Airtable, Apify, Anthropic (Claude API). An iPhone if you want the one tap Shortcut.\n\n**1. Airtable table.** Create a table with these fields (plain text is fine, Saved At can be a date): URL, Platform, Format, Source Username, Thumbnail, Caption, Transcript, Idea Card, Hook Analysis, Status, Saved At.\n\n**2. Replace placeholders.**\nYOUR_AIRTABLE_BASE_ID (starts with app) and YOUR_AIRTABLE_TABLE_ID (starts with tbl) in **Airtable dedupe** and **Airtable create**. Both are in the table's URL.\nYOUR_SHARED_SECRET in **Normalize**. Make it a long random string.\nOptional: CREATOR_CONTEXT in **Build enrich** so titles fit your niche.\n\n**3. Connect credentials.**\nAirtable Personal Access Token (scopes data.records:read and data.records:write) on both Airtable nodes.\nHeader Auth on **Apify transcript**: name `Authorization`, value `Bearer YOUR_APIFY_TOKEN`.\nHeader Auth on **Claude enrich**: name `x-api-key`, value `YOUR_ANTHROPIC_API_KEY`.\n\n**4. Activate, then test** in a browser:\n`https://YOUR_N8N_HOST/webhook/ig-save?secret=YOUR_SHARED_SECRET&source=shortcut&url=REEL_LINK`\n\n**5. iPhone Shortcut.** New Shortcut, turn on Show in Share Sheet (URLs only). Add Get URLs from Input, then Get Contents of URL with method GET and the URL above, with the URLs variable placed right after `url=`. Now Share on any reel and tap the Shortcut.\n\nThe Shortcut uses GET on purpose: iOS Shortcuts POST requests can fail against some hosts, GET does not.",
+        "height": 760,
+        "width": 480,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        -260
+      ],
+      "id": "ae0d6a9f-d90b-43ab-83b6-8ec9dd977e49",
+      "name": "Setup"
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "ig-save",
+        "responseMode": "onReceived",
+        "responseData": "IG save received",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "name": "Webhook",
+      "id": "cd950165-41fa-4771-bcac-598272bd0516",
+      "webhookId": "74bda9cd-b0c8-4e73-add0-d24d984a6651"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst q = $json.query || {};\nconst bd = ($json.body && typeof $json.body === 'object') ? $json.body : {};\nconst hdr = $json.headers || {};\nconst b = Object.assign({}, bd, q);\nconst EXPECTED = 'YOUR_SHARED_SECRET'; // any long random string, sent as ?secret=\nconst provided = q.secret || bd.secret || hdr['x-webhook-secret'] || '';\nif (provided !== EXPECTED) { throw new Error('unauthorized'); }\nconst raw = (b.url || b.link || '').trim();\nlet url = raw;\nif (url) { url = url.split('?')[0]; if (!url.endsWith('/')) url += '/'; }\nif (!url) { throw new Error('No url in payload'); }\nconst format = /\\/(reel|tv)\\//i.test(raw) ? 'Reel' : (/\\/p\\//i.test(raw) ? 'Post' : 'Reel');\nconst source = (b.source || 'unknown').toString();\nconst username = (b.username || '').toString();\nconst thumbnail = (b.thumbnail || '').toString();\nreturn [{ json: { url, format, source, username, thumbnail } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        200,
+        0
+      ],
+      "name": "Normalize",
+      "id": "13dae490-a7b3-41c6-bd81-7b6ff1fe2e30"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.airtable.com/v0/YOUR_AIRTABLE_BASE_ID/YOUR_AIRTABLE_TABLE_ID",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "airtableTokenApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "filterByFormula",
+              "value": "={{ \"{URL}='\" + $('Normalize').item.json.url + \"'\" }}"
+            },
+            {
+              "name": "maxRecords",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        400,
+        0
+      ],
+      "name": "Airtable dedupe",
+      "id": "17627a9c-bea3-4587-a79a-1e18e1e64c55",
+      "credentials": {
+        "airtableTokenApi": {
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d1",
+              "leftValue": "={{ $json.records.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        600,
+        0
+      ],
+      "name": "New save?",
+      "id": "40a74490-7a0c-4f88-8287-cc07e11c8e4f"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/sian.agency~instagram-ai-transcript-extractor/run-sync-get-dataset-items",
+        "authentication": "genericCredentialType",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ instagramUrl: $('Normalize').item.json.url }) }}",
+        "options": {
+          "timeout": 180000,
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        },
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        820,
+        -120
+      ],
+      "name": "Apify transcript",
+      "id": "34203ea8-d5a2-498b-9edc-b9ac8d856960",
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "Apify API (Authorization header)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\n// Optional: describe who is saving these reels, so titles fit your niche.\nconst CREATOR_CONTEXT = 'a creator who runs an online business';\n\nconst all = $input.all().map(x => x.json);\nlet rec = all[0];\nif (Array.isArray(rec)) rec = rec[0];\nrec = rec || {};\nconst n = $('Normalize').item.json;\nconst caption = (rec.caption || '').toString().slice(0, 2000);\nconst transcript = (rec.transcript || '').toString().slice(0, 4000);\nconst username = (rec.ownerUsername || n.username || '').toString();\nconst fullName = (rec.ownerFullName || '').toString();\nconst thumbnail = (rec.displayUrl || n.thumbnail || '').toString();\nconst views = rec.videoViewCount || rec.videoPlayCount || '';\nconst likes = rec.likesCount || '';\nconst enrichPrompt =\n  'You analyze Instagram reels that ' + CREATOR_CONTEXT + ' saved as short-form inspiration. '\n  + 'Return ONLY a JSON object, no prose, no code fences: {\"title\": string, \"hook\": string, \"summary\": string}. '\n  + 'title = 3 to 8 words, the content idea the creator could make from this, punchy, no hashtags, no emojis, no trailing period. '\n  + 'hook = one sentence naming the hook technique in the opening and why it stops the scroll. '\n  + 'summary = 1 to 2 sentences on what the reel is about and the angle worth stealing. '\n  + 'Never use dashes (em dash, en dash, or hyphen) as punctuation anywhere in title, hook, or summary. Use commas or periods instead. '\n  + 'If transcript and caption are both empty, infer from the author and set title to \"Saved reel from @' + (username || 'unknown') + '\" and summary to \"No transcript available, open the reel to review.\". '\n  + '\\n\\nAuthor: @' + username + (fullName ? (' (' + fullName + ')') : '')\n  + '\\nStats: ' + views + ' views, ' + likes + ' likes'\n  + '\\nCaption: ' + caption\n  + '\\nTranscript: ' + transcript;\nreturn [{ json: { url: n.url, format: n.format, username, thumbnail, caption, transcript, enrichPrompt } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1020,
+        -120
+      ],
+      "name": "Build enrich",
+      "id": "f3ae5675-66f1-4bc9-b7da-9ea79f45657b"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 500, messages: [{ role:'user', content: $('Build enrich').item.json.enrichPrompt }] }) }}",
+        "options": {},
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1220,
+        -120
+      ],
+      "name": "Claude enrich",
+      "id": "cb1cfac1-a287-4c42-b211-76bb4c433000",
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "Anthropic API (x-api-key header)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst be = $('Build enrich').item.json;\nlet title = '', hook = '', summary = '';\ntry {\n  const txt = ($json.content && $json.content[0] && $json.content[0].text) ? $json.content[0].text : '';\n  const cleaned = txt.replace(/```json/gi, '').replace(/```/g, '').trim();\n  const m = cleaned.match(/\\{[\\s\\S]*\\}/);\n  const o = JSON.parse(m ? m[0] : cleaned);\n  title = (o.title || '').toString().slice(0, 120);\n  hook = (o.hook || '').toString();\n  summary = (o.summary || '').toString();\n} catch (e) { /* defaults */ }\nif (!title) title = be.username ? ('Saved reel from @' + be.username) : 'Saved reel';\nconst ideaCard = summary ? (title + '. ' + summary) : title;\nconst raw = {\n  'URL': be.url,\n  'Platform': 'Instagram',\n  'Format': be.format,\n  'Source Username': be.username,\n  'Thumbnail': be.thumbnail,\n  'Caption': be.caption,\n  'Transcript': be.transcript,\n  'Idea Card': ideaCard,\n  'Hook Analysis': hook,\n  'Status': 'New',\n  'Saved At': $now.toISO(),\n};\nconst fields = {};\nfor (const k in raw) { const v = raw[k]; if (v !== undefined && v !== null && v !== '') fields[k] = v; }\nreturn [{ json: { fields } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1420,
+        -120
+      ],
+      "name": "Build fields",
+      "id": "df24c6d0-181f-42db-9f02-9104e9fb4540"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.airtable.com/v0/YOUR_AIRTABLE_BASE_ID/YOUR_AIRTABLE_TABLE_ID",
+        "authentication": "predefinedCredentialType",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ fields: $json.fields, typecast: true }) }}",
+        "options": {},
+        "nodeCredentialType": "airtableTokenApi"
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1620,
+        -120
+      ],
+      "name": "Airtable create",
+      "id": "8361476a-fc45-4d4d-87c2-2fdaa29fb7a5",
+      "credentials": {
+        "airtableTokenApi": {
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        820,
+        120
+      ],
+      "name": "Duplicate skip",
+      "id": "78f60781-64c5-4427-98fa-2873623dd437"
+    },
+    {
+      "parameters": {
+        "content": "## Save To Content OS\nGET webhook. Share a reel from Instagram, the Apify actor pulls the transcript and caption, Claude writes a title, hook analysis and summary, and a row lands in your Airtable inspiration table. Deduped on the reel URL, so saving twice does nothing.",
+        "height": 220,
+        "width": 420
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -260
+      ],
+      "name": "About",
+      "id": "83a50e6d-50dd-4ad3-9692-20973dcf0239"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize": {
+      "main": [
+        [
+          {
+            "node": "Airtable dedupe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable dedupe": {
+      "main": [
+        [
+          {
+            "node": "New save?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New save?": {
+      "main": [
+        [
+          {
+            "node": "Apify transcript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Duplicate skip",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apify transcript": {
+      "main": [
+        [
+          {
+            "node": "Build enrich",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build enrich": {
+      "main": [
+        [
+          {
+            "node": "Claude enrich",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude enrich": {
+      "main": [
+        [
+          {
+            "node": "Build fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build fields": {
+      "main": [
+        [
+          {
+            "node": "Airtable create",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {},
+  "tags": []
+}

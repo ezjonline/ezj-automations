@@ -33,8 +33,11 @@ Install the <skill-name> skill from https://github.com/ezjonline/ezj-automations
 | Template | What it does |
 |---|---|
 | [`IG_Research_Agent_Demo.json`](n8n%20templates/IG_Research_Agent_Demo.json) | Finds the reels breaking out in your niche and turns them into hooks and ideas. [Guide](https://www.ezjonline.com/resources/ig-research-agent) |
-| [`EZJ_GM_Lead_Scraper.json`](n8n%20templates/EZJ_GM_Lead_Scraper.json) | Scrapes Google Maps for local businesses, finds emails, researches them and writes the first email |
-| [`Content_OS.json`](n8n%20templates/Content_OS.json) | YouTube research, an idea bot and posting, run through Notion and Slack |
+| [`EZJ_GM_Lead_Scraper.json`](n8n%20templates/EZJ_GM_Lead_Scraper.json) | Scrapes Google Maps for local businesses, finds emails, researches them and writes the first email. [Guide](https://www.ezjonline.com/resources/gm-lead-scraper) |
+| [`Content_OS.json`](n8n%20templates/Content_OS.json) | YouTube research, an idea bot and posting, run through Notion and Slack. [Guide](https://www.ezjonline.com/resources/content-os) |
+| [`Save_To_Content_OS.json`](n8n%20templates/Save_To_Content_OS.json) | Share any Instagram reel from your phone and it lands in Airtable with its transcript and an AI breakdown. [Guide](https://www.ezjonline.com/resources/save-to-content-os) |
+| [`IG_DM_Bot_Control.json`](n8n%20templates/IG_DM_Bot_Control.json) | Turn your ManyChat Instagram DM bot on or off for one person from your phone. [Guide](https://www.ezjonline.com/resources/dm-bot-control) |
+| [`Fathom_Call_Notes.json`](n8n%20templates/Fathom_Call_Notes.json) | When a Fathom call ends, a Slack recap goes out and notes land on the client's Notion page. [Guide](https://www.ezjonline.com/resources/fathom-call-notes) |
 
 Import in n8n with **Workflows → Import from file**, then add your own credentials. Every ID in these files is a `YOUR_...` placeholder.
 
