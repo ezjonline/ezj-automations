@@ -13,8 +13,10 @@ Free Claude Code skills, n8n templates and prompts from [EZJ Online](https://www
 | [`session-handoff`](skills/session-handoff) | Writes a handoff doc so you can clear Claude Code without losing a decision | [Install](https://www.ezjonline.com/resources/session-handoff) |
 | [`session-close`](skills/session-close) | Checks what a Claude Code session actually got done | [Install](https://www.ezjonline.com/resources/session-close) |
 | [`discount-codes`](skills/discount-codes) | Screenshot any checkout, get the discount codes that actually work | [Install](https://www.ezjonline.com/resources/discount-codes) |
+| [`get-to-the-point`](skills/get-to-the-point) | Makes Claude answer first, in the fewest words | [Install](https://www.ezjonline.com/resources/get-to-the-point) |
+| [`os-audit`](skills/os-audit) | Audits a Claude Code project for stale data, broken routing and bloat | [Install](https://www.ezjonline.com/resources/os-audit) |
 | [`roast`](skills/roast) | Five personas pressure-test your idea, then one verdict: GO, RESHAPE or KILL | [Install](https://www.ezjonline.com/resources/roast) |
-| [`ezj-handoff-doc`](skills/ezj-handoff-doc) | One-page handoff docs for the developers who build for us | |
+| [`ezj-handoff-doc`](skills/ezj-handoff-doc) | One-page handoff docs anyone can understand | [Install](https://www.ezjonline.com/resources/handoff-doc) |
 
 More skills in their own repos: [Hormozi skill](https://github.com/ezjonline/hormozi-skill) · [Cold outreach skill](https://github.com/ezjonline/cold-outreach-skill)
 
@@ -39,6 +41,8 @@ Import in n8n with **Workflows → Import from file**, then add your own credent
 ## Prompts
 
 - [Nano Banana Pro prompts](prompts/higgsfield-nano-banana-prompts.md)
+- [Map your own AI OS](prompts/map-my-ai-os.md)
+- [Build an Instagram Research Agent](prompts/build-ig-research-agent.md)
 
 ## Want it built for you?
 
