@@ -91,3 +91,5 @@ Critical constraint: the face must remain 100% identical to the reference portra
 Every one of them follows the same structure: a specific real location, not a vague setting. A loud, physical prop doing the scroll-stopping. A camera and film stock called out by name where relevant, which pushes the model toward photographic realism instead of the smooth "AI look." A face-lock instruction that keeps identity intact. And a mood word that reads as unbothered, never posed. Swap the location, wardrobe, and prop, keep that structure, and you've got your own.
 
 If you're running an AI automation or content system for your business and want a second pair of hands on it, I'm at [ezjonline.com](https://ezjonline.com) or [@ezjcreative](https://www.instagram.com/ezjcreative/) on Instagram.
+
+Want these built for you? [Book a free AI Audit](https://www.ezjonline.com/ai-audit?utm_source=github&utm_medium=prompts&utm_campaign=nano-banana). More free resources at [ezjonline.com/resources](https://www.ezjonline.com/resources).

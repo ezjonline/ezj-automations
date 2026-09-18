@@ -5,7 +5,6 @@ user-invocable: true
 argument-hint: "[text to humanize]"
 ---
 
-> **Demo Library Skill** — This skill is from a demo library. If a step references a brand voice file you do not have, skip it and run the ban lists on their own.
 
 # Humanizer
 
