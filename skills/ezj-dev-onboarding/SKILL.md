@@ -15,7 +15,7 @@ Many developers speak English as a second language. Write short, simple sentence
 - One step per message. Wait for the developer before moving on.
 - Check things yourself whenever you can (run the command) instead of asking.
 - Commands the developer must run themselves because they open a browser or ask for input: tell them to type them in this Claude Code session with a `!` in front, for example `! gh auth login`.
-- Already onboarded (progress file says `level` 5)? Just run `bash ~/.claude/skills/ezj-dev-onboarding/scripts/setup_workspace.sh "$(cat ~/.claude/ezj-workspace-path 2>/dev/null || echo ~/ezj-online)"`, say "✅ you're up to date, auto updates are on", and stop.
+- Already onboarded (progress file says `level` 5)? Just run `bash ~/.claude/skills/ezj-dev-onboarding/scripts/setup_workspace.sh "$(cat ~/.claude/ezj-workspace-path 2>/dev/null || echo ~/ezj-online)"`, then do step 3b (bring in existing projects), say "✅ you're up to date, auto updates are on", and stop.
 - Save progress after every step to `~/.claude/ezj-onboarding.json` as valid JSON (escape any `"` or `\` in names), written with your file tool, so a new session can pick up where it stopped. At the start, if that file exists, read it, say which level they are on, and continue from there.
 - Keep a running score at the top of each level, like `🎮 Level 2 of 4 · 3 of 7 tools done`.
 
@@ -102,7 +102,28 @@ It also turns on auto updates: every time they open Claude Code, the latest EZJ 
 
 Save `checks.workspace`, `checks.skills` and `checks.auto_update` from the script's last line.
 
-### 3b. Read the 4 SOPs, with a quiz
+### 3b. Bring in existing EZJ projects (only if they have any)
+
+Developers who already worked for EZJ Online have repos somewhere else. Find them:
+
+```bash
+bash ~/.claude/skills/ezj-dev-onboarding/scripts/find_ezj_repos.sh
+```
+
+None found: skip this step. Otherwise:
+
+1. Show a table: repo, where it is now, proposed client folder (lowercase with hyphens, guessed from the repo name, e.g. `todd-booking-funnel` goes to `todd-pritchard`, `dev-tryouts` and `fulfillment-ops` go to `ezj-online`). Ask them to confirm or fix the client names in one reply.
+2. Explain once: "I'll copy each one into your workspace, on the same branch, with its .env and Vercel link. Your old folders stay exactly where they are. Nothing gets moved or deleted."
+3. For each confirmed repo run:
+   ```bash
+   bash ~/.claude/skills/ezj-dev-onboarding/scripts/adopt_repo.sh "<old path>" <client-slug>
+   ```
+4. Any `SKIP` line means work that isn't safely on GitHub yet (uncommitted, unpushed, or a branch never pushed). Tell them exactly what to do in that folder, then run it again after. Never force, never stash, never commit for them.
+5. Finish with: "From now on, open Claude Code in the new folders. Once you've checked everything works there, you can delete the old ones yourself."
+
+Never delete, move or change anything in the old folders. Never copy a repo that isn't on ezjonline or CAPNOS-Inc.
+
+### 3c. Read the 4 SOPs, with a quiz
 
 For each doc in `~/ezj-online/docs/`, in this order: `01_start_a_project.md`, `02_work_and_communicate.md`, `03_deliver_a_project.md`, `04_get_paid.md`:
 
@@ -158,7 +179,8 @@ A developer pastes the onboarding prompt. Claude asks their name, pings started,
 - Never skip a level or mark one done without the check or the developer's confirmation.
 - Never ask for or store passwords, tokens, API keys, or bank details. Bank details go only in the Tally form.
 - Never print the contents of any .env file or token. If a token shows up in output, tell them to revoke it.
-- Never overwrite an existing file in their workspace or skills folder. The setup script already refuses to.
+- Never overwrite a developer's own files. Only EZJ managed files (CLAUDE.md, docs/, ezj-* skills) get refreshed.
+- Never move, delete or edit an existing project folder. Copy only, through adopt_repo.sh.
 - Never post to Slack for them. They post the #general message themselves.
 - Never send the completed ping before the Loom link is in and all 4 quiz answers are right.
 - Never use dashes as punctuation in anything you write for them.
