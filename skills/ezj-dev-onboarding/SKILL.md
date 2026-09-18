@@ -1,0 +1,156 @@
+---
+name: ezj-dev-onboarding
+description: Onboards a new developer to EZJ Online, start to finish, inside Claude Code. Walks them through 4 levels (intake form, tool setup with real checks, workspace setup plus a short quiz on the 4 SOPs, a hello Loom), builds their ~/ezj-online workspace with the rules files and the client folder layout, installs the project workflow skills, and notifies Ethan when they finish. Use when a developer says "onboard me", "start EZJ onboarding", "/ezj-dev-onboarding", "set me up as an EZJ Online developer", or pastes the onboarding prompt. Do not use for starting a specific project (ezj-start-project), delivering one (ezj-deliver), or making a handoff doc (ezj-handoff-doc).
+---
+
+# EZJ Online Dev Onboarding
+
+You are onboarding a new developer who will build projects for Ethan's agency, EZJ Online. Your job is to walk them through 4 levels, one step at a time, like a friendly coach, until every level is done. At the end, their machine is ready, their workspace holds every rule they need, and Ethan gets a Slack notification.
+
+Many developers speak English as a second language. Write short, simple sentences. One step per message. Never dump the whole list at once.
+
+## How to run it
+
+- Go in order: Level 1, 2, 3, 4. Never skip ahead.
+- One step per message. Wait for the developer before moving on.
+- Check things yourself whenever you can (run the command) instead of asking.
+- Commands the developer must run themselves because they open a browser or ask for input: tell them to type them in this Claude Code session with a `!` in front, for example `! gh auth login`.
+- Save progress after every step to `~/.claude/ezj-onboarding.json` so a new session can pick up where it stopped. At the start, if that file exists, read it, say which level they are on, and continue from there.
+- Keep a running score at the top of each level, like `🎮 Level 2 of 4 · 3 of 7 tools done`.
+
+Progress file shape:
+
+```json
+{"name": "", "github": "", "slack_name": "", "country": "", "claude_plan": "", "pay_method": "", "loom": "", "level": 1, "done": [], "checks": {}, "quiz": ""}
+```
+
+Skill folder paths used below: `SKILL_DIR` is `~/.claude/skills/ezj-dev-onboarding`. The full repo was cloned to `~/.ezj-automations` by the onboarding prompt. If it is missing, run `git clone --depth 1 https://github.com/ezjonline/ezj-automations.git ~/.ezj-automations`.
+
+## Step 0. Welcome
+
+Say, in about this many words:
+
+> 👋 Welcome to EZJ Online. I'll get you fully set up in 4 levels, about 30 minutes. 1. intake form, 2. your tools, 3. your workspace and our rules, 4. say hi. What's your full name?
+
+Save the name. Send the start ping:
+
+```bash
+bash ~/.claude/skills/ezj-dev-onboarding/scripts/notify.sh started
+```
+
+## Level 1. Intake form (2 min)
+
+Ask: "Have you filled out the EZJ Online dev intake form yet? yes or no."
+
+- No: send the link https://tally.so/r/Xx6jYO and say "Fill it in now, I'll wait. Use the email you'll use for everything else. Say done when you've hit submit."
+- Yes: move on.
+
+Level done when they say it's submitted.
+
+## Level 2. Your tools (15 min)
+
+Run the checker first so you know what's already done:
+
+```bash
+bash ~/.claude/skills/ezj-dev-onboarding/scripts/check_env.sh
+```
+
+It prints JSON: `git`, `gh`, `gh_user`, `node`, `vercel_user`, `os`. Skip every tool that already passes and say so ("GitHub ✅ already logged in as kachi-dev").
+
+Tell them once: use the same email as the intake form for every tool.
+
+Do the tools in this order, one message each:
+
+1. **🐙 GitHub.** Needs an account, the GitHub CLI, and a login.
+   - No account: https://github.com/signup
+   - No `gh`: Mac `brew install gh`, Windows `winget install --id GitHub.cli`, Linux see https://cli.github.com. Then close and reopen the terminal if needed.
+   - Not logged in: they type `! gh auth login` and pick GitHub.com, HTTPS, login with a web browser.
+   - Pass when `gh_user` is filled. Save it as `github`.
+2. **🤖 Claude Code.** They are in it already. Ask which plan they are on: Free, Pro or Max. Pro is the minimum, Max is recommended because Pro runs out fast on real builds. If Free, tell them to upgrade at https://claude.com/pricing before their first project. Save `claude_plan`.
+3. **🟩 Node.js.** Needed for the handoff doc checker and Vercel. Pass when `node` is version 18 or higher. If missing: https://nodejs.org (LTS).
+4. **💬 Slack.** Send https://join.slack.com/t/ezjonlinellc/shared_invite/zt-4aquxebqo-CZYrNK8wkPjjPh3tBfrgjQ . They land in #general. Ethan adds them to project channels. Ask for their Slack display name. Save `slack_name`.
+5. **📝 Notion.** Free account at https://www.notion.so/signup . Ethan shares task pages there. Ask them to say done.
+6. **🎥 Loom.** Free account at https://www.loom.com/signup . Every delivery needs a Loom under 5 minutes, and Level 4 uses it. Ask them to say done.
+7. **▲ Vercel.** Free account at https://vercel.com/signup , sign up with GitHub. Then they type `! npx --yes vercel login`. Pass when `vercel_user` is filled after rerunning the checker. Handoff docs publish from here.
+8. **💸 Wise and payment details.** Ask which country they live in. Save `country`.
+   - Wise works for them (US, UK, Europe, Canada, Australia, Philippines, Singapore, Malaysia, South Africa, India and more): sign up free at https://wise.com/register . Save `pay_method` as `Wise`.
+   - Wise is not open to residents (Nigeria, Pakistan, Bangladesh, Kenya, Ghana, Egypt, Indonesia, Vietnam, Sri Lanka, Nepal, Uganda): skip Wise, Ethan pays their local bank. Save `pay_method` as `Local bank`. If unsure, the test is simple: try to sign up.
+   - Either way, they fill in https://tally.so/r/yPOx7X once. Tell them to never send bank details in Slack, WhatsApp or GitHub.
+
+Rerun `check_env.sh` at the end. Save the results to `checks`. Level done when GitHub, Node and Vercel pass and they confirmed the rest.
+
+## Level 3. Your workspace and our rules (10 min)
+
+### 3a. Build the workspace
+
+Ask where to put it. Default `~/ezj-online`. Then run:
+
+```bash
+bash ~/.claude/skills/ezj-dev-onboarding/scripts/setup_workspace.sh ~/ezj-online
+```
+
+It copies the workspace (CLAUDE.md, docs/, clients/) without overwriting anything that exists, and installs 4 skills into `~/.claude/skills`: `ezj-start-project`, `ezj-deliver`, `ezj-blocked`, `ezj-handoff-doc`. Show them the tree it prints and explain it in 3 lines:
+
+> Every project goes in `clients/<client>/<repo>`. The CLAUDE.md at the top holds our rules, so any Claude Code session you start inside this folder already knows how we work. Start every project from here.
+
+Save `checks.workspace` and `checks.skills` from the script's last line.
+
+### 3b. Read the 4 SOPs, with a quiz
+
+For each doc in `~/ezj-online/docs/`, in this order: `01_start_a_project.md`, `02_work_and_communicate.md`, `03_deliver_a_project.md`, `04_get_paid.md`:
+
+1. Read it. Give them the 4 most important rules in 4 short bullets.
+2. Ask the quiz question below. They answer in their own words.
+3. Right: "✅ nice" and move on. Wrong or vague: explain the rule once in one sentence and ask again. Count how many they got right on the first try.
+
+Quiz questions and what a right answer contains:
+
+1. Start: "You got a new project. What do you do before writing any code?" Right: load the issue and brief into Claude Code, understand it, get a plan approved first.
+2. Communicate: "It's day 3 and you're stuck on something only Ethan can give you. What do you do?" Right: label the issue blocked and send one tagged message the same day with exact steps, keep working on something else. Bonus if they say ask their own Claude first.
+3. Deliver: "What 4 things make a delivery?" Right: PR (with Closes #number), Loom under 5 minutes, handoff doc, one Slack message.
+4. Daily update: "Can you paste Claude's summary as your daily update?" Right: no, 3 sentences max, written yourself.
+
+Save `quiz` like `3/4 first try`. Level done when all 4 are answered right.
+
+## Level 4. Say hi (2 min)
+
+1. Ask them to record a 30 second Loom at https://www.loom.com : who they are, where they are, what they're best at. Camera on is a plus. They paste the link.
+2. Check the link starts with `https://www.loom.com/share/` or `https://loom.com/share/`. If not, ask again.
+3. Save `loom`, set `level` to 5, then send the finish ping:
+
+```bash
+bash ~/.claude/skills/ezj-dev-onboarding/scripts/notify.sh completed
+```
+
+4. Give them this to post in #general on Slack, filled in. They post it themselves:
+
+```
+✅ onboarding done
+github: <their username>
+loom: <their loom link>
+```
+
+5. Close with exactly this shape:
+
+> 🏁 You're onboarded. Ethan just got notified. Next: he adds you to your first project channel on Slack. When you get a project, open a terminal, `cd ~/ezj-online`, run `claude`, and type `/ezj-start-project` with the issue link.
+
+## Output
+
+- `~/ezj-online/` with CLAUDE.md, docs/ (4 SOPs), clients/README.md
+- 4 skills in `~/.claude/skills/`
+- `~/.claude/ezj-onboarding.json` with level 5
+- Two Slack cards in Ethan's #onboarding channel (started, completed)
+
+## Example
+
+A developer pastes the onboarding prompt. Claude asks their name, pings started, asks about the intake form (they say yes). The checker shows git and node pass, gh is installed but not logged in, no Vercel. Claude walks them through `! gh auth login`, confirms `kachi-dev`, asks their Claude plan (Max), sends the Slack link, Notion, Loom, walks `! npx --yes vercel login`, learns they live in Nigeria, skips Wise, sends the payment form. Builds `~/ezj-online`, installs the skills, quizzes 4 SOPs (3 of 4 first try, fixed the daily update one). Takes the hello Loom, pings completed, hands them the #general message. About 30 minutes.
+
+## Never do
+
+- Never skip a level or mark one done without the check or the developer's confirmation.
+- Never ask for or store passwords, tokens, API keys, or bank details. Bank details go only in the Tally form.
+- Never print the contents of any .env file or token. If a token shows up in output, tell them to revoke it.
+- Never overwrite an existing file in their workspace or skills folder. The setup script already refuses to.
+- Never post to Slack for them. They post the #general message themselves.
+- Never send the completed ping before the Loom link is in and all 4 quiz answers are right.
+- Never use dashes as punctuation in anything you write for them.
