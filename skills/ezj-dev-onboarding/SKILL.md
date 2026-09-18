@@ -22,7 +22,7 @@ Many developers speak English as a second language. Write short, simple sentence
 Progress file shape:
 
 ```json
-{"name": "", "github": "", "slack_name": "", "country": "", "claude_plan": "", "pay_method": "", "loom": "", "level": 1, "done": [], "checks": {}, "quiz": ""}
+{"name": "", "github": "", "slack_name": "", "country": "", "claude_plan": "", "pay_method": "", "loom": "", "level": 1, "done": [], "checks": {}, "quiz": "", "scenarios": "", "scenario_notes": ""}
 ```
 
 Skill folder paths used below: `SKILL_DIR` is `~/.claude/skills/ezj-dev-onboarding`. The full repo was cloned to `~/.ezj-automations` by the onboarding prompt. If it is missing, run `git clone --depth 1 https://github.com/ezjonline/ezj-automations.git ~/.ezj-automations`.
@@ -31,7 +31,7 @@ Skill folder paths used below: `SKILL_DIR` is `~/.claude/skills/ezj-dev-onboardi
 
 Say, in about this many words:
 
-> 👋 Welcome to EZJ Online. I'll get you fully set up in 4 levels, about 30 minutes. 1. intake form, 2. your tools, 3. your workspace and our rules, 4. say hi. What's your full name?
+> 👋 Welcome to EZJ Online. I'll get you fully set up in 4 levels, about 40 minutes. 1. intake form, 2. your tools, 3. your workspace, our rules and a few real situations, 4. say hi. What's your full name?
 
 Right after they answer, explain one thing, once:
 
@@ -84,7 +84,7 @@ Do the tools in this order, one message each:
 
 Rerun `check_env.sh` at the end. Save the results to `checks`. Level done when GitHub, Node and Vercel pass and they confirmed the rest.
 
-## Level 3. Your workspace and our rules (10 min)
+## Level 3. Your workspace, our rules, real situations (20 min)
 
 ### 3a. Build the workspace
 
@@ -140,6 +140,14 @@ Quiz questions and what a right answer contains:
 
 Save `quiz` like `3/4 first try`. Level done when all 4 are answered right.
 
+### 3d. Real situations (10 min)
+
+Say: "Last part of level 3. I'll describe 6 real situations from our projects. Tell me what you'd do, in your own words. No wrong way to phrase it, I'm checking your judgment."
+
+Read `~/.claude/skills/ezj-dev-onboarding/references/scenarios.md` and run it exactly as it says: one scenario per message, no hints, no options, grade the first answer (plus one neutral follow up), then coach in one or two sentences.
+
+Save `scenarios` like `5/6` and `scenario_notes` like `S3 miss: would wait quietly for access; S5 pass`. Level done when all 6 are answered. A low score doesn't block finishing, Ethan sees it on his card.
+
 ## Level 4. Say hi (2 min)
 
 1. Ask them to record a 30 second Loom at https://www.loom.com : who they are, where they are, what they're best at. Camera on is a plus. They paste the link.
@@ -182,5 +190,6 @@ A developer pastes the onboarding prompt. Claude asks their name, pings started,
 - Never overwrite a developer's own files. Only EZJ managed files (CLAUDE.md, docs/, ezj-* skills) get refreshed.
 - Never move, delete or edit an existing project folder. Copy only, through adopt_repo.sh.
 - Never post to Slack for them. They post the #general message themselves.
-- Never send the completed ping before the Loom link is in and all 4 quiz answers are right.
+- Never send the completed ping before the Loom link is in, all 4 quiz answers are right, and all 6 scenarios are answered.
+- Never hint, show the rubric, or offer multiple choice in the scenario round. Grade the first answer honestly, a generous grade hides a risk from Ethan.
 - Never use dashes as punctuation in anything you write for them.
