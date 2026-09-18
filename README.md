@@ -8,6 +8,7 @@ Free Claude Code skills, n8n templates and prompts from [EZJ Online](https://www
 
 | Skill | What it does | Page |
 |---|---|---|
+| [`callback`](skills/callback) | Turns your Fathom sales calls into vertical reels: cold open, captions, reaction stickers, loop | [Install](https://www.ezjonline.com/resources/callback-skill) |
 | [`dashboard`](skills/dashboard) | Builds a data dashboard that looks like a designer made it, in one HTML file | [Install](https://www.ezjonline.com/resources/dashboard-skill) |
 | [`humanizer`](skills/humanizer) | Rewrites any copy so it stops sounding like AI | |
 | [`session-handoff`](skills/session-handoff) | Writes a handoff doc so you can clear Claude Code without losing a decision | |
