@@ -48,7 +48,6 @@
       "name": "OpenRouter Chat Model",
       "credentials": {
         "openRouterApi": {
-          "id": "",
           "name": "OpenRouter API"
         }
       }
@@ -121,7 +120,7 @@
         "messages": {
           "messageValues": [
             {
-              "message": "=You are a sophisticated AI data-processing engine. Your task is to receive a raw JSON object for a single business prospect, perform two critical actions, and then provide your response in a specific JSON format.\n\n**Your Instructions:**\n\n1.  **EXTRACT KEY DATA:** You must parse the raw JSON input to find and extract the following specific data points. If a field is not present, use a value of `null`.\n    * **company name:** Look for `title`.\n    * **cateogory name** Look for 'categoryName'\n    * **email:** Find the first available email address. Look in fields like `emails` 'emails[0]' 'leadsEnrichment[0] or 'email'\n    * **website** Look for the `website` field.\n    * **city:** look for `city'.\n\n\n2.  **FORMAT THE OUTPUT:** You MUST structure your entire response as a single, clean JSON object. The object should contain exactly the keys listed below. Do not include any other text, explanations, or greetings in your response\u2014ONLY the final JSON object.\n\n**Required Output Format:**\n{\n  \"companyName\": \"...\",\n  \"categoryName\": \"...\",\n  \"email\": \"...\",\n  \"website\": \"...\",\n  \"city\": \"...\", \n  \"state\": \"...\", \n  \"domainKey\": \"...\"\n}"
+              "message": "=You are a sophisticated AI data-processing engine. Your task is to receive a raw JSON object for a single business prospect, perform two critical actions, and then provide your response in a specific JSON format.\n\n**Your Instructions:**\n\n1.  **EXTRACT KEY DATA:** You must parse the raw JSON input to find and extract the following specific data points. If a field is not present, use a value of `null`.\n    * **company name:** Look for `title`.\n    * **cateogory name** Look for 'categoryName'\n    * **email:** Find the first available email address. Look in fields like `emails` 'emails[0]' 'leadsEnrichment[0] or 'email'\n    * **website** Look for the `website` field.\n    * **city:** look for `city'.\n\n\n2.  **FORMAT THE OUTPUT:** You MUST structure your entire response as a single, clean JSON object. The object should contain exactly the keys listed below. Do not include any other text, explanations, or greetings in your response—ONLY the final JSON object.\n\n**Required Output Format:**\n{\n  \"companyName\": \"...\",\n  \"categoryName\": \"...\",\n  \"email\": \"...\",\n  \"website\": \"...\",\n  \"city\": \"...\", \n  \"state\": \"...\", \n  \"domainKey\": \"...\"\n}"
             }
           ]
         },
@@ -185,17 +184,17 @@
         "operation": "update",
         "base": {
           "__rl": true,
-          "value": "appER1XgrIkinSyXl",
+          "value": "YOUR_AIRTABLE_BASE_ID",
           "mode": "list",
           "cachedResultName": "Texas Med Spas",
-          "cachedResultUrl": "https://airtable.com/appER1XgrIkinSyXl"
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID"
         },
         "table": {
           "__rl": true,
-          "value": "tblzcvZkd61Os1scQ",
+          "value": "YOUR_AIRTABLE_TABLE_ID",
           "mode": "list",
           "cachedResultName": "Dallas",
-          "cachedResultUrl": "https://airtable.com/appER1XgrIkinSyXl/tblzcvZkd61Os1scQ"
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID/YOUR_AIRTABLE_TABLE_ID"
         },
         "columns": {
           "mappingMode": "defineBelow",
@@ -434,7 +433,6 @@
       "name": "Add Company Research to Airtable",
       "credentials": {
         "airtableTokenApi": {
-          "id": "",
           "name": "Airtable account"
         }
       }
@@ -444,17 +442,17 @@
         "operation": "update",
         "base": {
           "__rl": true,
-          "value": "appER1XgrIkinSyXl",
+          "value": "YOUR_AIRTABLE_BASE_ID",
           "mode": "list",
           "cachedResultName": "Texas Med Spas",
-          "cachedResultUrl": "https://airtable.com/appER1XgrIkinSyXl"
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID"
         },
         "table": {
           "__rl": true,
-          "value": "tblzcvZkd61Os1scQ",
+          "value": "YOUR_AIRTABLE_TABLE_ID",
           "mode": "list",
           "cachedResultName": "Dallas",
-          "cachedResultUrl": "https://airtable.com/appER1XgrIkinSyXl/tblzcvZkd61Os1scQ"
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID/YOUR_AIRTABLE_TABLE_ID"
         },
         "columns": {
           "mappingMode": "defineBelow",
@@ -693,7 +691,6 @@
       "name": "Add Custom Outreach Variables to Airtable",
       "credentials": {
         "airtableTokenApi": {
-          "id": "",
           "name": "Airtable account"
         }
       }
@@ -734,25 +731,25 @@
         "operation": "search",
         "base": {
           "__rl": true,
-          "value": "appER1XgrIkinSyXl",
+          "value": "YOUR_AIRTABLE_BASE_ID",
           "mode": "list",
           "cachedResultName": "Texas Med Spas",
-          "cachedResultUrl": "https://airtable.com/appER1XgrIkinSyXl"
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID"
         },
         "table": {
           "__rl": true,
-          "value": "tblzcvZkd61Os1scQ",
+          "value": "YOUR_AIRTABLE_TABLE_ID",
           "mode": "list",
           "cachedResultName": "Dallas",
-          "cachedResultUrl": "https://airtable.com/appER1XgrIkinSyXl/tblzcvZkd61Os1scQ"
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID/YOUR_AIRTABLE_TABLE_ID"
         },
         "options": {
           "view": {
             "__rl": true,
-            "value": "viwcM3pYuCwL9dUDo",
+            "value": "YOUR_AIRTABLE_VIEW_ID",
             "mode": "list",
             "cachedResultName": "Needs Enrichment",
-            "cachedResultUrl": "https://airtable.com/appER1XgrIkinSyXl/tblzcvZkd61Os1scQ/viwcM3pYuCwL9dUDo"
+            "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID/YOUR_AIRTABLE_TABLE_ID/YOUR_AIRTABLE_VIEW_ID"
           }
         }
       },
@@ -766,7 +763,6 @@
       "name": "Search records",
       "credentials": {
         "airtableTokenApi": {
-          "id": "",
           "name": "Airtable account"
         }
       }
@@ -776,17 +772,17 @@
         "operation": "search",
         "base": {
           "__rl": true,
-          "value": "appwtH8KWUYtZb8UQ",
+          "value": "YOUR_AIRTABLE_BASE_ID",
           "mode": "list",
           "cachedResultName": "GA, Tree Services, GM",
-          "cachedResultUrl": "https://airtable.com/appwtH8KWUYtZb8UQ"
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID"
         },
         "table": {
           "__rl": true,
-          "value": "tblzcvZkd61Os1scQ",
+          "value": "YOUR_AIRTABLE_TABLE_ID",
           "mode": "list",
           "cachedResultName": "ALL",
-          "cachedResultUrl": "https://airtable.com/appwtH8KWUYtZb8UQ/tblzcvZkd61Os1scQ"
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID/YOUR_AIRTABLE_TABLE_ID"
         },
         "options": {
           "fields": [
@@ -804,7 +800,6 @@
       "name": "Get Existing Leads",
       "credentials": {
         "airtableTokenApi": {
-          "id": "",
           "name": "Airtable account"
         }
       }
@@ -902,7 +897,6 @@
       "name": "Bulk Enrich Emails",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "",
           "name": "AnyMailFinder API"
         }
       }
@@ -924,7 +918,6 @@
       "name": "Download Emails",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "",
           "name": "AnyMailFinder API"
         }
       }
@@ -982,17 +975,17 @@
         "operation": "update",
         "base": {
           "__rl": true,
-          "value": "appER1XgrIkinSyXl",
+          "value": "YOUR_AIRTABLE_BASE_ID",
           "mode": "list",
           "cachedResultName": "Texas Med Spas",
-          "cachedResultUrl": "https://airtable.com/appER1XgrIkinSyXl"
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID"
         },
         "table": {
           "__rl": true,
-          "value": "tblzcvZkd61Os1scQ",
+          "value": "YOUR_AIRTABLE_TABLE_ID",
           "mode": "list",
           "cachedResultName": "Dallas",
-          "cachedResultUrl": "https://airtable.com/appER1XgrIkinSyXl/tblzcvZkd61Os1scQ"
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID/YOUR_AIRTABLE_TABLE_ID"
         },
         "columns": {
           "mappingMode": "defineBelow",
@@ -1227,14 +1220,13 @@
       "name": "Add Missing Leads",
       "credentials": {
         "airtableTokenApi": {
-          "id": "",
           "name": "Airtable account"
         }
       }
     },
     {
       "parameters": {
-        "jsCode": "for (const item of $input.all()) {\n  const type = item.json.emails_type;\n\n  if (type === 'valid') {\n    item.json.status = '\u2705 Verified';\n  } else if (type === 'risky') {\n    item.json.status = '\u26a0\ufe0f Risky - Manual Check';\n  } else {\n    item.json.status = '\u274c Not Found';\n  }\n}\n\nreturn $input.all();"
+        "jsCode": "for (const item of $input.all()) {\n  const type = item.json.emails_type;\n\n  if (type === 'valid') {\n    item.json.status = '✅ Verified';\n  } else if (type === 'risky') {\n    item.json.status = '⚠️ Risky - Manual Check';\n  } else {\n    item.json.status = '❌ Not Found';\n  }\n}\n\nreturn $input.all();"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -1258,7 +1250,7 @@
             {
               "id": "4fcd5fdb-2559-4e67-80aa-dd06dda3713e",
               "leftValue": "={{ $json.status }}",
-              "rightValue": "\u2705 Verified",
+              "rightValue": "✅ Verified",
               "operator": {
                 "type": "string",
                 "operation": "equals"
@@ -1359,17 +1351,17 @@
         "operation": "upsert",
         "base": {
           "__rl": true,
-          "value": "appER1XgrIkinSyXl",
+          "value": "YOUR_AIRTABLE_BASE_ID",
           "mode": "list",
           "cachedResultName": "Texas Med Spas",
-          "cachedResultUrl": "https://airtable.com/appER1XgrIkinSyXl"
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID"
         },
         "table": {
           "__rl": true,
-          "value": "tblzcvZkd61Os1scQ",
+          "value": "YOUR_AIRTABLE_TABLE_ID",
           "mode": "list",
           "cachedResultName": "Dallas",
-          "cachedResultUrl": "https://airtable.com/appER1XgrIkinSyXl/tblzcvZkd61Os1scQ"
+          "cachedResultUrl": "https://airtable.com/YOUR_AIRTABLE_BASE_ID/YOUR_AIRTABLE_TABLE_ID"
         },
         "columns": {
           "mappingMode": "defineBelow",
@@ -1610,7 +1602,6 @@
       "name": "Add all results",
       "credentials": {
         "airtableTokenApi": {
-          "id": "",
           "name": "Airtable account"
         }
       }
@@ -1647,7 +1638,6 @@
       "name": "Get Job Status",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "",
           "name": "AnyMailFinder API"
         }
       }
@@ -1659,31 +1649,31 @@
         "formFields": {
           "values": [
             {
-              "fieldLabel": "\ud83d\udd0d Search term 1"
+              "fieldLabel": "🔍 Search term 1"
             },
             {
-              "fieldLabel": " \ud83d\udd0d Search term 2"
+              "fieldLabel": " 🔍 Search term 2"
             },
             {
-              "fieldLabel": "\ud83d\udd0d Search term 3"
+              "fieldLabel": "🔍 Search term 3"
             },
             {
-              "fieldLabel": "\ud83d\udd0d Search term 4"
+              "fieldLabel": "🔍 Search term 4"
             },
             {
-              "fieldLabel": "\ud83d\udd0d Search term 5"
+              "fieldLabel": "🔍 Search term 5"
             },
             {
-              "fieldLabel": "\ud83d\udccd Location"
+              "fieldLabel": "📍 Location"
             },
             {
-              "fieldLabel": "\ud83d\udcaf Number of places to extract (per each search term or URL)"
+              "fieldLabel": "💯 Number of places to extract (per each search term or URL)"
             },
             {
-              "fieldLabel": "\ud83c\udfe2 G-Maps Category"
+              "fieldLabel": "🏢 G-Maps Category"
             },
             {
-              "fieldLabel": "\ud83d\udce9 Instantly Campaign ID",
+              "fieldLabel": "📩 Instantly Campaign ID",
               "placeholder": "12345"
             }
           ]
@@ -1719,7 +1709,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n    \"categoryFilterWords\": [],\n    \"includeWebResults\": false,\n    \"locationQuery\": \"{{ $json['\ud83d\udccd Location'] }}\",\n    \"maxCrawledPlacesPerSearch\": {{ $json['\ud83d\udcaf Number of places to extract (per each search term or URL)'] }},\n    \"maxImages\": 0,\n    \"maximumLeadsEnrichmentRecords\": 1,\n    \"scrapeContacts\": true,\n    \"scrapeDirectories\": false,\n    \"scrapeImageAuthors\": false,\n    \"scrapePlaceDetailPage\": false,\n    \"scrapeReviewsPersonalData\": false,\n    \"scrapeSocialMediaProfiles\": {\n        \"facebooks\": true,\n        \"instagrams\": true\n    },\n    \"scrapeTableReservationProvider\": false,\n    \"searchStringsArray\": [\n        \"{{ $json['\ud83d\udd0d Search term 1'] }}\",\n        \"{{ $json['\ud83d\udd0d Search term 2'] }}\",\n        \"{{ $json['\ud83d\udd0d Search term 3'] }}\",\n        \"{{ $json['\ud83d\udd0d Search term 4'] }}\",\n        \"{{ $json['\ud83d\udd0d Search term 5'] }}\",\n        \"{{ $json['\ud83d\udd0d Search term 6'] }}\",\n        \"{{ $json['\ud83d\udd0d Search term 7'] }}\",\n        \"{{ $json['\ud83d\udd0d Search term 8'] }}\",\n        \"{{ $json['\ud83d\udd0d Search term 9'] }}\",\n        \"{{ $json['\ud83d\udd0d Search term 10'] }}\"\n    ],\n    \"skipClosedPlaces\": false,\n    \"website\": \"withWebsite\"\n}",
+        "jsonBody": "={\n    \"categoryFilterWords\": [],\n    \"includeWebResults\": false,\n    \"locationQuery\": \"{{ $json['📍 Location'] }}\",\n    \"maxCrawledPlacesPerSearch\": {{ $json['💯 Number of places to extract (per each search term or URL)'] }},\n    \"maxImages\": 0,\n    \"maximumLeadsEnrichmentRecords\": 1,\n    \"scrapeContacts\": true,\n    \"scrapeDirectories\": false,\n    \"scrapeImageAuthors\": false,\n    \"scrapePlaceDetailPage\": false,\n    \"scrapeReviewsPersonalData\": false,\n    \"scrapeSocialMediaProfiles\": {\n        \"facebooks\": true,\n        \"instagrams\": true\n    },\n    \"scrapeTableReservationProvider\": false,\n    \"searchStringsArray\": [\n        \"{{ $json['🔍 Search term 1'] }}\",\n        \"{{ $json['🔍 Search term 2'] }}\",\n        \"{{ $json['🔍 Search term 3'] }}\",\n        \"{{ $json['🔍 Search term 4'] }}\",\n        \"{{ $json['🔍 Search term 5'] }}\",\n        \"{{ $json['🔍 Search term 6'] }}\",\n        \"{{ $json['🔍 Search term 7'] }}\",\n        \"{{ $json['🔍 Search term 8'] }}\",\n        \"{{ $json['🔍 Search term 9'] }}\",\n        \"{{ $json['🔍 Search term 10'] }}\"\n    ],\n    \"skipClosedPlaces\": false,\n    \"website\": \"withWebsite\"\n}",
         "options": {}
       },
       "id": "efb96b0b-95db-45b2-8a6d-3236d72d29aa",
@@ -1746,7 +1736,6 @@
       "name": "Tavily",
       "credentials": {
         "tavilyApi": {
-          "id": "",
           "name": "Tavily API"
         }
       }
@@ -1778,7 +1767,6 @@
       "name": "OpenRouter 2",
       "credentials": {
         "openRouterApi": {
-          "id": "",
           "name": "OpenRouter API"
         }
       }
@@ -1797,7 +1785,6 @@
       "name": "OpenRouter 1",
       "credentials": {
         "openRouterApi": {
-          "id": "",
           "name": "OpenRouter API"
         }
       }
@@ -1808,7 +1795,7 @@
         "text": "=Generate a personalized cold email using this prospect's data:\n\n**Company Overview:** \n{{ $('Company Research1').item.json.output.companyOverview }}\n\n**Recent News:** \n{{ $('Company Research1').item.json.output.recentWebsiteNews }}\n\n**Company:** \n{{ $('Search records').item.json.title }}\n\n**Comprehensive Summary:** \n{{ $('Company Research1').item.json.output.comprehensiveSummary }}\n\n**Key Offerings:** \n{{ $('Company Research1').item.json.output.keyOfferings }}\n\n**Third Party Sentiment:** \n{{ $('Company Research1').item.json.output.thirdPartySentiment }}",
         "hasOutputParser": true,
         "options": {
-          "systemMessage": "=# B2B Cold Outreach Email Writer \u2014 Master System Prompt\n# AI Voice Appointment Booking Agent | EZJ Online\n# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n# TO SWITCH NICHES: Edit ONLY the \"NICHE & OFFER CONTEXT\" block below.\n# Every other section is niche-agnostic and must never be changed.\n# \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\n---\n\n## NICHE & OFFER CONTEXT\n*(Edit this block only when switching niches. Leave everything else untouched.)*\n\n**Target niche:** Tree service and tree removal companies\n\n**Who you're emailing:** Owners and operators of local tree service businesses scraped from Google Maps.\n\n**The core problem this niche faces:**\nWhen crews are out on jobs, the phone rings with no one available to answer. Calls go to voicemail, appointments never get booked, and high-intent leads move on to the next company on Google. These businesses lose jobs every week not because they can't do the work, but because the inquiry never turned into a booked appointment.\n\n**How to describe \"being busy\" for this niche:**\n- \"When you and your crew are out on a job\"\n- \"When staff is tied up on-site\"\n- \"When no one is available to pick up\"\n\n**What the appointment is called in this niche:** booked estimate (use \"estimate\" or \"appointment\" interchangeably)\n\n**Niche-specific framing examples for the icebreaker:**\n- Reference: crew size, types of jobs (removal, trimming, stump grinding, emergency work, land clearing), years in business, service area, Google reviews\n- Example observation: \"The focus on emergency removal and large residential jobs stood out.\"\n- Example observation: \"Noticed you run a full-service operation covering removal, trimming, and stump work.\"\n\n**Social proof geography rule for this niche:**\n- If recipient is on the West Coast: use Midwest or Southeast cities (Nashville, Columbus, Atlanta, Charlotte)\n- If recipient is in the South/Southeast: use Midwest or Northeast cities (Chicago, Indianapolis, Philadelphia)\n- If recipient is in the Midwest: use East or West Coast cities (Tampa, Phoenix, Portland)\n- If recipient is in the Northeast: use Southwest or Southeast cities (Dallas, Austin, Orlando)\n\n**Company name shortening rules for this niche:**\nStrip these words from the end of the name:\n- \"Tree Service\", \"Tree Care\", \"Tree Removal\", \"Tree Co\", \"Arborist\", \"Landscaping\", \"Land Clearing\", \"Lawn Care\", \"LLC\", \"Inc\", \"Corp\", \"& Sons\", \"and Sons\"\n\nExamples:\n- \"Greenfield Tree Service\" \u2192 \"Greenfield\"\n- \"Pioneer Tree Care LLC\" \u2192 \"Pioneer\"\n- \"Atlas Tree Removal\" \u2192 \"Atlas\"\n- \"Hernandez & Sons Tree Co\" \u2192 \"Hernandez\"\n- \"Blue Ridge Tree Service\" \u2192 \"Blue Ridge\"\n- \"Cardinal Tree and Landscaping\" \u2192 \"Cardinal\"\n\n---\n\n## Role\n\nYou are an Expert B2B Cold Outreach Email Writer for EZJ Online.\n\nYour role is to write **short, plain-text cold emails** that feel like they were written quickly by a real founder on an iPhone.\n\n**The goal is to earn a reply, not to explain, convince, or close.**\n\n---\n\n## The Offer (Universal \u2014 Do Not Change Per Niche)\n\nYou sell one thing: **an AI voice agent that handles overflow inbound calls as a backup system, so businesses capture booked appointments they would have otherwise lost to voicemail.**\n\n**Core positioning (always):**\n- You help local businesses bring in approximately 20 additional booked appointments per month\n- The AI voice agent acts as a backup for when staff is busy, not a replacement for anyone\n- Performance-based: only makes sense if it actually produces bookings\n- Risk reversal: if it doesn't book 20 appointments in 60 days, you'll work for free until it does\n\n**Key components every email MUST include:**\n1. The outcome: ~20 additional booked appointments per month\n2. The mechanism: AI voice agent that handles overflow calls when staff is busy\n3. The risk reversal: 20 appointments in 60 days or you work for free / they don't pay\n\n**STRICT RULES:**\n- Do NOT mention pricing or setup fees\n- Do NOT mention monthly costs\n- Do NOT mention contracts\n- Do NOT mention refunds explicitly\n- Do NOT use \"No strings attached\" language\n- The risk reversal must feel real but low-drama\n- Communicate: \"You're not taking a risk by exploring this\"\n\n**FRAMING RULES (Universal):**\n\n**NEVER say:**\n- \"Replace your receptionist\" or \"Replace your staff\"\n- \"Automate your front desk\" or \"Automate your office\"\n- Anything that implies job loss\n- \"No one answers the phone\" (implies staff incompetence)\n\n**ALWAYS frame it as:**\n- \"When your team is busy, we make sure calls still get handled\"\n- \"A backup system for overflow calls\"\n- \"Captures bookings that would have otherwise gone to voicemail\"\n- \"We make sure every inbound call gets handled, even when staff is tied up\"\n\n---\n\n## Core Framework (Universal \u2014 Do Not Change)\n\nYou must follow this cold email framework in this exact order:\n\n1. **Personalization** (Icebreaker)\n2. **Who am I and what outcome do I deliver?** (Introduction)\n3. **How does it work?** (Mechanism)\n4. **Why am I worth trusting?** (Social proof)\n5. **The guarantee** (Risk reversal)\n\n**CRITICAL ORDER RULE:**\nExplain the OUTCOME (booked appointments) BEFORE explaining the mechanism (AI voice agent). Then prove you've done it (social proof), then state the risk reversal.\n\nKey principles:\n- Make it easy for the reader to say yes to a conversation\n- Reduce friction and cognitive load\n- Lead with outcome, not features\n- Use calm confidence and permission-based language\n- Let the risk reversal do the heavy lifting\n- Observational, not flattering\n- No hype, no buzzwords, no long explanations\n- Sounds human, slightly blunt, never corporate\n- Casual tone: \"I was wondering if...\" not \"I am reaching out to offer...\"\n\n---\n\n## Your Task\n\nGenerate a short, highly personalized cold email **(100\u2013150 words)** split into the following JSON variables:\n\n```json\n{\n  \"icebreaker\": \"...\",\n  \"introduction\": \"...\",\n  \"value_proposition\": \"...\",\n  \"cta\": \"...\",\n  \"shortenedCompanyName\": \"...\"\n}\n```\n\n**CRITICAL ISOLATION RULE:**\nEach JSON variable must contain ONLY its designated content.\n- `icebreaker` = ONLY the icebreaker\n- `introduction` = ONLY the introduction (1-2 sentences, outcome only)\n- `value_proposition` = ONLY mechanism + social proof + risk reversal (3-4 sentences)\n- `cta` = ONLY the two-line CTA\n\nIf the icebreaker contains the introduction, value prop, or CTA, you have failed the task.\n\n---\n\n## Tone & Style\n\n- **Spartan / laconic voice**\n- Casual but professional (friendly conversation, not corporate)\n- Calm, confident, low-pressure\n- Short 1-2 sentence paragraphs with line breaks\n- Observational, not flattering\n- Paraphrase inputs; never copy verbatim\n- Use softer language: \"I was wondering if...\" \"Figured this might...\" \"Thought you might...\"\n- Permission-based language in CTAs\n\n**You are writing to sound relevant, not impressive.**\n\n---\n\n## Formatting Rules\n\n- **Shorten company names** using the rules in the NICHE & OFFER CONTEXT block above\n- **Shorten locations:** \"San Fran\" not \"San Francisco\", \"LA\" not \"Los Angeles\", \"NYC\" not \"New York City\"\n- Plain text only\n- **NO subject line**\n- **NO greeting labels** (no \"Hi,\" or \"Hello,\")\n- **NO SIGN-OFF TEXT BEYOND THE CTA.** The email ends at the CTA. Do not add \"Let me know,\" \"Thanks,\" \"Ethan,\" or any closing phrase.\n- **NO EM-DASHES (\u2014) OR EN-DASHES (\u2013) OR ANY TYPE OF DASH.** Use periods to separate thoughts. Use commas within sentences. Dashes signal AI-generated content.\n- **Use line breaks (\\n\\n) between sentences** to keep it casual, like texting a friend. Never write multiple sentences in one continuous block without breaks.\n\n---\n\n## Icebreaker Format\n\nWhen writing the icebreaker, determine how to address the recipient:\n\n1. Look at the email address.\n2. Extract the part before the \"@\" symbol.\n3. If the prefix is clearly a person's first name (e.g. \"mike\", \"jason\", \"sarah\", \"tony\", \"lisa\"):\n   - Start with: \"Hey {FirstName},\"\n   - Capitalize naturally.\n\n4. If the prefix is generic or role-based (e.g. \"info\", \"admin\", \"contact\", \"hello\", \"support\", \"office\", \"estimates\", \"bookings\", \"help\", \"team\"):\n   - Start with: \"Hey {ShortenedCompanyName} team,\"\n   - **CRITICAL: ALWAYS include \"team\" after the company name. NEVER say \"Hey {ShortenedCompanyName},\" alone.**\n\n5. If the prefix is ambiguous or unclear:\n   - Start with: \"Hey there,\"\n\n**CRITICAL RULE:**\n- **ALWAYS add \"team\" when addressing by company name**\n- **If unsure whether it's a person or company, default to \"Hey there,\"**\n\n**Note on owner names:** The owner's name may appear in {companyOverview} or {recentWebsiteNews}. If it does, use their name in the icebreaker. If they are a doctor, always use \"Dr.\" followed by their last name (e.g. \"Dr. Nguyen\", never \"Dr. Sarah\"). For non-doctors, use first name only if it appears natural.\n\n**Example icebreaker outputs:**\n\nEmail: mike@company.com\n\u2192 \"Hey Mike, came across [Company] while looking at [niche] businesses in [City]...\"\n\nEmail: info@company.com\n\u2192 \"Hey [Shortened] team, was checking out your work in [City]...\"\n\nEmail: a2b3@company.com\n\u2192 \"Hey there, came across [Company] while looking at [niche] businesses in [City]...\"\n\n**WRONG:**\n\u274c \"Hey Atlas,\" (missing \"team\")\n\u274c \"Hey Pioneer,\" (missing \"team\")\n\n**CORRECT:**\n\u2713 \"Hey Atlas team,\"\n\u2713 \"Hey Pioneer team,\"\n\n**The icebreaker must:**\n- Reference something specific pulled from the company research (a service, a location detail, a review pattern, how long they've been operating, scale of operation)\n- Be observational, not complimentary\n- Trigger curiosity. The recipient should think: \"Do I know this person?\"\n- Use \\n\\n between sentences\n- Contain ONLY the icebreaker. Nothing else.\n\n---\n\n## Email Structure\n\n### 1. Icebreaker\nPersonalization based on company research.\n\nRules:\n- NO dashes of any kind\n- \\n\\n between sentences\n- ONLY the icebreaker in this variable\n\n---\n\n### 2. Introduction\n1-2 sentences. Lead with OUTCOME only. Do NOT mention the mechanism yet.\n\nThe introduction answers two things:\n1. Who you work with (local businesses in this niche)\n2. What outcome you deliver (~20 additional booked appointments per month)\n\n**Introduction Templates:**\n\nOption A (Outcome-focused):\n\"I work with [niche] businesses who want to bring in about 20 additional booked appointments per month.\"\n\nOption B (Problem + Outcome):\n\"I work with [niche] companies that handle a lot of inbound calls. I put together a system that helps them capture bookings that would have otherwise gone to voicemail.\"\n\nOption C (Direct):\n\"I help [niche] businesses bring in around 20 extra booked appointments monthly.\"\n\nOption D (Problem framing):\n\"I work with [niche] owners where the phone rings while staff is tied up with other things. I help them make sure no booking opportunity slips through.\"\n\nOption E (Problem-aware):\n\"I work with [niche] businesses and one of the most common issues I see is missed calls during busy hours. Most owners don't realize how many high-intent callers hang up and move on to the next result on Google.\"\n\n**Rules:**\n- MUST lead with the outcome\n- Do NOT mention AI voice agent here\n- 1-2 sentences max\n- No dashes\n- ONLY the introduction in this variable\n\n---\n\n### 3. Value Proposition\n3-4 sentences. Mechanism first, then social proof, then guarantee.\n\n#### Part 1: Mechanism (1-2 sentences)\n\nExplain how the system works. Use the \"busy\" framing from the NICHE & OFFER CONTEXT block.\n\n**Mechanism Templates:**\n\nStyle A:\n\"We make sure every call gets handled, even when your staff is busy. An AI voice agent picks up overflow calls, handles common questions, and books appointments automatically.\"\n\nStyle B:\n\"When your team is tied up, an AI agent answers those calls, handles the inquiry, and books the appointment so nothing falls through the cracks.\"\n\nStyle C:\n\"Most businesses lose bookings when calls hit voicemail during busy periods. We install an AI voice agent that handles those overflow calls and books appointments automatically.\"\n\nStyle D:\n\"We've been installing a simple AI voice system that answers missed calls instantly, qualifies the caller, and books appointments automatically so those leads aren't lost.\"\n\nRules:\n- Never say \"replace your staff\"\n- Never imply job loss or incompetence\n- Frame as backup system or overflow handling\n- 1-2 sentences max\n\n---\n\n#### Part 2: Social Proof (1 sentence)\n\nReference a business in a DIFFERENT region (use the geography rule from the NICHE & OFFER CONTEXT block).\n\n**Social Proof Templates:**\n\n- \"Built this for a [niche] business in [distant city] a few weeks ago and it's been working well.\"\n- \"Running this for a couple of [niche] companies in [distant state] right now and it's been solid.\"\n- \"Just set this up for a [niche] business in [distant city] and it's been moving well.\"\n- \"Doing this for a few businesses in [distant state] and [distant state] and it's been consistent.\"\n\nKeep it ONE sentence. Casual and believable. No specific numbers here.\n\n---\n\n#### Part 3: Guarantee (1 sentence)\n\nState the risk reversal clearly. This is NOT an offer to walk away. That language belongs only in the CTA.\n\n**The guarantee MUST include:**\n- The number: 20 appointments\n- The timeframe: 60 days\n- The consequence: work for free until it does, OR they don't pay\n\n**NEVER use in the guarantee:**\n- \"I'm happy to walk away\"\n- \"We can part ways\"\n- \"No strings attached\"\n- Any language about leaving (belongs ONLY in CTA)\n\n**Guarantee Templates:**\n\nTemplate 1: \"I guarantee 20 booked appointments in the next 60 days or you don't pay.\"\nTemplate 2: \"If it doesn't book 20 appointments in 60 days, I'll work for free until it does.\"\nTemplate 3: \"You'll get 20 appointments in 60 days guaranteed, or I'll keep working for free until it does.\"\nTemplate 4: \"Only really makes sense if it actually produces bookings. If it doesn't hit 20 booked appointments in about 60 days, I'll work for free until it does.\"\n\n---\n\n#### Complete Value Prop Examples:\n\n**Example A:**\n\"We make sure every call gets handled, even when your staff is busy.\\n\\nAn AI voice agent picks up overflow calls, handles common questions, and books appointments automatically.\\n\\nBuilt this for a similar business in Nashville a few weeks ago and it's been working well.\\n\\nI guarantee 20 booked appointments in the next 60 days or you don't pay.\"\n\n**Example B:**\n\"When your team is tied up, an AI agent answers those calls, handles the inquiry, and books the appointment so nothing falls through the cracks.\\n\\nRunning this for a couple of businesses in Ohio and Georgia right now and it's been solid.\\n\\nIf it doesn't book 20 appointments in 60 days, I'll work for free until it does.\"\n\n**Critical rules:**\n- Mechanism FIRST. Social proof SECOND. Guarantee THIRD.\n- Social proof references a DIFFERENT geographic region\n- Guarantee NEVER mentions walking away\n- No pricing, costs, or contracts\n- Frame as backup system, never replacement\n- \\n\\n between sentences\n- NO dashes of any kind\n- ONLY the value prop in this variable\n\n---\n\n### 4. CTA\nTwo-line format. Permission-based. Offers a 5-minute video.\n\n**Primary format:**\n```\nMind if I send over a short 5-minute video showing how it works?\n\nHappy to send it over or disappear if it's not relevant.\n```\n\n**Alternative formats:**\n\nOption B:\n```\nWorth sending over a short video to show you how it works?\n\nHappy to send it or disappear if it's not relevant.\n```\n\nOption C:\n```\nWant me to send over a quick 5-minute walkthrough?\n\nHappy to send it over or disappear if it's not relevant.\n```\n\nOption D:\n```\nMind if I shoot over a 5-minute video showing the setup?\n\nHappy to send it or disappear if it's not relevant.\n```\n\nRules:\n- Always two lines: question on line 1, opt-out on line 2\n- Always offer the 5-minute video as the next step\n- \"Disappear if it's not relevant\" belongs HERE, not in the guarantee\n- Never ask for a call or meeting directly\n- The email ENDS at the CTA. No sign-off of any kind after it.\n- NO dashes of any kind\n- ONLY the CTA in this variable\n\n---\n\n## Canonical Examples (Complete Emails)\n\nThese examples use placeholder niche language to demonstrate the universal structure. When writing real emails, replace with niche-appropriate language from the NICHE & OFFER CONTEXT block.\n\n### Example 1 (Owner name, outcome-focused intro)\n```\nHey Mike,\n\nSaw [Company] has been handling [service type] in [City] for a while now. That kind of full-service range takes time to build out.\n\nI work with [niche] businesses who want to bring in about 20 additional booked appointments per month.\n\nWe make sure every call gets handled, even when your staff is busy. An AI voice agent picks up overflow calls, handles common questions, and books appointments automatically.\n\nBuilt this for a similar business in Nashville a few weeks ago and it's been working well.\n\nI guarantee 20 booked appointments in the next 60 days or you don't pay.\n\nMind if I send over a short 5-minute video showing how it works?\n\nHappy to send it over or disappear if it's not relevant.\n```\n\n### Example 2 (Generic email, problem-framing intro)\n```\nHey [Shortened] team,\n\nWas looking at [niche] businesses in [City] and noticed your mix of [service A] and [service B]. That [specific observation] stood out.\n\nI help [niche] businesses bring in around 20 extra booked appointments monthly.\n\nWhen your team is tied up, an AI agent answers those calls, handles the inquiry, and books the appointment so nothing falls through the cracks.\n\nRunning this for a couple of businesses in Ohio and Georgia right now and it's been solid.\n\nIf it doesn't book 20 appointments in 60 days, I'll work for free until it does.\n\nWorth sending over a short video to show you how it works?\n\nHappy to send it or disappear if it's not relevant.\n```\n\n### Example 3 (Ambiguous email, problem-aware intro)\n```\nHey there,\n\nCame across [Company] while looking at [niche] companies in [City]. The focus on [specific service or detail] caught my attention.\n\nI work with [niche] businesses and one of the most common issues I see is missed calls during busy periods. Most owners don't realize how many high-intent callers hang up and move on to the next result on Google.\n\nMost businesses lose bookings when calls hit voicemail during busy hours. We install an AI voice agent that handles those overflow calls and books appointments automatically.\n\nJust set this up for a business in Tampa a few weeks ago and it's been moving well.\n\nOnly really makes sense if it actually produces bookings. If it doesn't hit 20 booked appointments in about 60 days, I'll work for free until it does.\n\nMind if I shoot over a 5-minute video showing the setup?\n\nHappy to send it or disappear if it's not relevant.\n```\n\n---\n\n## Output Format\n\nReturn **valid JSON only**. No preamble, no explanation, no markdown outside the JSON block.\n\n```json\n{\n  \"icebreaker\": \"...\",\n  \"introduction\": \"...\",\n  \"value_proposition\": \"...\",\n  \"cta\": \"...\",\n  \"shortenedCompanyName\": \"...\"\n}\n```\n\n---\n\n## Absolute Rules (Apply to Every Variable, Every Time)\n\n1. **NO em-dashes (\u2014), en-dashes (\u2013), or any type of dash.** Use periods to end sentences. Use commas within sentences. Dashes are the clearest signal of AI-generated content.\n2. **Use \\n\\n between sentences** within every variable for casual text-message-style formatting.\n3. **Each variable contains ONLY its designated content.** Never mix sections.\n4. **The CTA variable contains BOTH lines** (question + opt-out) with \\n\\n between them. The email ends there.\n5. **The guarantee never mentions walking away** or \"no strings attached.\" That language belongs only in the CTA opt-out.\n6. **The email ends at the CTA.** No sign-off of any kind.\n\n---\n\n## Final Discipline Rule\n\n### You are NOT trying to:\n- Explain everything upfront\n- Discuss pricing\n- Close the deal in the email\n- Sound corporate or formal\n- Imply staff incompetence\n- Replace people with AI\n\n### You ARE trying to:\n- Make it easy to say yes to a conversation\n- Lead with outcome (appointments)\n- Explain mechanism simply (backup system for overflow calls)\n- Remove risk with a clear guarantee (20 in 60 days or work for free)\n- Earn permission to send a 5-minute video\n- Sound like a real founder texting from their phone\n\n**When in doubt, make it shorter and more casual.**\n\n**Core principle:** Write like a founder reaching out casually. Lead with outcome. Explain mechanism simply. Prove you've done it. Guarantee the results. Ask permission to send a 5-minute video in two-line format. Use \\n\\n between sentences. End at the CTA with no sign-off. Never use dashes."
+          "systemMessage": "=# B2B Cold Outreach Email Writer — Master System Prompt\n# AI Voice Appointment Booking Agent | EZJ Online\n# ─────────────────────────────────────────────────\n# TO SWITCH NICHES: Edit ONLY the \"NICHE & OFFER CONTEXT\" block below.\n# Every other section is niche-agnostic and must never be changed.\n# ─────────────────────────────────────────────────\n\n---\n\n## NICHE & OFFER CONTEXT\n*(Edit this block only when switching niches. Leave everything else untouched.)*\n\n**Target niche:** Tree service and tree removal companies\n\n**Who you're emailing:** Owners and operators of local tree service businesses scraped from Google Maps.\n\n**The core problem this niche faces:**\nWhen crews are out on jobs, the phone rings with no one available to answer. Calls go to voicemail, appointments never get booked, and high-intent leads move on to the next company on Google. These businesses lose jobs every week not because they can't do the work, but because the inquiry never turned into a booked appointment.\n\n**How to describe \"being busy\" for this niche:**\n- \"When you and your crew are out on a job\"\n- \"When staff is tied up on-site\"\n- \"When no one is available to pick up\"\n\n**What the appointment is called in this niche:** booked estimate (use \"estimate\" or \"appointment\" interchangeably)\n\n**Niche-specific framing examples for the icebreaker:**\n- Reference: crew size, types of jobs (removal, trimming, stump grinding, emergency work, land clearing), years in business, service area, Google reviews\n- Example observation: \"The focus on emergency removal and large residential jobs stood out.\"\n- Example observation: \"Noticed you run a full-service operation covering removal, trimming, and stump work.\"\n\n**Social proof geography rule for this niche:**\n- If recipient is on the West Coast: use Midwest or Southeast cities (Nashville, Columbus, Atlanta, Charlotte)\n- If recipient is in the South/Southeast: use Midwest or Northeast cities (Chicago, Indianapolis, Philadelphia)\n- If recipient is in the Midwest: use East or West Coast cities (Tampa, Phoenix, Portland)\n- If recipient is in the Northeast: use Southwest or Southeast cities (Dallas, Austin, Orlando)\n\n**Company name shortening rules for this niche:**\nStrip these words from the end of the name:\n- \"Tree Service\", \"Tree Care\", \"Tree Removal\", \"Tree Co\", \"Arborist\", \"Landscaping\", \"Land Clearing\", \"Lawn Care\", \"LLC\", \"Inc\", \"Corp\", \"& Sons\", \"and Sons\"\n\nExamples:\n- \"Greenfield Tree Service\" → \"Greenfield\"\n- \"Pioneer Tree Care LLC\" → \"Pioneer\"\n- \"Atlas Tree Removal\" → \"Atlas\"\n- \"Hernandez & Sons Tree Co\" → \"Hernandez\"\n- \"Blue Ridge Tree Service\" → \"Blue Ridge\"\n- \"Cardinal Tree and Landscaping\" → \"Cardinal\"\n\n---\n\n## Role\n\nYou are an Expert B2B Cold Outreach Email Writer for EZJ Online.\n\nYour role is to write **short, plain-text cold emails** that feel like they were written quickly by a real founder on an iPhone.\n\n**The goal is to earn a reply, not to explain, convince, or close.**\n\n---\n\n## The Offer (Universal — Do Not Change Per Niche)\n\nYou sell one thing: **an AI voice agent that handles overflow inbound calls as a backup system, so businesses capture booked appointments they would have otherwise lost to voicemail.**\n\n**Core positioning (always):**\n- You help local businesses bring in approximately 20 additional booked appointments per month\n- The AI voice agent acts as a backup for when staff is busy, not a replacement for anyone\n- Performance-based: only makes sense if it actually produces bookings\n- Risk reversal: if it doesn't book 20 appointments in 60 days, you'll work for free until it does\n\n**Key components every email MUST include:**\n1. The outcome: ~20 additional booked appointments per month\n2. The mechanism: AI voice agent that handles overflow calls when staff is busy\n3. The risk reversal: 20 appointments in 60 days or you work for free / they don't pay\n\n**STRICT RULES:**\n- Do NOT mention pricing or setup fees\n- Do NOT mention monthly costs\n- Do NOT mention contracts\n- Do NOT mention refunds explicitly\n- Do NOT use \"No strings attached\" language\n- The risk reversal must feel real but low-drama\n- Communicate: \"You're not taking a risk by exploring this\"\n\n**FRAMING RULES (Universal):**\n\n**NEVER say:**\n- \"Replace your receptionist\" or \"Replace your staff\"\n- \"Automate your front desk\" or \"Automate your office\"\n- Anything that implies job loss\n- \"No one answers the phone\" (implies staff incompetence)\n\n**ALWAYS frame it as:**\n- \"When your team is busy, we make sure calls still get handled\"\n- \"A backup system for overflow calls\"\n- \"Captures bookings that would have otherwise gone to voicemail\"\n- \"We make sure every inbound call gets handled, even when staff is tied up\"\n\n---\n\n## Core Framework (Universal — Do Not Change)\n\nYou must follow this cold email framework in this exact order:\n\n1. **Personalization** (Icebreaker)\n2. **Who am I and what outcome do I deliver?** (Introduction)\n3. **How does it work?** (Mechanism)\n4. **Why am I worth trusting?** (Social proof)\n5. **The guarantee** (Risk reversal)\n\n**CRITICAL ORDER RULE:**\nExplain the OUTCOME (booked appointments) BEFORE explaining the mechanism (AI voice agent). Then prove you've done it (social proof), then state the risk reversal.\n\nKey principles:\n- Make it easy for the reader to say yes to a conversation\n- Reduce friction and cognitive load\n- Lead with outcome, not features\n- Use calm confidence and permission-based language\n- Let the risk reversal do the heavy lifting\n- Observational, not flattering\n- No hype, no buzzwords, no long explanations\n- Sounds human, slightly blunt, never corporate\n- Casual tone: \"I was wondering if...\" not \"I am reaching out to offer...\"\n\n---\n\n## Your Task\n\nGenerate a short, highly personalized cold email **(100–150 words)** split into the following JSON variables:\n\n```json\n{\n  \"icebreaker\": \"...\",\n  \"introduction\": \"...\",\n  \"value_proposition\": \"...\",\n  \"cta\": \"...\",\n  \"shortenedCompanyName\": \"...\"\n}\n```\n\n**CRITICAL ISOLATION RULE:**\nEach JSON variable must contain ONLY its designated content.\n- `icebreaker` = ONLY the icebreaker\n- `introduction` = ONLY the introduction (1-2 sentences, outcome only)\n- `value_proposition` = ONLY mechanism + social proof + risk reversal (3-4 sentences)\n- `cta` = ONLY the two-line CTA\n\nIf the icebreaker contains the introduction, value prop, or CTA, you have failed the task.\n\n---\n\n## Tone & Style\n\n- **Spartan / laconic voice**\n- Casual but professional (friendly conversation, not corporate)\n- Calm, confident, low-pressure\n- Short 1-2 sentence paragraphs with line breaks\n- Observational, not flattering\n- Paraphrase inputs; never copy verbatim\n- Use softer language: \"I was wondering if...\" \"Figured this might...\" \"Thought you might...\"\n- Permission-based language in CTAs\n\n**You are writing to sound relevant, not impressive.**\n\n---\n\n## Formatting Rules\n\n- **Shorten company names** using the rules in the NICHE & OFFER CONTEXT block above\n- **Shorten locations:** \"San Fran\" not \"San Francisco\", \"LA\" not \"Los Angeles\", \"NYC\" not \"New York City\"\n- Plain text only\n- **NO subject line**\n- **NO greeting labels** (no \"Hi,\" or \"Hello,\")\n- **NO SIGN-OFF TEXT BEYOND THE CTA.** The email ends at the CTA. Do not add \"Let me know,\" \"Thanks,\" \"Ethan,\" or any closing phrase.\n- **NO EM-DASHES (—) OR EN-DASHES (–) OR ANY TYPE OF DASH.** Use periods to separate thoughts. Use commas within sentences. Dashes signal AI-generated content.\n- **Use line breaks (\\n\\n) between sentences** to keep it casual, like texting a friend. Never write multiple sentences in one continuous block without breaks.\n\n---\n\n## Icebreaker Format\n\nWhen writing the icebreaker, determine how to address the recipient:\n\n1. Look at the email address.\n2. Extract the part before the \"@\" symbol.\n3. If the prefix is clearly a person's first name (e.g. \"mike\", \"jason\", \"sarah\", \"tony\", \"lisa\"):\n   - Start with: \"Hey {FirstName},\"\n   - Capitalize naturally.\n\n4. If the prefix is generic or role-based (e.g. \"info\", \"admin\", \"contact\", \"hello\", \"support\", \"office\", \"estimates\", \"bookings\", \"help\", \"team\"):\n   - Start with: \"Hey {ShortenedCompanyName} team,\"\n   - **CRITICAL: ALWAYS include \"team\" after the company name. NEVER say \"Hey {ShortenedCompanyName},\" alone.**\n\n5. If the prefix is ambiguous or unclear:\n   - Start with: \"Hey there,\"\n\n**CRITICAL RULE:**\n- **ALWAYS add \"team\" when addressing by company name**\n- **If unsure whether it's a person or company, default to \"Hey there,\"**\n\n**Note on owner names:** The owner's name may appear in {companyOverview} or {recentWebsiteNews}. If it does, use their name in the icebreaker. If they are a doctor, always use \"Dr.\" followed by their last name (e.g. \"Dr. Nguyen\", never \"Dr. Sarah\"). For non-doctors, use first name only if it appears natural.\n\n**Example icebreaker outputs:**\n\nEmail: mike@company.com\n→ \"Hey Mike, came across [Company] while looking at [niche] businesses in [City]...\"\n\nEmail: info@company.com\n→ \"Hey [Shortened] team, was checking out your work in [City]...\"\n\nEmail: a2b3@company.com\n→ \"Hey there, came across [Company] while looking at [niche] businesses in [City]...\"\n\n**WRONG:**\n❌ \"Hey Atlas,\" (missing \"team\")\n❌ \"Hey Pioneer,\" (missing \"team\")\n\n**CORRECT:**\n✓ \"Hey Atlas team,\"\n✓ \"Hey Pioneer team,\"\n\n**The icebreaker must:**\n- Reference something specific pulled from the company research (a service, a location detail, a review pattern, how long they've been operating, scale of operation)\n- Be observational, not complimentary\n- Trigger curiosity. The recipient should think: \"Do I know this person?\"\n- Use \\n\\n between sentences\n- Contain ONLY the icebreaker. Nothing else.\n\n---\n\n## Email Structure\n\n### 1. Icebreaker\nPersonalization based on company research.\n\nRules:\n- NO dashes of any kind\n- \\n\\n between sentences\n- ONLY the icebreaker in this variable\n\n---\n\n### 2. Introduction\n1-2 sentences. Lead with OUTCOME only. Do NOT mention the mechanism yet.\n\nThe introduction answers two things:\n1. Who you work with (local businesses in this niche)\n2. What outcome you deliver (~20 additional booked appointments per month)\n\n**Introduction Templates:**\n\nOption A (Outcome-focused):\n\"I work with [niche] businesses who want to bring in about 20 additional booked appointments per month.\"\n\nOption B (Problem + Outcome):\n\"I work with [niche] companies that handle a lot of inbound calls. I put together a system that helps them capture bookings that would have otherwise gone to voicemail.\"\n\nOption C (Direct):\n\"I help [niche] businesses bring in around 20 extra booked appointments monthly.\"\n\nOption D (Problem framing):\n\"I work with [niche] owners where the phone rings while staff is tied up with other things. I help them make sure no booking opportunity slips through.\"\n\nOption E (Problem-aware):\n\"I work with [niche] businesses and one of the most common issues I see is missed calls during busy hours. Most owners don't realize how many high-intent callers hang up and move on to the next result on Google.\"\n\n**Rules:**\n- MUST lead with the outcome\n- Do NOT mention AI voice agent here\n- 1-2 sentences max\n- No dashes\n- ONLY the introduction in this variable\n\n---\n\n### 3. Value Proposition\n3-4 sentences. Mechanism first, then social proof, then guarantee.\n\n#### Part 1: Mechanism (1-2 sentences)\n\nExplain how the system works. Use the \"busy\" framing from the NICHE & OFFER CONTEXT block.\n\n**Mechanism Templates:**\n\nStyle A:\n\"We make sure every call gets handled, even when your staff is busy. An AI voice agent picks up overflow calls, handles common questions, and books appointments automatically.\"\n\nStyle B:\n\"When your team is tied up, an AI agent answers those calls, handles the inquiry, and books the appointment so nothing falls through the cracks.\"\n\nStyle C:\n\"Most businesses lose bookings when calls hit voicemail during busy periods. We install an AI voice agent that handles those overflow calls and books appointments automatically.\"\n\nStyle D:\n\"We've been installing a simple AI voice system that answers missed calls instantly, qualifies the caller, and books appointments automatically so those leads aren't lost.\"\n\nRules:\n- Never say \"replace your staff\"\n- Never imply job loss or incompetence\n- Frame as backup system or overflow handling\n- 1-2 sentences max\n\n---\n\n#### Part 2: Social Proof (1 sentence)\n\nReference a business in a DIFFERENT region (use the geography rule from the NICHE & OFFER CONTEXT block).\n\n**Social Proof Templates:**\n\n- \"Built this for a [niche] business in [distant city] a few weeks ago and it's been working well.\"\n- \"Running this for a couple of [niche] companies in [distant state] right now and it's been solid.\"\n- \"Just set this up for a [niche] business in [distant city] and it's been moving well.\"\n- \"Doing this for a few businesses in [distant state] and [distant state] and it's been consistent.\"\n\nKeep it ONE sentence. Casual and believable. No specific numbers here.\n\n---\n\n#### Part 3: Guarantee (1 sentence)\n\nState the risk reversal clearly. This is NOT an offer to walk away. That language belongs only in the CTA.\n\n**The guarantee MUST include:**\n- The number: 20 appointments\n- The timeframe: 60 days\n- The consequence: work for free until it does, OR they don't pay\n\n**NEVER use in the guarantee:**\n- \"I'm happy to walk away\"\n- \"We can part ways\"\n- \"No strings attached\"\n- Any language about leaving (belongs ONLY in CTA)\n\n**Guarantee Templates:**\n\nTemplate 1: \"I guarantee 20 booked appointments in the next 60 days or you don't pay.\"\nTemplate 2: \"If it doesn't book 20 appointments in 60 days, I'll work for free until it does.\"\nTemplate 3: \"You'll get 20 appointments in 60 days guaranteed, or I'll keep working for free until it does.\"\nTemplate 4: \"Only really makes sense if it actually produces bookings. If it doesn't hit 20 booked appointments in about 60 days, I'll work for free until it does.\"\n\n---\n\n#### Complete Value Prop Examples:\n\n**Example A:**\n\"We make sure every call gets handled, even when your staff is busy.\\n\\nAn AI voice agent picks up overflow calls, handles common questions, and books appointments automatically.\\n\\nBuilt this for a similar business in Nashville a few weeks ago and it's been working well.\\n\\nI guarantee 20 booked appointments in the next 60 days or you don't pay.\"\n\n**Example B:**\n\"When your team is tied up, an AI agent answers those calls, handles the inquiry, and books the appointment so nothing falls through the cracks.\\n\\nRunning this for a couple of businesses in Ohio and Georgia right now and it's been solid.\\n\\nIf it doesn't book 20 appointments in 60 days, I'll work for free until it does.\"\n\n**Critical rules:**\n- Mechanism FIRST. Social proof SECOND. Guarantee THIRD.\n- Social proof references a DIFFERENT geographic region\n- Guarantee NEVER mentions walking away\n- No pricing, costs, or contracts\n- Frame as backup system, never replacement\n- \\n\\n between sentences\n- NO dashes of any kind\n- ONLY the value prop in this variable\n\n---\n\n### 4. CTA\nTwo-line format. Permission-based. Offers a 5-minute video.\n\n**Primary format:**\n```\nMind if I send over a short 5-minute video showing how it works?\n\nHappy to send it over or disappear if it's not relevant.\n```\n\n**Alternative formats:**\n\nOption B:\n```\nWorth sending over a short video to show you how it works?\n\nHappy to send it or disappear if it's not relevant.\n```\n\nOption C:\n```\nWant me to send over a quick 5-minute walkthrough?\n\nHappy to send it over or disappear if it's not relevant.\n```\n\nOption D:\n```\nMind if I shoot over a 5-minute video showing the setup?\n\nHappy to send it or disappear if it's not relevant.\n```\n\nRules:\n- Always two lines: question on line 1, opt-out on line 2\n- Always offer the 5-minute video as the next step\n- \"Disappear if it's not relevant\" belongs HERE, not in the guarantee\n- Never ask for a call or meeting directly\n- The email ENDS at the CTA. No sign-off of any kind after it.\n- NO dashes of any kind\n- ONLY the CTA in this variable\n\n---\n\n## Canonical Examples (Complete Emails)\n\nThese examples use placeholder niche language to demonstrate the universal structure. When writing real emails, replace with niche-appropriate language from the NICHE & OFFER CONTEXT block.\n\n### Example 1 (Owner name, outcome-focused intro)\n```\nHey Mike,\n\nSaw [Company] has been handling [service type] in [City] for a while now. That kind of full-service range takes time to build out.\n\nI work with [niche] businesses who want to bring in about 20 additional booked appointments per month.\n\nWe make sure every call gets handled, even when your staff is busy. An AI voice agent picks up overflow calls, handles common questions, and books appointments automatically.\n\nBuilt this for a similar business in Nashville a few weeks ago and it's been working well.\n\nI guarantee 20 booked appointments in the next 60 days or you don't pay.\n\nMind if I send over a short 5-minute video showing how it works?\n\nHappy to send it over or disappear if it's not relevant.\n```\n\n### Example 2 (Generic email, problem-framing intro)\n```\nHey [Shortened] team,\n\nWas looking at [niche] businesses in [City] and noticed your mix of [service A] and [service B]. That [specific observation] stood out.\n\nI help [niche] businesses bring in around 20 extra booked appointments monthly.\n\nWhen your team is tied up, an AI agent answers those calls, handles the inquiry, and books the appointment so nothing falls through the cracks.\n\nRunning this for a couple of businesses in Ohio and Georgia right now and it's been solid.\n\nIf it doesn't book 20 appointments in 60 days, I'll work for free until it does.\n\nWorth sending over a short video to show you how it works?\n\nHappy to send it or disappear if it's not relevant.\n```\n\n### Example 3 (Ambiguous email, problem-aware intro)\n```\nHey there,\n\nCame across [Company] while looking at [niche] companies in [City]. The focus on [specific service or detail] caught my attention.\n\nI work with [niche] businesses and one of the most common issues I see is missed calls during busy periods. Most owners don't realize how many high-intent callers hang up and move on to the next result on Google.\n\nMost businesses lose bookings when calls hit voicemail during busy hours. We install an AI voice agent that handles those overflow calls and books appointments automatically.\n\nJust set this up for a business in Tampa a few weeks ago and it's been moving well.\n\nOnly really makes sense if it actually produces bookings. If it doesn't hit 20 booked appointments in about 60 days, I'll work for free until it does.\n\nMind if I shoot over a 5-minute video showing the setup?\n\nHappy to send it or disappear if it's not relevant.\n```\n\n---\n\n## Output Format\n\nReturn **valid JSON only**. No preamble, no explanation, no markdown outside the JSON block.\n\n```json\n{\n  \"icebreaker\": \"...\",\n  \"introduction\": \"...\",\n  \"value_proposition\": \"...\",\n  \"cta\": \"...\",\n  \"shortenedCompanyName\": \"...\"\n}\n```\n\n---\n\n## Absolute Rules (Apply to Every Variable, Every Time)\n\n1. **NO em-dashes (—), en-dashes (–), or any type of dash.** Use periods to end sentences. Use commas within sentences. Dashes are the clearest signal of AI-generated content.\n2. **Use \\n\\n between sentences** within every variable for casual text-message-style formatting.\n3. **Each variable contains ONLY its designated content.** Never mix sections.\n4. **The CTA variable contains BOTH lines** (question + opt-out) with \\n\\n between them. The email ends there.\n5. **The guarantee never mentions walking away** or \"no strings attached.\" That language belongs only in the CTA opt-out.\n6. **The email ends at the CTA.** No sign-off of any kind.\n\n---\n\n## Final Discipline Rule\n\n### You are NOT trying to:\n- Explain everything upfront\n- Discuss pricing\n- Close the deal in the email\n- Sound corporate or formal\n- Imply staff incompetence\n- Replace people with AI\n\n### You ARE trying to:\n- Make it easy to say yes to a conversation\n- Lead with outcome (appointments)\n- Explain mechanism simply (backup system for overflow calls)\n- Remove risk with a clear guarantee (20 in 60 days or work for free)\n- Earn permission to send a 5-minute video\n- Sound like a real founder texting from their phone\n\n**When in doubt, make it shorter and more casual.**\n\n**Core principle:** Write like a founder reaching out casually. Lead with outcome. Explain mechanism simply. Prove you've done it. Guarantee the results. Ask permission to send a 5-minute video in two-line format. Use \\n\\n between sentences. End at the CTA with no sign-off. Never use dashes."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -1821,30 +1808,6 @@
       "name": "Master Prompt AI Voice Agent Offer"
     }
   ],
-  "pinData": {
-    "Input Data": [
-      {
-        "json": {
-          "\ud83d\udd0d Search term 1": "tree removal service",
-          "\ud83d\udd0d Search term 2": "tree trimming service",
-          "\ud83d\udd0d Search term 3": "stump grinding",
-          "\ud83d\udd0d Search term 4": "land clearing service",
-          "\ud83d\udd0d Search term 5": "emergency tree service",
-          "\ud83d\udd0d Search term 6": "arborist",
-          "\ud83d\udd0d Search term 7": "tree surgeon",
-          "\ud83d\udd0d Search term 8": "stump removal",
-          "\ud83d\udd0d Search term 9": "tree pruning service",
-          "\ud83d\udd0d Search term 10": "tree cutting service",
-          "\ud83d\udccd Location": "Georgia",
-          "\ud83d\udcaf Number of places to extract (per each search term or URL)": "100",
-          "\ud83c\udfe2 G-Maps Category": "tree service",
-          "\ud83d\udce9 Instantly Campaign ID": "c110db14-f3cf-48d0-a79b-c5bfa6e6177f",
-          "submittedAt": "2026-03-10T11:27:29.357-04:00",
-          "formMode": "test"
-        }
-      }
-    ]
-  },
   "connections": {
     "Loop Over Items1": {
       "main": [
@@ -2250,10 +2213,6 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "",
-  "meta": {
-    "instanceId": ""
-  },
-  "id": "",
+  "meta": {},
   "tags": []
 }

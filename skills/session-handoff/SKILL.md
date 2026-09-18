@@ -4,7 +4,6 @@ description: Generate a comprehensive copy-paste-ready handoff document that cap
 allowed-tools: Read, Write, Bash, Glob, Grep
 ---
 
-> **Demo Library Skill** — This skill is from a demo library. Some values use placeholders (e.g. `{{USER_NAME}}`, `{{TIMEZONE}}`). If something doesn't work, check for placeholder values and replace them with your own information first.
 
 # Session Handoff
 

@@ -1,0 +1,45 @@
+# EZJ Automations
+
+Free Claude Code skills, n8n templates and prompts from [EZJ Online](https://www.ezjonline.com). The same ones I use to run my own business.
+
+**Every resource has a page with a one-click install prompt: [ezjonline.com/resources](https://www.ezjonline.com/resources)**
+
+## Skills
+
+| Skill | What it does | Page |
+|---|---|---|
+| [`dashboard`](skills/dashboard) | Builds a data dashboard that looks like a designer made it, in one HTML file | [Install](https://www.ezjonline.com/resources/dashboard-skill) |
+| [`humanizer`](skills/humanizer) | Rewrites any copy so it stops sounding like AI | |
+| [`session-handoff`](skills/session-handoff) | Writes a handoff doc so you can clear Claude Code without losing a decision | |
+| [`session-close`](skills/session-close) | Checks what a Claude Code session actually got done | |
+| [`ezj-handoff-doc`](skills/ezj-handoff-doc) | One-page handoff docs for the developers who build for us | |
+
+More skills in their own repos: [Hormozi skill](https://github.com/ezjonline/hormozi-skill) · [Cold outreach skill](https://github.com/ezjonline/cold-outreach-skill)
+
+### Install a skill
+
+Paste this into Claude Code, swapping in the skill name:
+
+```
+Install the <skill-name> skill from https://github.com/ezjonline/ezj-automations/tree/main/skills/<skill-name> into ~/.claude/skills/<skill-name>, then confirm it is available.
+```
+
+## n8n templates
+
+| Template | What it does |
+|---|---|
+| [`IG_Research_Agent_Demo.json`](n8n%20templates/IG_Research_Agent_Demo.json) | Finds the reels breaking out in your niche and turns them into hooks and ideas. [Guide](https://www.ezjonline.com/resources/ig-research-agent) |
+| [`EZJ_GM_Lead_Scraper.json`](n8n%20templates/EZJ_GM_Lead_Scraper.json) | Scrapes Google Maps for local businesses, finds emails, researches them and writes the first email |
+| [`Content_OS.json`](n8n%20templates/Content_OS.json) | YouTube research, an idea bot and posting, run through Notion and Slack |
+
+Import in n8n with **Workflows → Import from file**, then add your own credentials. Every ID in these files is a `YOUR_...` placeholder.
+
+## Prompts
+
+- [Nano Banana Pro prompts](prompts/higgsfield-nano-banana-prompts.md)
+
+## Want it built for you?
+
+[Book a free AI Audit](https://www.ezjonline.com/ai-audit). You leave with a plan for your business, whether or not we work together.
+
+MIT licensed. Use anything here, in your business or your clients'.
