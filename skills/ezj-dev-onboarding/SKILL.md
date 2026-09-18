@@ -15,6 +15,7 @@ Many developers speak English as a second language. Write short, simple sentence
 - One step per message. Wait for the developer before moving on.
 - Check things yourself whenever you can (run the command) instead of asking.
 - Commands the developer must run themselves because they open a browser or ask for input: tell them to type them in this Claude Code session with a `!` in front, for example `! gh auth login`.
+- Already onboarded (progress file says `level` 5)? Just run `bash ~/.claude/skills/ezj-dev-onboarding/scripts/setup_workspace.sh "$(cat ~/.claude/ezj-workspace-path 2>/dev/null || echo ~/ezj-online)"`, say "✅ you're up to date, auto updates are on", and stop.
 - Save progress after every step to `~/.claude/ezj-onboarding.json` as valid JSON (escape any `"` or `\` in names), written with your file tool, so a new session can pick up where it stopped. At the start, if that file exists, read it, say which level they are on, and continue from there.
 - Keep a running score at the top of each level, like `🎮 Level 2 of 4 · 3 of 7 tools done`.
 
@@ -97,7 +98,9 @@ It copies the workspace (CLAUDE.md, docs/, clients/) without overwriting anythin
 
 > Every project goes in `clients/<client>/<repo>`. The CLAUDE.md at the top holds our rules, so any Claude Code session you start inside this folder already knows how we work. Start every project from here.
 
-Save `checks.workspace` and `checks.skills` from the script's last line.
+It also turns on auto updates: every time they open Claude Code, the latest EZJ rules, docs and skills download on their own. Tell them in one line, and that their own notes go in `CLAUDE.local.md`, never in `CLAUDE.md`.
+
+Save `checks.workspace`, `checks.skills` and `checks.auto_update` from the script's last line.
 
 ### 3b. Read the 4 SOPs, with a quiz
 
@@ -140,7 +143,8 @@ loom: <their loom link>
 
 ## Output
 
-- `~/ezj-online/` with CLAUDE.md, docs/ (4 SOPs), clients/README.md
+- `~/ezj-online/` with CLAUDE.md (auto updated), CLAUDE.local.md (theirs), docs/ (auto updated), clients/README.md
+- A SessionStart hook in `~/.claude/settings.json` that runs `scripts/sync.sh` (backup at `settings.json.bak-ezj`)
 - 4 skills in `~/.claude/skills/`
 - `~/.claude/ezj-onboarding.json` with level 5
 - Two Slack cards in Ethan's #onboarding channel (started, completed)

@@ -1,5 +1,7 @@
 # EZJ Online developer workspace
 
+> Managed by EZJ Online and updated automatically at the start of every Claude Code session. Don't edit this file, your changes get replaced. Put your own notes in `CLAUDE.local.md` next to it.
+
 This folder is where a developer builds every project for EZJ Online, Ethan's AI agency. Any Claude Code session started inside it (or inside any project under `clients/`) loads this file, so Claude already knows how we work.
 
 ## Who's who
@@ -12,8 +14,9 @@ This folder is where a developer builds every project for EZJ Online, Ethan's AI
 
 ```
 ~/ezj-online/
-  CLAUDE.md          these rules
-  docs/              the 4 SOPs, read them once, come back when unsure
+  CLAUDE.md          these rules, auto updated
+  CLAUDE.local.md    your own notes, never touched
+  docs/              the SOPs, auto updated, read them when unsure
   clients/<client>/<repo>/   one folder per client, one repo per project
 ```
 
@@ -46,3 +49,7 @@ Start every project with `/ezj-start-project <issue link>`. It clones the repo i
 - Blocker messages are the exception: write those exactly, with click by click steps (see docs/02_work_and_communicate.md).
 - Only touch the files the issue needs. Never rewrite shared files like the root README unless the issue asks.
 - No dashes as punctuation in anything written for Ethan or clients.
+
+## When the rules change
+
+A session can start with a note that the EZJ Online rules were updated. Tell the developer in one line what changed, then follow the new rules. The newest docs/ and this file always win over anything older, including an issue template or an old habit.
