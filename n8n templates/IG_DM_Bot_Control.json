@@ -1,0 +1,585 @@
+{
+  "name": "IG DM Bot Control (TEMPLATE)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# Setup\n**Accounts you need:** n8n (with the public API enabled), ManyChat Pro connected to Instagram, Slack.\n\n**1. How your DM bot must be wired.** Your ManyChat automation sends each incoming DM to an n8n workflow through an External Request with full contact data, received on a node named **Webhook**. That workflow's id is YOUR_DM_BOT_WORKFLOW_ID (it is in its URL). This template reads its last 200 executions to match an Instagram handle to a ManyChat subscriber id, so the person must have DM'd you recently.\n\n**2. ManyChat custom fields used.** bot_paused (true/false), force_on (true/false), test_ai_until (number), conversation_summary, current_phase (number), AI > Answer 1 to AI > Answer 6, AI > User Messages. If yours are named differently, edit **Build mutation body** and **Resolve subscriber_id**.\n\n**3. Replace placeholders.**\n**Validate request:** YOUR_SHARED_SECRET (long random string) and YOUR_IG_HANDLE. Optional: BOT_NAME and AVATAR.\n**Fetch n8n executions:** YOUR_N8N_HOST and YOUR_DM_BOT_WORKFLOW_ID.\n**Build confirm message:** YOUR_SLACK_CHANNEL_ID.\n\n**4. Connect credentials.**\nHeader Auth on **Fetch n8n executions**: name `X-N8N-API-KEY`, value `YOUR_N8N_API_KEY` (n8n Settings, n8n API).\nHeader Auth on both ManyChat nodes: name `Authorization`, value `Bearer YOUR_MANYCHAT_TOKEN` (ManyChat Settings, API).\nSlack API on **Slack: control confirm**: bot token `YOUR_SLACK_BOT_TOKEN` with chat:write, bot invited to the channel.\n\n**5. Activate and use.**\n`https://YOUR_N8N_HOST/webhook/dm-bot-control?action=off&u=HANDLE&s=YOUR_SHARED_SECRET`\nSave that as an iPhone Shortcut (Ask for Input for the handle, Get Contents of URL, Show Result) for one tap control.\n\nAnyone with the secret can control your bot. Keep the link private and change the secret if it leaks.",
+        "height": 820,
+        "width": 520,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -980,
+        -1260
+      ],
+      "id": "35bc4419-d36e-41c6-958a-b4e4aeac40f4",
+      "name": "Setup"
+    },
+    {
+      "parameters": {
+        "content": "## IG DM Bot Control\nOne link turns your ManyChat Instagram DM bot ON, OFF, or resets its memory for a single person, without opening ManyChat. It finds the person's ManyChat subscriber id in your DM bot workflow's recent executions, flips their custom fields, answers with a small confirmation card, and pings Slack.\n\n`?action=on|off|reset|status&u=<handle or profile link>&s=<secret>` (add `&fmt=text` for plain text)",
+        "height": 300,
+        "width": 520,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -980,
+        -420
+      ],
+      "id": "cbf6529e-c7f8-49a1-8f0d-7d4ecede8d84",
+      "name": "About"
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "dm-bot-control",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -960,
+        0
+      ],
+      "name": "Webhook",
+      "id": "6b4a8124-347c-4f5d-8001-36db0b3ce264",
+      "webhookId": "666d7ae8-7159-445c-8569-2dcb47796a88"
+    },
+    {
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "// ===== SETUP: edit these =====\nconst SECRET = \"YOUR_SHARED_SECRET\";   // any long random string, sent as &s=\nconst IG_HANDLE = \"YOUR_IG_HANDLE\";    // your Instagram account, without the @\nconst BOT_NAME = \"DM Bot\";             // name shown on the confirmation card\n// Optional avatar for the card. iOS Shortcuts \"Show Result\" blocks remote images,\n// so paste a data URI here (data:image/jpeg;base64,...). Leave empty for a plain circle.\nconst AVATAR = \"\";\n// ==============================\n\nconst q = (($input.first().json && $input.first().json.query) || {});\nconst action = String(q.action || '').toLowerCase().trim();\n// u can be a handle, an @handle, or a shared profile link\n// (instagram.com/name?igsh=...).\nfunction extractHandle(input) {\n  const t = String(input || '').trim();\n  if (!t) return '';\n  if (/instagram\\.com\\/(p|reel|reels|stories)\\//i.test(t)) return '';\n  const m = t.match(/instagram\\.com\\/([a-zA-Z0-9._]+)/i);\n  const h = (m ? m[1] : t.replace(/^@/, '')).toLowerCase();\n  return /^[a-z0-9._]{1,30}$/.test(h) ? h : '';\n}\nconst usernameRaw = extractHandle(q.u);\nconst provided = String(q.s || '').trim();\nif (provided !== SECRET) {\n  return [{ json: { ok: false, message: 'forbidden' } }];\n}\nconst VALID_ACTIONS = ['off', 'on', 'reset', 'status'];\nif (!VALID_ACTIONS.includes(action)) {\n  return [{ json: { ok: false, message: `bad action. one of: ${VALID_ACTIONS.join(', ')}` } }];\n}\nif (!usernameRaw) {\n  return [{ json: { ok: false, message: 'missing u (ig_username)' } }];\n}\n// Confirmation card for the iOS Shortcut. fmt=text gets plain text.\nconst esc = s => String(s).replace(/[&<>\"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;' }[c]));\nconst STATES = {\n  on:      { color: '#22c55e', title: 'Bot ON',    sub: `${BOT_NAME} answers their next message.`, text: 'Bot ON for @H. It answers their next message.' },\n  off:     { color: '#ef4444', title: 'Bot OFF',   sub: `${BOT_NAME} steps back. You've got the conversation.`, text: 'Bot OFF for @H. You have the conversation.' },\n  reset:   { color: '#f5a524', title: 'Bot reset', sub: 'Memory wiped. It starts fresh on their next message.', text: 'Bot reset for @H. Memory wiped.' },\n  unknown: { color: '#f5a524', title: 'Not found', sub: `They haven't DM'd you recently, so ${BOT_NAME} can't find them.`, text: `Can't find @H. They have to DM @${IG_HANDLE} first, then try again.` },\n};\nfunction card(kind, handle, fmt) {\n  const s = STATES[kind];\n  const h = String(handle).replace(/[^a-z0-9._]/g, '');\n  if (fmt === 'text') return s.text.replace('@H', '@' + h);\n  const pic = AVATAR ? `<img src=\"${esc(AVATAR)}\" alt=\"\">` : '<div class=\"ph\"></div>';\n  return `<!doctype html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>html,body{margin:0;background:#0a0a0a;color:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,\"Helvetica Neue\",sans-serif;text-align:center}body{padding:32px 20px}.av{position:relative;display:inline-block}.av img,.av .ph{width:112px;height:112px;border-radius:50%;border:3px solid #f47c20;box-shadow:0 0 44px rgba(244,124,32,.45);display:block}.av .ph{background:#1c1c1e}.st{position:absolute;right:6px;bottom:6px;width:22px;height:22px;border-radius:50%;background:${s.color};border:3px solid #0a0a0a}.k{font-size:12px;letter-spacing:3px;font-weight:700;color:#f47c20;margin-top:18px}h1{font-size:30px;margin:6px 0 4px;font-weight:800}.h{font-size:18px;color:${s.color};font-weight:600}.s{font-size:15px;color:#8e8e93;margin:10px auto 0;max-width:280px;line-height:1.4}</style></head><body><div class=\"av\">${pic}<span class=\"st\"></span></div><div class=\"k\">${esc(BOT_NAME.toUpperCase())}</div><h1>${s.title}</h1><div class=\"h\">@${h}</div><div class=\"s\">${esc(s.sub)}</div></body></html>`;\n}\nconst fmt = String(q.fmt || '').toLowerCase() === 'text' ? 'text' : 'html';\nreturn [{ json: {\n  ok: true, action, ig_username: usernameRaw,\n  reply_ok: STATES[action] ? card(action, usernameRaw, fmt) : '',\n  reply_unknown: card('unknown', usernameRaw, fmt),\n  content_type: fmt === 'text' ? 'text/plain; charset=utf-8' : 'text/html; charset=utf-8',\n} }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -760,
+        0
+      ],
+      "name": "Validate request",
+      "id": "a13f122a-3b93-4a58-b165-1c5f78ace30a"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e2a8f205-0ab4-4bfb-82bc-f949117b8412",
+              "leftValue": "={{ $json.ok }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -560,
+        0
+      ],
+      "name": "Authorized?",
+      "id": "d0aaafee-3ed9-4974-a99f-437f405a370d"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=forbidden: {{ $json.message }}",
+        "options": {
+          "responseCode": 403
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        -360,
+        200
+      ],
+      "name": "Respond forbidden",
+      "id": "a403ea24-28c7-42d3-a10b-7eb21db4434b"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://YOUR_N8N_HOST/api/v1/executions?workflowId=YOUR_DM_BOT_WORKFLOW_ID&limit=200&includeData=true",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -360,
+        -80
+      ],
+      "name": "Fetch n8n executions",
+      "id": "940194f9-de0a-4011-b023-db6dc5cbc874",
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "n8n API (X-N8N-API-KEY header)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "// Pull the original action+ig_username from Validate request (because\n// the upstream HTTP call replaced $json with the n8n executions list).\nconst validated = $('Validate request').first().json || {};\nconst action = validated.action;\nconst target = String(validated.ig_username || '').toLowerCase().trim();\n\nconst allRuns = $('Fetch n8n executions').all();\nlet resolved = null;\nlet lastSeen = '';\nlet lastMsg = '';\nfor (const it of allRuns) {\n  const exes = (it.json && it.json.data) || [];\n  for (const ex of exes) {\n    try {\n      const body = ex.data.resultData.runData.Webhook[0].data.main[0][0].json.body;\n      const ig = String(body.ig_username || '').toLowerCase().replace(/^@/, '').trim();\n      if (ig !== target) continue;\n      const started = ex.startedAt || '';\n      if (!resolved || started > lastSeen) {\n        resolved = body.id;\n        lastSeen = started;\n        lastMsg = (body.custom_fields && body.custom_fields['AI > User Messages']) || '';\n      }\n    } catch (e) {}\n  }\n}\nreturn [{ json: {\n  action,\n  ig_username: target,\n  resolved,\n  last_seen: lastSeen,\n  last_msg: lastMsg,\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        -80
+      ],
+      "name": "Resolve subscriber_id",
+      "id": "49fd6d3d-abc1-4b67-a76f-c025e2cd6983"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c8d76ecc-3532-4ed8-8be9-9247baf65f34",
+              "leftValue": "={{ $json.resolved }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        40,
+        -80
+      ],
+      "name": "Resolved?",
+      "id": "6f44b680-a885-44c6-8aa5-38253a518939"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $('Validate request').first().json.reply_unknown }}",
+        "options": {
+          "responseCode": 404,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "={{ $('Validate request').first().json.content_type }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        100
+      ],
+      "name": "Respond unknown user",
+      "id": "0f13a9b9-e8bd-4940-8158-10a8c97d37ec"
+    },
+    {
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "const action = $json.action;\nconst sid = $json.resolved;\nlet fields;\nif (action === 'off') {\n  // Same as the bot form: silence it and clear both bypasses so it\n  // cannot sneak back on.\n  fields = [\n    { field_name: 'bot_paused', field_value: true },\n    { field_name: 'force_on', field_value: false },\n    { field_name: 'test_ai_until', field_value: 0 },\n  ];\n} else if (action === 'on') {\n  // The bot is silent by default, so ON has to arm it (force_on), not just unpause.\n  fields = [\n    { field_name: 'bot_paused', field_value: false },\n    { field_name: 'force_on', field_value: true },\n  ];\n} else if (action === 'reset') {\n  fields = [\n    { field_name: 'conversation_summary', field_value: null },\n    { field_name: 'current_phase', field_value: 0 },\n    { field_name: 'AI > Answer 1', field_value: null },\n    { field_name: 'AI > Answer 2', field_value: null },\n    { field_name: 'AI > Answer 3', field_value: null },\n    { field_name: 'AI > Answer 4', field_value: null },\n    { field_name: 'AI > Answer 5', field_value: null },\n    { field_name: 'AI > Answer 6', field_value: null },\n    { field_name: 'bot_paused', field_value: false },\n  ];\n} else {\n  fields = null;\n}\nconst body = fields ? JSON.stringify({ subscriber_id: Number(sid) || sid, fields }) : null;\nreturn [{ json: { ...$json, mutation_body: body } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        -180
+      ],
+      "name": "Build mutation body",
+      "id": "4d13cb8e-aee5-4aa4-836a-07c902a8bb86"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2f2fe32d-9472-4b56-be01-ec9dab54714e",
+              "leftValue": "={{ $json.action }}",
+              "rightValue": "status",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        440,
+        -180
+      ],
+      "name": "Status branch?",
+      "id": "7bf433f0-bc1e-4ced-9bb3-50666e8378ed"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.manychat.com/fb/subscriber/getInfo?subscriber_id={{ $json.resolved }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        640,
+        -260
+      ],
+      "name": "ManyChat getInfo",
+      "id": "6e434a67-bcef-4cfc-bddc-45e66909503d",
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "ManyChat API (Authorization header)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=@{{ $('Resolve subscriber_id').first().json.ig_username }} (sid={{ $('Resolve subscriber_id').first().json.resolved }})\nlast_seen: {{ $('Resolve subscriber_id').first().json.last_seen }}\nlast_msg: {{ $('Resolve subscriber_id').first().json.last_msg }}\n\n{{ JSON.stringify($json.data.custom_fields, null, 2) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        840,
+        -260
+      ],
+      "name": "Respond status",
+      "id": "7b6f2c80-fc2c-4d2a-b3e0-af731354af06"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.manychat.com/fb/subscriber/setCustomFields",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.mutation_body }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        640,
+        -100
+      ],
+      "name": "ManyChat setCustomFields",
+      "id": "3311087d-2af5-4b2b-85e1-165c46d54d94",
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "ManyChat API (Authorization header)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $('Validate request').first().json.reply_ok }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "={{ $('Validate request').first().json.content_type }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        840,
+        -100
+      ],
+      "name": "Respond mutation",
+      "id": "39bbeb99-10e2-4db5-8273-cf040e12d799"
+    },
+    {
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "const action = $('Build mutation body').first().json.action;\nconst handle = $('Resolve subscriber_id').first().json.ig_username;\nconst lastMsg = String($('Resolve subscriber_id').first().json.last_msg || '').slice(0, 120);\nconst labels = { on: '🟢 turned ON', off: '🔴 turned OFF', reset: '♻️ reset' };\nconst label = labels[action] || action;\nconst lines = [`IG DM bot ${label} for @${handle}`];\nif (lastMsg) lines.push(`last msg: \"${lastMsg}\"`);\nlines.push('via phone shortcut / dashboard control');\nreturn [{ json: { slack_body: JSON.stringify({\n  channel: \"YOUR_SLACK_CHANNEL_ID\", // a channel id (C...) or your own user id (U...) for a DM\n  text: lines.join('\\n'),\n}) } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        60
+      ],
+      "name": "Build confirm message",
+      "id": "abc3910f-e6f3-4948-af69-0f36b62ffb8e"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://slack.com/api/chat.postMessage",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.slack_body }}",
+        "options": {
+          "timeout": 15000,
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        },
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "slackApi"
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        840,
+        60
+      ],
+      "name": "Slack: control confirm",
+      "onError": "continueRegularOutput",
+      "id": "3015956a-84b3-43ce-b225-abfd70dd1a8f",
+      "credentials": {
+        "slackApi": {
+          "name": "Slack account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate request": {
+      "main": [
+        [
+          {
+            "node": "Authorized?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Authorized?": {
+      "main": [
+        [
+          {
+            "node": "Fetch n8n executions",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond forbidden",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch n8n executions": {
+      "main": [
+        [
+          {
+            "node": "Resolve subscriber_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolve subscriber_id": {
+      "main": [
+        [
+          {
+            "node": "Resolved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolved?": {
+      "main": [
+        [
+          {
+            "node": "Build mutation body",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond unknown user",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build mutation body": {
+      "main": [
+        [
+          {
+            "node": "Status branch?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Status branch?": {
+      "main": [
+        [
+          {
+            "node": "ManyChat getInfo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ManyChat setCustomFields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ManyChat getInfo": {
+      "main": [
+        [
+          {
+            "node": "Respond status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ManyChat setCustomFields": {
+      "main": [
+        [
+          {
+            "node": "Respond mutation",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Build confirm message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build confirm message": {
+      "main": [
+        [
+          {
+            "node": "Slack: control confirm",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {},
+  "tags": []
+}
