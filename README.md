@@ -9,9 +9,11 @@ Free Claude Code skills, n8n templates and prompts from [EZJ Online](https://www
 | Skill | What it does | Page |
 |---|---|---|
 | [`dashboard`](skills/dashboard) | Builds a data dashboard that looks like a designer made it, in one HTML file | [Install](https://www.ezjonline.com/resources/dashboard-skill) |
-| [`humanizer`](skills/humanizer) | Rewrites any copy so it stops sounding like AI | |
-| [`session-handoff`](skills/session-handoff) | Writes a handoff doc so you can clear Claude Code without losing a decision | |
-| [`session-close`](skills/session-close) | Checks what a Claude Code session actually got done | |
+| [`humanizer`](skills/humanizer) | Rewrites any copy so it stops sounding like AI | [Install](https://www.ezjonline.com/resources/humanizer) |
+| [`session-handoff`](skills/session-handoff) | Writes a handoff doc so you can clear Claude Code without losing a decision | [Install](https://www.ezjonline.com/resources/session-handoff) |
+| [`session-close`](skills/session-close) | Checks what a Claude Code session actually got done | [Install](https://www.ezjonline.com/resources/session-close) |
+| [`discount-codes`](skills/discount-codes) | Screenshot any checkout, get the discount codes that actually work | [Install](https://www.ezjonline.com/resources/discount-codes) |
+| [`roast`](skills/roast) | Five personas pressure-test your idea, then one verdict: GO, RESHAPE or KILL | [Install](https://www.ezjonline.com/resources/roast) |
 | [`ezj-handoff-doc`](skills/ezj-handoff-doc) | One-page handoff docs for the developers who build for us | |
 
 More skills in their own repos: [Hormozi skill](https://github.com/ezjonline/hormozi-skill) · [Cold outreach skill](https://github.com/ezjonline/cold-outreach-skill)
