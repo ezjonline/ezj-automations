@@ -13,8 +13,11 @@ node_v=""; has node && node_v=$(ver node --version)
 vercel_user=""
 if has npx; then
   # --yes installs vercel into the npx cache on first run without a prompt
-  vercel_user=$(npx --yes vercel whoami 2>/dev/null | tail -1 | tr -d '\r"')
-  case "$vercel_user" in *" "*|"") vercel_user="" ;; esac
+  # logged out exits non zero and prints a JSON error, so trust the exit code, not the text
+  if out=$(npx --yes vercel whoami 2>/dev/null); then
+    vercel_user=$(printf '%s' "$out" | tail -1 | tr -d '\r"')
+    case "$vercel_user" in *" "*|*"{"*|*"}"*) vercel_user="" ;; esac
+  fi
 fi
 os=$(uname -s 2>/dev/null || echo unknown)
 

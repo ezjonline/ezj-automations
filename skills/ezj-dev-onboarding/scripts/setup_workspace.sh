@@ -6,6 +6,7 @@ TARGET="${1:-$HOME/ezj-online}"
 TARGET="${TARGET/#\~/$HOME}"
 REPO="$HOME/.ezj-automations"
 SRC="$HOME/.claude/skills/ezj-dev-onboarding"
+[ -d "$SRC/workspace" ] || { echo "The onboarding skill folder is missing. Paste the onboarding prompt again."; exit 1; }
 
 if [ -d "$REPO/.git" ]; then git -C "$REPO" pull -q 2>/dev/null; else
   git clone -q --depth 1 https://github.com/ezjonline/ezj-automations.git "$REPO"; fi

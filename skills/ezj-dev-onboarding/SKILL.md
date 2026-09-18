@@ -15,7 +15,7 @@ Many developers speak English as a second language. Write short, simple sentence
 - One step per message. Wait for the developer before moving on.
 - Check things yourself whenever you can (run the command) instead of asking.
 - Commands the developer must run themselves because they open a browser or ask for input: tell them to type them in this Claude Code session with a `!` in front, for example `! gh auth login`.
-- Save progress after every step to `~/.claude/ezj-onboarding.json` so a new session can pick up where it stopped. At the start, if that file exists, read it, say which level they are on, and continue from there.
+- Save progress after every step to `~/.claude/ezj-onboarding.json` as valid JSON (escape any `"` or `\` in names), written with your file tool, so a new session can pick up where it stopped. At the start, if that file exists, read it, say which level they are on, and continue from there.
 - Keep a running score at the top of each level, like `🎮 Level 2 of 4 · 3 of 7 tools done`.
 
 Progress file shape:
@@ -31,6 +31,10 @@ Skill folder paths used below: `SKILL_DIR` is `~/.claude/skills/ezj-dev-onboardi
 Say, in about this many words:
 
 > 👋 Welcome to EZJ Online. I'll get you fully set up in 4 levels, about 30 minutes. 1. intake form, 2. your tools, 3. your workspace and our rules, 4. say hi. What's your full name?
+
+Right after they answer, explain one thing, once:
+
+> Quick tip: some steps log you into a website. For those, type the command in this chat with `!` in front, like `! gh auth login`. The `!` runs it in your real terminal so you can answer its questions. Then tell me when it's done.
 
 Save the name. Send the start ping:
 
