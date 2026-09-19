@@ -16,7 +16,7 @@ Stopped halfway? Open Claude Code again and paste the same prompt. It picks up w
 
 ## Staying up to date
 
-Setup adds a SessionStart hook that runs `scripts/sync.sh` when Claude Code opens. At most once an hour it pulls this repo and refreshes the EZJ managed files: `~/ezj-online/CLAUDE.md`, `~/ezj-online/docs/`, and the `ezj-*` skills. When something changed, Claude tells the developer what. The developer's own notes go in `~/ezj-online/CLAUDE.local.md`, which sync never touches. To change a rule for every developer, edit `workspace/` or `project_skills/` here and push.
+Setup adds a SessionStart hook that runs `scripts/sync.sh` when Claude Code opens. At most once an hour it pulls this repo and refreshes the EZJ managed files: `~/ezj-online/CLAUDE.md`, `~/ezj-online/docs/`, and the `ezj-*` skills. When something changed, Claude tells the developer what. The developer's own notes go in `~/ezj-online/CLAUDE.local.md`, which sync never touches. To change a rule for every developer, edit `workspace/` or `project_skills/` here and push. To give every developer a new skill, add its folder name to `skills.txt` and push. Removing a line removes that skill from their machines (only skills installed from this list, never their own).
 
 ## What you end up with
 

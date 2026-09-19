@@ -100,7 +100,7 @@ It copies the workspace (CLAUDE.md, docs/, clients/) without overwriting anythin
 
 It also turns on auto updates: every time they open Claude Code, the latest EZJ rules, docs and skills download on their own. Tell them in one line, and that their own notes go in `CLAUDE.local.md`, never in `CLAUDE.md`.
 
-Save `checks.workspace`, `checks.skills` and `checks.auto_update` from the script's last line.
+Save `checks.workspace`, `checks.skills` and `checks.auto_update` from the script's last line. **`auto_update` must be true before moving on.** If it's false: Node is usually missing (fix Level 2 step 3 and rerun the script), or `~/.claude/settings.json` isn't valid JSON (show them the error, fix the file with them, rerun). Never skip this, it's how they get every new rule and skill.
 
 ### 3b. Bring in existing EZJ projects (only if they have any)
 
@@ -190,6 +190,7 @@ A developer pastes the onboarding prompt. Claude asks their name, pings started,
 - Never overwrite a developer's own files. Only EZJ managed files (CLAUDE.md, docs/, ezj-* skills) get refreshed.
 - Never move, delete or edit an existing project folder. Copy only, through adopt_repo.sh.
 - Never post to Slack for them. They post the #general message themselves.
+- Never send the completed ping with `checks.auto_update` false.
 - Never send the completed ping before the Loom link is in, all 4 quiz answers are right, and all 6 scenarios are answered.
 - Never hint, show the rubric, or offer multiple choice in the scenario round. Grade the first answer honestly, a generous grade hides a risk from Ethan.
 - Never use dashes as punctuation in anything you write for them.

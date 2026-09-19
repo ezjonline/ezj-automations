@@ -1,0 +1,8 @@
+# Skills every EZJ Online developer gets. One per line, a folder under skills/ in this repo.
+# Add a line and push: every developer has it at their next Claude Code session.
+# Remove a line: it gets removed from their machines too (only skills installed from this list).
+ezj-dev-onboarding
+ezj-handoff-doc
+ezj-dev-onboarding/project_skills/ezj-start-project
+ezj-dev-onboarding/project_skills/ezj-deliver
+ezj-dev-onboarding/project_skills/ezj-blocked

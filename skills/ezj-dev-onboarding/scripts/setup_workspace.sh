@@ -50,9 +50,10 @@ elif command -v node >/dev/null 2>&1; then
 fi
 
 ok_skills=true
-for s in ezj-start-project ezj-deliver ezj-blocked ezj-handoff-doc; do
+for s in $(cat "$HOME/.claude/.ezj-managed-skills" 2>/dev/null); do
   [ -f "$HOME/.claude/skills/$s/SKILL.md" ] || ok_skills=false
 done
+[ -s "$HOME/.claude/.ezj-managed-skills" ] || ok_skills=false
 
 echo "Workspace: $TARGET"
 (cd "$TARGET" && find . -not -path '*/.git*' -not -path './clients/*/*' | sort | sed 's/^\.\///' | sed '/^\.$/d' | sed 's/^/  /')
