@@ -35,6 +35,15 @@ Start every project with `/ezj-start-project <issue link>`. It clones the repo i
 9. **One message, one place.** Slack only. No GitHub mentions to get attention, no WhatsApp doubles, no "just checking in".
 10. **Deadlines:** most projects take 1 week, big ones 2. Say you'll miss it before the date, never after.
 
+## Your commands
+
+- `/ezj-start-project <issue link>`: start a project the right way
+- `/ezj-blocked`: a real blocker, written so Ethan can act in one click
+- `/ezj-deliver`: checks all 4 delivery parts before you send
+- `/ezj-handoff-doc`: the handoff page
+- `/session-close`: end of session, did I finish what I started
+- `/session-handoff`: long session or stopping mid task, so the next session picks up exactly here
+
 ## Security, no exceptions
 
 - Never commit secrets. Keys live in `.env`, and `.env` is in `.gitignore`.

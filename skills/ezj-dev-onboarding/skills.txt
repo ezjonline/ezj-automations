@@ -6,3 +6,5 @@ ezj-handoff-doc
 ezj-dev-onboarding/project_skills/ezj-start-project
 ezj-dev-onboarding/project_skills/ezj-deliver
 ezj-dev-onboarding/project_skills/ezj-blocked
+session-close
+session-handoff

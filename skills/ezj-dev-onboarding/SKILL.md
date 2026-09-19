@@ -94,7 +94,7 @@ Ask where to put it. Default `~/ezj-online`. Then run:
 bash ~/.claude/skills/ezj-dev-onboarding/scripts/setup_workspace.sh ~/ezj-online
 ```
 
-It copies the workspace (CLAUDE.md, docs/, clients/) without overwriting anything that exists, and installs 4 skills into `~/.claude/skills`: `ezj-start-project`, `ezj-deliver`, `ezj-blocked`, `ezj-handoff-doc`. Show them the tree it prints and explain it in 3 lines:
+It copies the workspace (CLAUDE.md, docs/, clients/) without overwriting anything that exists, and installs every skill in `skills.txt` into `~/.claude/skills` (today: `ezj-start-project`, `ezj-deliver`, `ezj-blocked`, `ezj-handoff-doc`, `session-close`, `session-handoff`). Show them the tree it prints and explain it in 3 lines:
 
 > Every project goes in `clients/<client>/<repo>`. The CLAUDE.md at the top holds our rules, so any Claude Code session you start inside this folder already knows how we work. Start every project from here.
 
@@ -147,6 +147,21 @@ Say: "Last part of level 3. I'll describe 6 real situations from our projects. T
 Read `~/.claude/skills/ezj-dev-onboarding/references/scenarios.md` and run it exactly as it says: one scenario per message, no hints, no options, grade the first answer (plus one neutral follow up), then coach in one or two sentences.
 
 Save `scenarios` like `5/6` and `scenario_notes` like `S3 miss: would wait quietly for access; S5 pass`. Level done when all 6 are answered. A low score doesn't block finishing, Ethan sees it on his card.
+
+### 3e. Your toolkit (2 min)
+
+Show this table, then ask them to pick the one they'd use at the end of a work day and say why. Any sensible answer passes.
+
+| Type this | When |
+|---|---|
+| `/ezj-start-project <issue link>` | You got a new project. Sets up the folder and a plan |
+| `/ezj-blocked` | Only Ethan or the client can unblock you |
+| `/ezj-deliver` | You're done and ready to send it for review |
+| `/ezj-handoff-doc` | Makes the handoff page (`/ezj-deliver` runs it for you) |
+| `/session-close` | End of a session: did I finish what I started, what's still open |
+| `/session-handoff` | Session getting long or you're stopping mid task: writes a note so a fresh session continues exactly where you left off |
+
+Tell them: these update themselves, and Ethan adds new ones over time. Type `/` in Claude Code to see them all.
 
 ## Level 4. Say hi (2 min)
 
