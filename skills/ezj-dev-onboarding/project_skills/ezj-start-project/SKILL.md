@@ -9,7 +9,7 @@ Turns an issue link into a cloned repo in the right folder, a clear understandin
 
 ## Inputs
 
-- The GitHub issue or epic link. If missing, ask for it.
+- The GitHub issue or epic link. If missing, ask for it. Usually it arrives inside the kickoff prompt from the Slack card's 📋 Copy context button, which also names the client slug and the brief path.
 - The client name, from the Slack kickoff card. Ask once. For dev trials or internal work use `ezj-online`.
 
 ## Process
@@ -21,7 +21,7 @@ Turns an issue link into a cloned repo in the right folder, a clear understandin
    mkdir -p ~/ezj-online/clients/<client-slug>
    gh repo clone <owner>/<repo> ~/ezj-online/clients/<client-slug>/<repo>
    ```
-4. Read, in this order, whatever exists: the repo's `CLAUDE.md`, `docs/DEVELOPMENT_BRIEF.md`, `docs/CLIENT_CONTEXT.md`, then the issue with comments (`gh issue view <n> --repo <owner>/<repo> --comments`). If it's an epic, read every sub-issue it links, with comments.
+4. Read, in this order, whatever exists: the repo's `CLAUDE.md`, the brief, the client context, then the issue with comments (`gh issue view <n> --repo <owner>/<repo> --comments`). If it's an epic, read every sub-issue it links, with comments. The brief is `docs/DEVELOPMENT_BRIEF.md`, or `docs/<project>/DEVELOPMENT_BRIEF.md` in a repo with several projects (the kickoff prompt or the epic names the path), with `CLIENT_CONTEXT.md` next to it.
 5. Reply with exactly:
    - **What we're building** (1 line)
    - **Who it's for** (1 line)
