@@ -17,7 +17,7 @@ Many developers speak English as a second language. Write short, simple sentence
 - Commands the developer must run themselves because they open a browser or ask for input: tell them to type them in this Claude Code session with a `!` in front, for example `! gh auth login`.
 - Already onboarded (progress file says `level` 5)? Just run `bash ~/.claude/skills/ezj-dev-onboarding/scripts/setup_workspace.sh "$(cat ~/.claude/ezj-workspace-path 2>/dev/null || echo ~/ezj-online)"`, then do step 3b (bring in existing projects), say "✅ you're up to date, auto updates are on", and stop.
 - Save progress after every step to `~/.claude/ezj-onboarding.json` as valid JSON (escape any `"` or `\` in names), written with your file tool, so a new session can pick up where it stopped. At the start, if that file exists, read it, say which level they are on, and continue from there.
-- Keep a running score at the top of each level, like `🎮 Level 2 of 4 · 3 of 7 tools done`.
+- Keep a running score at the top of each level, like `🎮 Level 2 of 4 · 3 of 10 tools done`.
 
 Progress file shape:
 
@@ -100,7 +100,19 @@ Do the tools in this order, one message each:
    - Wise is not open to residents (Nigeria, Pakistan, Bangladesh, Kenya, Ghana, Egypt, Indonesia, Vietnam, Sri Lanka, Nepal, Uganda): skip Wise, Ethan pays their local bank. Save `pay_method` as `Local bank`. If unsure, the test is simple: try to sign up.
    - Either way, they fill in https://tally.so/r/yPOx7X once. Tell them to never send bank details in Slack, WhatsApp or GitHub.
 
-Rerun `check_env.sh` at the end. Save the results to `checks`. Level done when GitHub, Node and Vercel pass and they confirmed the rest.
+9. **🎥 Fathom. Required.** A note taker that joins their calls, records them and writes the transcript. Every call they are on with Ethan or a client, their own Fathom is in it, from their own account. Ethan's Fathom feeds his systems, not theirs, and they should never have to ask him for a transcript to know what they were asked to build.
+   - Sign up free at https://fathom.video with the same email as the intake form.
+   - **Connect their calendar.** This is the step that matters, it is what makes it join on its own.
+   - Turn on auto record for every meeting.
+   - Tell them: two note takers in one call is normal here, not a mistake. Transcripts are confidential, they hold prices and what people get paid, and they never leave Fathom and Notion.
+   - Ask them to confirm all three: account, calendar connected, auto record on.
+10. **🎙️ Wispr Flow. Optional, and Ethan recommends it.** They hold a key, talk, and it types what they said, cleaned up, into Slack, Notion or Claude. It is not a note taker and it does not record calls. Most of a dev's day here is explaining things in writing, to Ethan or to Claude, and talking is about three times faster than typing.
+   - Sign up at https://wisprflow.ai/r?ETHAN815
+   - **Get the desktop app.** The browser version is not the thing.
+   - **Go through their onboarding**, people who skip it give up on day one.
+   - Say plainly that this one is a preference, not a rule, and nobody is checking. Take "not now" as a fine answer and move on without selling it twice.
+
+Rerun `check_env.sh` at the end. Save the results to `checks`. Level done when GitHub, Node and Vercel pass, Fathom is confirmed (account, calendar, auto record), and they confirmed the rest. Wispr Flow never blocks.
 
 ## Level 3. Your workspace, our rules, real situations (20 min)
 
