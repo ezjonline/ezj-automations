@@ -22,7 +22,7 @@ Many developers speak English as a second language. Write short, simple sentence
 Progress file shape:
 
 ```json
-{"name": "", "github": "", "slack_name": "", "country": "", "claude_plan": "", "pay_method": "", "loom": "", "level": 1, "done": [], "checks": {}, "quiz": "", "scenarios": "", "scenario_notes": ""}
+{"name": "", "github": "", "slack_name": "", "country": "", "claude_plan": "", "pay_method": "", "profile_slack": false, "profile_notion": false, "loom": "", "level": 1, "done": [], "checks": {}, "quiz": "", "scenarios": "", "scenario_notes": ""}
 ```
 
 Skill folder paths used below: `SKILL_DIR` is `~/.claude/skills/ezj-dev-onboarding`. The full repo was cloned to `~/.ezj-automations` by the onboarding prompt. If it is missing, run `git clone --depth 1 https://github.com/ezjonline/ezj-automations.git ~/.ezj-automations`.
@@ -43,14 +43,32 @@ Save the name. Send the start ping:
 bash ~/.claude/skills/ezj-dev-onboarding/scripts/notify.sh started
 ```
 
-## Level 1. Intake form (2 min)
+## Level 1. Intake form and your profile (5 min)
 
-Ask: "Have you filled out the EZJ Online dev intake form yet? yes or no."
+**1a. Intake form.** Ask: "Have you filled out the EZJ Online dev intake form yet? yes or no."
 
 - No: send the link https://tally.so/r/Xx6jYO and say "Fill it in now, I'll wait. Use the email you'll use for everything else. Say done when you've hit submit."
 - Yes: move on.
 
-Level done when they say it's submitted.
+**1b. Your name and face.** This one is not optional and you do not move past it. Say:
+
+> Before anything else, two minutes on your profile. We work across a dozen time zones and have never met. When your name shows up as an email address with a grey circle, nobody knows who answered them or whose work they're looking at. So: your real name and a real photo of your face, in Slack and in Notion.
+>
+> **Slack:** click your photo top right, Profile, Edit. Full name = your real first and last name, not your email, not a company name. Photo = a clear shot of your actual face, shoulders up, good light. A phone selfie in daylight is perfect.
+>
+> **Notion:** open https://www.notion.so/my-settings , click your name at the top of the Settings panel, set Preferred name to your real name and add the same photo.
+>
+> Not a real photo of you: no AI portraits, no logos, no avatars, no group shots. Same photo in both so people recognise you.
+
+Then ask them to confirm each one separately: "Slack done? and Notion done?"
+
+- **Do not continue to Level 2 until they confirm Slack.** If they say they will do it later, say it takes two minutes and wait. This is the one step in the whole onboarding that blocks.
+- **No Notion invite yet?** That is fine and common. Get Slack done now, record `profile_notion` as `"pending"`, tell them to do Notion the same day their invite lands, and remind them once at Level 4.
+- Save `profile_slack` and `profile_notion` to the progress file as `true` or `"pending"`.
+
+Full SOP, if they want it in writing: the "Set up your profile: Slack and Notion" page in the SOPs database in Notion.
+
+Level done when the intake form is submitted and Slack shows their real name and face.
 
 ## Level 2. Your tools (15 min)
 
@@ -165,6 +183,7 @@ Tell them: these update themselves, and Ethan adds new ones over time. Type `/` 
 
 ## Level 4. Say hi (2 min)
 
+0. If `profile_notion` is `"pending"`, remind them once: "Your Notion invite should be in by now. Two minutes: https://www.notion.so/my-settings , real name and the same photo as Slack." Update the progress file with their answer.
 1. Ask them to record a 30 second Loom at https://www.loom.com : who they are, where they are, what they're best at. Camera on is a plus. They paste the link.
 2. Check the link starts with `https://www.loom.com/share/` or `https://loom.com/share/`. If not, ask again.
 3. Save `loom`, set `level` to 5, then send the finish ping:
