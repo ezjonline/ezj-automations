@@ -173,4 +173,4 @@ Ask instead for **confirmation that access was granted**, and have them invite y
 - **There is no `THANK_YOU_PAGE` block type.** A thank you screen is a `PAGE_BREAK` flagged `isThankYouPage`, with the copy in the blocks after it. The builder handles this for you.
 - **TITLE blocks must not share a `groupUuid` with their input block.** Tally changed this in May 2026 and getting it wrong renders a silently blank form. The builder already separates them.
 - **The respond page is cached for a few seconds after a write.** Wait about five seconds before verifying.
-- **Building forms through the API needs a paid Tally plan.** On the free plan, Tally branding also shows at the bottom of every form. Mention it once if it matters for a client-facing form, then let it go.
+- **The API works on Tally's free plan.** Verified against a live free account. The free plan does show a small Tally badge at the bottom of every form, which is the only thing paying removes. Mention it once if it matters for a client-facing form, then let it go.
