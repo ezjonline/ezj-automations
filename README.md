@@ -19,6 +19,7 @@ Free Claude Code skills, n8n templates and prompts from [EZJ Online](https://www
 | [`roast`](skills/roast) | Five personas pressure-test your idea, then one verdict: GO, RESHAPE or KILL | [Install](https://www.ezjonline.com/resources/roast) |
 | [`ezj-handoff-doc`](skills/ezj-handoff-doc) | One-page handoff docs anyone can understand | [Install](https://www.ezjonline.com/resources/handoff-doc) |
 | [`proposal-builder`](skills/proposal-builder) | Turns a sales call transcript into a finished, priced client proposal as one web page | [Install](https://www.ezjonline.com/resources/proposal-builder) |
+| [`tally-forms`](skills/tally-forms) | Builds a branded, multi-step Tally form through the API, in your colours, in about a minute | [Install](https://www.ezjonline.com/resources/tally-forms) |
 
 More skills in their own repos: [Hormozi skill](https://github.com/ezjonline/hormozi-skill) · [Cold outreach skill](https://github.com/ezjonline/cold-outreach-skill)
 
