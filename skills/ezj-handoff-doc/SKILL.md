@@ -1,12 +1,12 @@
 ---
 name: ezj-handoff-doc
-description: Turns a finished build into a branded EZJ Online handoff doc, one self contained HTML page in black and orange that explains what was built, how it works, how to test it, how to set it up, what breaks it, and what is still needed, in plain English anyone can follow, with diagrams, status pills and real numbers. Then publishes it to a link and writes the Slack delivery message. Use when a developer says "make the handoff doc", "create a handoff doc", "handoff doc for this project", "/ezj-handoff-doc", "I'm ready to deliver", "write up what I built for Ethan", or when EZJ Online needs a client facing project update page. Do not use for priced proposals, AI audit reports, data dashboards, or a continuation note for a new Claude session.
+description: Turns a finished build into a branded EZJ Online handoff doc, one self contained HTML page in black and orange that explains what was built, how it works, how to test it, how to set it up, what breaks it, and what is still needed, in plain English anyone can follow, with diagrams, status pills and real numbers. Then publishes it to a link and writes the Slack delivery message. Use when a developer says "make the handoff doc", "create a handoff doc", "handoff doc for this project", "/ezj-handoff-doc", "I'm ready to deliver", "write up what I built for Ethan". This is the internal doc for Ethan, never the one a client reads. Do not use for priced proposals, AI audit reports, data dashboards, or a continuation note for a new Claude session.
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 
 # EZJ Handoff Doc
 
-Produces one HTML page that lets Ethan (and his client, and the next developer) understand a finished build in about five minutes without opening GitHub, reading code, or asking the developer a single question. It sits next to a Loom walkthrough and a pull request. It is the written half of every delivery to EZJ Online.
+Produces one HTML page that lets Ethan (and the next developer) understand a finished build in about five minutes without opening GitHub, reading code, or asking the developer a single question. It sits next to a Loom walkthrough and a pull request. It is the written half of every delivery to EZJ Online.
 
 The bar: a smart person who has never seen the project reads it once and can explain what it does, test it, set it up from zero, and fix the three most likely problems. If they would need to message the developer, the doc failed.
 
@@ -14,7 +14,9 @@ The look is fixed. Black, orange `#F47C20`, Montserrat and Open Sans, the EZJ On
 
 ## When to use
 
-Use at the end of a build, in the same Claude Code session and repo where the work was done, so the whole context is available. Also use for a client facing project update page.
+Use at the end of a build, in the same Claude Code session and repo where the work was done, so the whole context is available.
+
+This is the **internal** handoff. Ethan reads it to see what you built, how to use it and how to configure it, so keep the setup, settings, failure modes and status in full. Do not water it down for the client. Ethan turns it into a short client guide himself.
 
 Do not use for a proposal with pricing, an AI audit report, a live data dashboard, a README, or a note that helps a new Claude session continue work.
 

@@ -1,6 +1,6 @@
 # Writing the handoff doc
 
-The reader is Ethan, then his client, then the next developer. None of them wrote the code. Some read English as a second language. All of them are busy. Write for that.
+The reader is Ethan, then the next developer. The client never reads this doc, Ethan writes them a separate short guide from it. None of them wrote the code. Some read English as a second language. All of them are busy. Write for that.
 
 ## The five minute rule
 
