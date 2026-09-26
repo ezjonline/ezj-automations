@@ -121,6 +121,30 @@ if (words < 250) warn(`${words} words. That is probably too thin to set this up 
 const kb = Math.round(Buffer.byteLength(html) / 1024);
 if (kb > 600) warn(`${kb} KB. Big embedded images slow the page. Shrink or drop them.`);
 
+// Skill freshness: the branding lives in the public repo. An installed copy never updates
+// itself, so a developer can keep shipping an old logo forever. Compare the logo bytes
+// against the canonical copy and say so. Network trouble warns, it never blocks a delivery.
+const CANON = 'https://raw.githubusercontent.com/ezjonline/ezj-automations/main/skills/ezj-handoff-doc/assets/ezj-logo-white.png';
+try {
+  const ac = new AbortController();
+  const t = setTimeout(() => ac.abort(), 6000);
+  const res = await fetch(CANON, { signal: ac.signal });
+  clearTimeout(t);
+  if (res.ok) {
+    const canonBytes = Buffer.from(await res.arrayBuffer());
+    const mine = readFileSync(LOGO_PNG);
+    if (!canonBytes.equals(mine)) {
+      fail('Your installed copy of this skill has an out of date EZJ logo. Reinstall it, then run this again:\n'
+        + '        Reinstall the Claude Code skill from https://github.com/ezjonline/ezj-automations/tree/main/skills/ezj-handoff-doc\n'
+        + '        into ~/.claude/skills/ezj-handoff-doc, replacing what is there, then rebuild this doc from the new template.');
+    }
+  } else {
+    warn(`Could not check the skill is up to date (GitHub returned ${res.status}). Carry on.`);
+  }
+} catch {
+  warn('Could not reach GitHub to check the skill is up to date. Carry on.');
+}
+
 console.log(`\nHandoff doc check: ${file}`);
 console.log(`${words} words, ${kb} KB\n`);
 for (const f of fails) console.log('FAIL  ' + f);
