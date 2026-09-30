@@ -71,7 +71,7 @@ Each delivery gets its own folder, so two developers in one repo never overwrite
 
 ### 3. Fill it section by section with Edit
 
-Never rewrite the whole file in one go, and never retype the logo `<img class="logo">` line. It carries the real logo as embedded data and it breaks if touched. Replace the example content (Harbor Dental, a fictional project) section by section.
+Never rewrite the whole file in one go, and never retype the logo `<svg class="ezj-lockup">` line. It is the real EZJ Online logo drawn inline, and it breaks if touched. Replace the example content (Harbor Dental, a fictional project) section by section.
 
 | Section | `id` | Needed | Built from (see `references/components.md`) |
 |---|---|---|---|
@@ -97,7 +97,7 @@ Read `references/writing.md` before writing a word. The short version: plain Eng
 node ~/.claude/skills/ezj-handoff-doc/scripts/check.mjs docs/handoff/$SLUG/index.html
 ```
 
-It fails on: a missing or damaged logo, anything loaded from a file next to the page, leftover example content, a missing Loom link, missing How it works or Status, no diagram, anything that looks like a secret, and dashes used as punctuation. Fix every FAIL and run it again until it prints PASS. If the logo fails, run it once with `--fix-logo`.
+It fails on: a missing, damaged or old logo, anything loaded from a file next to the page, leftover example content, a missing Loom link, missing How it works or Status, no diagram, anything that looks like a secret, and dashes used as punctuation. Fix every FAIL and run it again until it prints PASS. If the logo fails, run it once with `--fix-logo`.
 
 ### 5. Look at it
 
@@ -157,7 +157,7 @@ A good run: the developer types `/ezj-handoff-doc`. Claude asks for the Loom, th
 - Never put real customer data: names, emails, phone numbers, messages. Use test data.
 - Never invent a number, a test result, or a status. If it was not run, it is not shown. "Not tested" is an honest status.
 - Never mark something Working that only works on the developer's machine or account.
-- Never change the logo line, link the logo as a file, or load images from next to the page.
+- Never change the logo line, swap in an older EZJ logo, link the logo as a file, or load images from next to the page.
 - Never redesign the page, change the colors or fonts, or switch to a light theme.
 - Never paste code, logs, or raw Claude output into the doc. Commands to run are fine.
 - Never use jargon without saying what it means in the same sentence.

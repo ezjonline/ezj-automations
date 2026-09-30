@@ -15,7 +15,7 @@ This file is the spec for that template. Read it in full before building a propo
 |---|---|
 | `ezj_template/index.html` | The template. `{{TOKENS}}` for every client string, a rules comment at the top of every section, one `:root` block for every colour and font. |
 | `example_filled_proposal.html` | The filled reference. Same page, filled in. Every name and number in it is made up, so copy its shape and its voice, never its content. |
-| `logo.txt` | The EZJ mark as one line of base64. Paste it into `{{LOGO_EMBED}}` so the page carries its own logo. |
+| `logo.txt` | The EZJ Online lockup (orange mark, white words) as one data URI line, for the OG card only. The page draws the logo inline. |
 | `fonts.css` | Montserrat and Figtree embedded as base64. Only needed if the page must render with no internet. |
 
 **Default skin is EZJ's own brand, every time.** The client brand skin (§11) is used only
@@ -36,8 +36,8 @@ cp assets/ezj_template/index.html "$D/<client-slug>.html"
 ```
 
 1. Fill every `{{TOKEN}}` section by section, following each section's comment.
-2. Paste the one line inside `assets/logo.txt` into every `{{LOGO_EMBED}}`. The page then
-   carries its own logo and needs no image files beside it.
+2. Leave the logo alone: the locked EZJ Online lockup is already inline in the bar and
+   footer, and the favicon is embedded. The page needs no image files beside it.
 3. Delete the commented client skin block in `:root` and every section with no real material.
 4. `grep -o '{{[A-Z0-9_]*}}' "$D/<client-slug>.html" | sort -u` prints nothing except the
    five placeholders Ethan fills on deploy: `{{PAGE_URL}}`, `{{OG_IMAGE_URL}}` and the four
@@ -115,7 +115,7 @@ The only hex values allowed in a filled EZJ skin page:
 
 | # | Section | Hooks | Must contain |
 |---|---|---|---|
-| 1 | Top bar | `.bar` | EZJ mark (38px) and the EZJ ONLINE wordmark, a hairline, the offer name, the date on the right. The client's name is never a logo here, it goes in the kicker. |
+| 1 | Top bar | `.bar` | The EZJ Online lockup (28px, inline SVG), a hairline, the offer name, the date on the right. The client's name is never a logo here, it goes in the kicker. |
 | 2 | Hero | `.hero`, `h1 em` | Kicker "Prepared for <names>", a three or four line uppercase H1 with the payoff lines wrapped in `<em>` (the orange underline bar), one sub sentence opening with the proof in bold, two buttons: the plans, and the first section worth reading. |
 | 3 | Metric band | `.band`, `.tile` | Exactly four numbers from the Fathom Key Takeaways, each with a visual (§6). |
 | 4 | Proof before price | `.proof`, `.find`, `.verdict` | Black header (context line and title), two context rows, three stat cards with one `.find.alert` carrying the bad news, the verdict bar, an optional "To be clear" tint note, one verbatim quote. |
@@ -255,8 +255,8 @@ the house recipe. Build it in HTML and screenshot it, never generate it with an 
 
 The OG card is Ethan's step, not yours. He fills `{{OG_IMAGE_URL}}` when he deploys.
 It is documented here so the recipe stays in one place. If you do build one, embed the
-logo from `logo.txt` the same way the page does, there is no separate image file in this
-package.
+logo from `logo.txt` (the lockup as a data URI) as the top row's `<img>`, there is no separate
+image file in this package.
 
 Write `og.html` in the scratchpad:
 
@@ -271,7 +271,7 @@ body{width:1200px;height:630px;overflow:hidden;background:#0d0d0d;position:relat
 svg{position:absolute;left:0;top:0}
 .c{position:absolute;left:64px;top:56px;width:700px}
 .top{display:flex;align-items:center;gap:14px}
-.top img{width:46px;height:46px}
+.top img{height:40px;width:auto}
 .top span{font-family:'Montserrat';font-weight:800;font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:#F47C20}
 h1{font-family:'Montserrat';font-weight:900;font-size:56px;line-height:1.02;letter-spacing:-.03em;text-transform:uppercase;margin-top:42px}
 h1 span{color:#F47C20}
@@ -294,7 +294,7 @@ h1 span{color:#F47C20}
   <circle cx="1010" cy="315" r="50" fill="url(#nd)"/>
 </svg>
 <div class="c">
-  <div class="top"><img src="ezj-logo.png" alt=""><span>{{OFFER_NAME}} · Proposal for {{CLIENT_COMPANY}}</span></div>
+  <div class="top"><img src="{{LOGO_EMBED}}" alt="EZJ Online"><span>{{OFFER_NAME}} · Proposal for {{CLIENT_COMPANY}}</span></div>
   <h1>{{HERO_LINE_1}}<br>{{HERO_LINE_2}}<br><span>{{HERO_PAYOFF_LINE_1}}<br>{{HERO_PAYOFF_LINE_2}}</span></h1>
   <div class="m"><div><b>{{METRIC_1_SHORT}}</b>{{METRIC_1_LABEL_SHORT}}</div><div><b>{{METRIC_2_SHORT}}</b>{{METRIC_2_LABEL_SHORT}}</div><div><b>{{METRIC_3_SHORT}}</b>{{METRIC_3_LABEL_SHORT}}</div></div>
 </div>
@@ -436,7 +436,7 @@ and the band agree, no spaced hyphen in visible copy.
 - Save the finished page as `<client-slug>.html`, with `<client-slug>-og.jpg` beside it, and
   **send both to Ethan. He deploys it.** You never publish a proposal, never create a payment
   link, and never send the page to the prospect.
-- The page is one self-contained file. The logo is embedded from `logo.txt`, the CSS and the
+- The page is one self-contained file. The logo is drawn inline, the CSS and the
   script are inline, and the only thing it loads from the internet is the Google Fonts link.
   So it opens correctly from a double click, from an email attachment, and from a Slack file.
   Check that before you send it.

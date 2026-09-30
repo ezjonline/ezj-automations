@@ -50,7 +50,8 @@ Claude asks for your Loom link, your live link, the client name and your name. T
 | `references/components.md` | Copy and paste snippets for every block on the page |
 | `references/writing.md` | How to write it so a non developer understands it |
 | `scripts/check.mjs` | Checks the logo, secrets, leftover example text, the Loom link, and dashes. Must say PASS |
-| `assets/ezj-logo-white.png` | The logo, embedded into every doc automatically |
+| `assets/ezj-online-logo-inline.html` | The EZJ Online logo as inline SVG, built into every doc. The `.css` file next to it is its size rule |
+| `assets/ezj-logo-white.png` | Not used by the doc. Kept so copies installed before 1 Oct 2026 fail the check and get reinstalled |
 
 ## The rules it holds
 

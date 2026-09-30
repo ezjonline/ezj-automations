@@ -29,7 +29,7 @@ this template came from:
 | `assets/ezj_template/index.html` | The template. Every client string is a `{{TOKEN}}`, every section opens with a comment giving its rules, and all colours and fonts live in one `:root` block. |
 | `assets/ezj_template_pattern.md` | The spec. **Read it in full before building.** Section order, palette and gradient rules, fonts, metric band patterns, pricing card rules, OG recipe, QA. |
 | `assets/example_filled_proposal.html` | A filled reference in this exact markup. Every name and number in it is invented. Keep it open beside the template and copy its shape, never its content. |
-| `assets/logo.txt` | The EZJ mark as one line of base64. Paste it into every `{{LOGO_EMBED}}` so the page carries its own logo. |
+| `assets/logo.txt` | The EZJ Online lockup (orange mark, white words) as one data URI line, only for the OG card's `<img>`. The page template already draws the logo inline. |
 | `assets/fonts.css` | Montserrat and Figtree embedded as base64. Only needed if the page has to render with no internet. |
 
 **Two skins, one page.**
@@ -121,7 +121,7 @@ buys new builds at a stated pace, and then the 90 day roadmap names every build 
 ### 4. Write the page from the template
 
 The page is a **self contained `index.html`**: inline CSS, inline SVG, one small script, the
-logo embedded as one line of base64. Start from the template, never from a blank file:
+EZJ Online logo drawn inline as SVG. Start from the template, never from a blank file:
 
 ```bash
 D=~/proposals/<client-slug>
@@ -130,7 +130,7 @@ cp assets/ezj_template/index.html "$D/<client-slug>.html"
 ```
 
 Fill every `{{TOKEN}}` in place, following the comment at the top of each section and the
-spec. Paste the single line inside `assets/logo.txt` into every `{{LOGO_EMBED}}`. Delete
+spec. Delete
 the commented client skin block on an EZJ skin page, and delete any section with no real
 material rather than padding it. Then prove nothing is left:
 
@@ -208,8 +208,8 @@ clipped headline. Shorten the copy before you shrink the type.
 The finished file has to open correctly from a double click, from an email attachment and
 from a Slack file, with nothing beside it. Confirm:
 
-- Every `{{LOGO_EMBED}}` is filled with the line from `logo.txt`, so the mark shows in the
-  top bar, the footer and the browser tab.
+- The EZJ Online lockup shows in the top bar and the footer, and the orange mark in the
+  browser tab. They are built into the template: never retype, recolor or swap them.
 - No `src` or `href` points at a file on your computer.
 - The only thing it loads from the internet is the Google Fonts link. If the page has to work
   with no internet, inline `assets/fonts.css` into the `<style>` block in place of that link.

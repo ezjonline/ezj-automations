@@ -13,17 +13,44 @@ import { fileURLToPath } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, '..');
-const LOGO_PNG = join(ROOT, 'assets', 'ezj-logo-white.png');
-const LOGO_URI = 'data:image/png;base64,' + readFileSync(LOGO_PNG).toString('base64');
-const LOGO_TAG_RE = /<img\b[^>]*class="logo"[^>]*>/i;
+// The EZJ Online logo, locked 2026-09-30: the orange mark plus "EZJ Online", drawn inline as SVG.
+// Both asset files are verbatim copies of the brand kit. The words take the text color, white here.
+const LOGO_FILE = join(ROOT, 'assets', 'ezj-online-logo-inline.html');
+const LOGO_SVG = readFileSync(LOGO_FILE, 'utf8').trim();
+const LOGO_CSS = [readFileSync(join(ROOT, 'assets', 'ezj-online-logo-inline.css'), 'utf8').trim(), '.by .ezj-lockup{height:28px;color:#fff}'];
+const LOGO_RE = /<svg\b[^>]*class="ezj-lockup"[^>]*>[\s\S]*?<\/svg>/i;
+// Retired logos: the brush "EZJ ONLINE" image and the gradient app icon. Never ship them.
+const OLD_LOGO_RE = /<img\b[^>]*class="logo"[^>]*>/i;
+const OLD_LOGO_DATA = /iVBORw0KGgoAAAANSUhEUgAAAoAAAABZ|iVBORw0KGgoAAAANSUhEUgAAAdAAAAHPC/;
+const OLD_IMG_RE = new RegExp(`<img\\b[^>]*(class="logo"|src="data:image/png;base64,(${OLD_LOGO_DATA.source}))[^>]*>`, 'gi');
+const squash = s => s.replace(/\s+/g, '');
+
+// Puts the real logo and its size rule in, replacing a retired, damaged or missing one.
+function fixLogo(html) {
+  if (LOGO_RE.test(html)) html = html.replace(LOGO_RE, () => LOGO_SVG);
+  else if (OLD_LOGO_RE.test(html)) html = html.replace(OLD_LOGO_RE, () => LOGO_SVG);
+  else if (html.includes('__EZJ_LOGO__')) html = html.replace('__EZJ_LOGO__', () => LOGO_SVG);
+  else html = html.replace(/<div class="by">/, m => m + LOGO_SVG);
+  html = html.replace(OLD_IMG_RE, '');
+  html = html.replace('retype, or move this img.', 'retype, or move this svg.');
+  const missing = LOGO_CSS.filter(r => !squash(html).includes(squash(r)));
+  if (missing.length) {
+    const old = /^( *)\.by img\.logo \{[^}]*\}[ \t]*$/m;
+    html = old.test(html)
+      ? html.replace(old, (m, sp) => missing.map(r => sp + r).join('\n'))
+      : html.replace('</style>', () => missing.map(r => '  ' + r).join('\n') + '\n</style>');
+  }
+  return html;
+}
 
 const args = process.argv.slice(2);
 
 if (args.includes('--build-template')) {
   const t = join(ROOT, 'template', 'handoff.html');
   const html = readFileSync(t, 'utf8');
-  if (!html.includes('__EZJ_LOGO__')) { console.log('template already has the logo embedded'); process.exit(0); }
-  writeFileSync(t, html.replace('__EZJ_LOGO__', LOGO_URI));
+  const fixed = fixLogo(html);
+  if (fixed === html) { console.log('template already has the logo embedded'); process.exit(0); }
+  writeFileSync(t, fixed);
   console.log('logo embedded into template/handoff.html');
   process.exit(0);
 }
@@ -36,9 +63,7 @@ if (!file || !existsSync(file)) {
 let html = readFileSync(file, 'utf8');
 
 if (args.includes('--fix-logo')) {
-  const tag = '<img class="logo" src="' + LOGO_URI + '" alt="EZJ Online" width="158" height="22">';
-  if (LOGO_TAG_RE.test(html)) html = html.replace(LOGO_TAG_RE, tag);
-  else html = html.replace(/<div class="by">/, '<div class="by">' + tag);
+  html = fixLogo(html);
   writeFileSync(file, html);
   console.log('logo restored');
 }
@@ -48,13 +73,12 @@ const warns = [];
 const fail = m => fails.push(m);
 const warn = m => warns.push(m);
 
-// 1. Logo: embedded, byte for byte the real file. A path to a file breaks the moment the page moves.
-const logoTag = html.match(LOGO_TAG_RE);
-if (!logoTag) fail('No logo. The <img class="logo"> in the header is missing. Run with --fix-logo.');
-else {
-  const src = (logoTag[0].match(/src="([^"]*)"/) || [])[1] || '';
-  if (src !== LOGO_URI) fail('Logo is not the real embedded EZJ logo (wrong file, a path, or damaged data). Run with --fix-logo.');
-}
+// 1. Logo: inline, character for character the brand kit's. A path to a file breaks the moment the page moves.
+const logos = html.match(new RegExp(LOGO_RE.source, 'gi')) || [];
+if (OLD_LOGO_RE.test(html) || OLD_LOGO_DATA.test(html)) fail('The old EZJ logo is in the page. It is retired. Run with --fix-logo.');
+if (!logos.length) fail('No logo. The <svg class="ezj-lockup"> in the header is missing. Run with --fix-logo.');
+else if (logos.some(s => s !== LOGO_SVG)) fail('Logo is not the real EZJ Online logo (edited or damaged). Run with --fix-logo.');
+else if (LOGO_CSS.some(r => !squash(html).includes(squash(r)))) fail('The logo size rule is missing from the <style>, so the logo shows at the wrong size. Run with --fix-logo.');
 
 // 2. One self contained file. Images must be embedded. Only Google Fonts may load from outside.
 for (const m of html.matchAll(/<(img|script|link|source|video|audio|iframe)\b[^>]*?\s(src|href)="([^"]*)"/gi)) {
@@ -124,7 +148,9 @@ if (kb > 600) warn(`${kb} KB. Big embedded images slow the page. Shrink or drop 
 // Skill freshness: the branding lives in the public repo. An installed copy never updates
 // itself, so a developer can keep shipping an old logo forever. Compare the logo bytes
 // against the canonical copy and say so. Network trouble warns, it never blocks a delivery.
-const CANON = 'https://raw.githubusercontent.com/ezjonline/ezj-automations/main/skills/ezj-handoff-doc/assets/ezj-logo-white.png';
+// assets/ezj-logo-white.png is not used any more. It stays in the repo holding the new logo,
+// so copies installed before 2026-10-01 (which compare that file) fail and get reinstalled.
+const CANON = 'https://raw.githubusercontent.com/ezjonline/ezj-automations/main/skills/ezj-handoff-doc/assets/ezj-online-logo-inline.html';
 try {
   const ac = new AbortController();
   const t = setTimeout(() => ac.abort(), 6000);
@@ -132,7 +158,7 @@ try {
   clearTimeout(t);
   if (res.ok) {
     const canonBytes = Buffer.from(await res.arrayBuffer());
-    const mine = readFileSync(LOGO_PNG);
+    const mine = readFileSync(LOGO_FILE);
     if (!canonBytes.equals(mine)) {
       fail('Your installed copy of this skill has an out of date EZJ logo. Reinstall it, then run this again:\n'
         + '        Reinstall the Claude Code skill from https://github.com/ezjonline/ezj-automations/tree/main/skills/ezj-handoff-doc\n'
