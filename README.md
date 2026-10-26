@@ -23,6 +23,7 @@ Free Claude Code skills, n8n templates and prompts from [EZJ Online](https://www
 | [`carousel-repurposer`](skills/carousel-repurposer) | Turns one reel into a finished Instagram carousel in your brand's voice | [Install](https://www.ezjonline.com/resources/carousel-repurposer) |
 | [`newsletter-repurposer`](skills/newsletter-repurposer) | Turns a post into a newsletter draft that sounds like the founder wrote it | [Install](https://www.ezjonline.com/resources/newsletter-repurposer) |
 | [`overlay-assistant`](skills/overlay-assistant) | Decides and writes the on-screen text overlays for a reel, ready to review | [Install](https://www.ezjonline.com/resources/overlay-assistant) |
+| [`branded-report`](skills/branded-report) | Turns your numbers and notes into a branded PDF report: client updates, campaign results, retrospectives | [Install](skills/branded-report#install) |
 
 More skills in their own repos: [Hormozi skill](https://github.com/ezjonline/hormozi-skill) · [Cold outreach skill](https://github.com/ezjonline/cold-outreach-skill)
 

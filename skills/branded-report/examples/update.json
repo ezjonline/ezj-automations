@@ -1,0 +1,32 @@
+{
+  "title": "Here's what's live, and what's next",
+  "kicker": "Project update",
+  "date": "October 24, 2026",
+  "prepared_for": "Harbour Dental",
+  "lede": "Everything from our call this morning. The new booking page goes live on Monday.",
+  "hero": "light",
+  "file_name": "Harbour Dental, Update 24 Oct",
+  "blocks": [
+    { "type": "cards", "columns": 2, "items": [
+      { "tag": "Live now", "full": true, "title": "On your site: [book.harbourdental.com](https://book.harbourdental.com)", "bullets": [
+        "**Booking in 3 steps.** Pick a service, pick a time, confirm. No account needed.",
+        "**Reminders.** A text the day before and two hours before every visit.",
+        "**Your calendar stays the source.** Anything booked here lands on the front desk calendar."
+      ]},
+      { "tag": "Finishing this week", "tag_style": "ghost", "title": "Follow up texts", "bullets": [
+        "**Missed a visit.** A friendly text the next morning with a rebook link.",
+        "**Six months since a cleaning.** One text, then one email a week later."
+      ]},
+      { "tag": "November 3", "tag_style": "ghost", "title": "Reviews", "bullets": [
+        "**One ask, after the visit.** Happy patients go to Google, anyone unhappy comes to you first.",
+        "**Copy for your OK:** in the shared folder."
+      ]},
+      { "tag": "What we need from you", "dark": true, "full": true, "numbered": true, "bullets": [
+        "Your OK on the review text",
+        "The front desk's cell for missed visit alerts",
+        "Which services patients can book online"
+      ]}
+    ]}
+  ],
+  "closing": "Questions on any of this, text us. We go through it together on Monday."
+}

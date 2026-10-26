@@ -1,0 +1,12 @@
+{
+  "name": "EZJ Online",
+  "website": "ezjonline.com",
+  "accent": "#F47C20",
+  "ink": "#0D0D0D",
+  "paper": "#FFFFFF",
+  "soft": "#FAF7F4",
+  "font_family": "Figtree",
+  "font_file": "fonts/Figtree-VariableFont_wght.ttf",
+  "logo_on_dark": "logo/ezj-online-logo-orange-white.svg",
+  "logo_on_light": "logo/ezj-online-logo-orange-black.svg"
+}

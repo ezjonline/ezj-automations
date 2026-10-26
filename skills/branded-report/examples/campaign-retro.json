@@ -1,0 +1,261 @@
+{
+  "title": "Your spring open house, by the ==numbers==",
+  "kicker": "Campaign results",
+  "date": "May 2, 2026",
+  "prepared_for": "Northside Fitness",
+  "lede": "Two weeks of texts and emails to 9,412 past members. Here is what went out, what came back, and what we change for the summer push.",
+  "hero": "dark",
+  "file_name": "Northside Fitness, Spring Open House Results",
+  "blocks": [
+    {
+      "type": "stats",
+      "items": [
+        {
+          "value": "412",
+          "label": "Members who RSVP'd yes",
+          "note": "Goal was 300",
+          "accent": true
+        },
+        {
+          "value": "18,940",
+          "label": "Emails delivered",
+          "note": "3 sends"
+        },
+        {
+          "value": "6,102",
+          "label": "Texts delivered",
+          "note": "2 sends"
+        },
+        {
+          "value": "$1.12",
+          "label": "Cost per RSVP",
+          "note": "Texting spend only"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "size": "lead",
+      "text": "The open house beat its goal by **37%**. Texts did the heavy lifting: one in three RSVPs came in within an hour of a text, while email kept the list warm for a fraction of the cost."
+    },
+    {
+      "type": "heading",
+      "number": true,
+      "text": "How people moved through it"
+    },
+    {
+      "type": "columns",
+      "widths": [
+        1,
+        1
+      ],
+      "columns": [
+        [
+          {
+            "type": "funnel",
+            "title": "Email",
+            "steps": [
+              {
+                "label": "Delivered",
+                "value": 18940
+              },
+              {
+                "label": "Opened",
+                "value": 7387,
+                "rate_label": "open rate"
+              },
+              {
+                "label": "Clicked RSVP",
+                "value": 902,
+                "rate_label": "of opens"
+              },
+              {
+                "label": "RSVP yes",
+                "value": 251,
+                "rate_label": "of clicks"
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "type": "funnel",
+            "title": "Text",
+            "steps": [
+              {
+                "label": "Sent",
+                "value": 6480
+              },
+              {
+                "label": "Delivered",
+                "value": 6102,
+                "rate_label": "delivered"
+              },
+              {
+                "label": "Clicked RSVP",
+                "value": 744,
+                "rate_label": "of delivered"
+              },
+              {
+                "label": "RSVP yes",
+                "value": 161,
+                "rate_label": "of clicks"
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "type": "bars",
+      "title": "RSVPs by send",
+      "items": [
+        {
+          "label": "Email 1, the invite",
+          "value": 104
+        },
+        {
+          "label": "Text 1, the invite",
+          "value": 98
+        },
+        {
+          "label": "Email 2, the reminder",
+          "value": 77,
+          "muted": true
+        },
+        {
+          "label": "Email 3, last call",
+          "value": 70,
+          "muted": true
+        },
+        {
+          "label": "Text 2, last call",
+          "value": 63
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "number": true,
+      "text": "Every send",
+      "sub": "Delivered counts come from the email and text platforms. RSVPs come from the sign up form."
+    },
+    {
+      "type": "table",
+      "columns": [
+        "Send",
+        "Date",
+        "Delivered",
+        "Opened",
+        "Clicked",
+        "RSVP yes"
+      ],
+      "rows": [
+        [
+          "Email 1, the invite",
+          "Apr 14",
+          "6,402",
+          "2,690",
+          "355",
+          "104"
+        ],
+        [
+          "Text 1, the invite",
+          "Apr 15",
+          "3,221",
+          "",
+          "401",
+          "98"
+        ],
+        [
+          "Email 2, the reminder",
+          "Apr 21",
+          "6,288",
+          "2,391",
+          "301",
+          "77"
+        ],
+        [
+          "Email 3, last call",
+          "Apr 27",
+          "6,250",
+          "2,306",
+          "246",
+          "70"
+        ],
+        [
+          "Text 2, last call",
+          "Apr 28",
+          "2,881",
+          "",
+          "343",
+          "63"
+        ],
+        [
+          "Total",
+          "",
+          "25,042",
+          "7,387",
+          "1,646",
+          "412"
+        ]
+      ],
+      "total_row": true,
+      "note": "Texts have no open count, phones do not report one."
+    },
+    {
+      "type": "heading",
+      "number": true,
+      "text": "What worked, and what we change"
+    },
+    {
+      "type": "cards",
+      "columns": 2,
+      "items": [
+        {
+          "tag": "Keep",
+          "title": "What worked",
+          "bullets": [
+            "**Texts close fast.** 61% of text RSVPs came within an hour of the send.",
+            "**One clear link.** Every message pointed to the same form, so nothing leaked to a second page.",
+            "**Dropping people who already said yes.** Nobody who RSVP'd got another invite."
+          ]
+        },
+        {
+          "tag": "Change",
+          "tag_style": "ghost",
+          "title": "What we change",
+          "bullets": [
+            "**Email 3 was one too many.** It cost little but added the most unsubscribes, 41.",
+            "**378 texts never arrived.** Most were landlines. We clean those out before the next send.",
+            "**We missed 600 members with no email topic set.** That one is on us, it is fixed for summer."
+          ]
+        }
+      ]
+    },
+    {
+      "type": "callout",
+      "tone": "soft",
+      "title": "For the summer push",
+      "text": "Lead with email, text only the last call, and send the reminder to openers who did not click. On these numbers that saves about $400 for the same RSVPs."
+    },
+    {
+      "type": "asks",
+      "title": "What we need from you",
+      "items": [
+        "Pick the summer event date",
+        "Send us the door count from the day",
+        "OK the cleaned text list (we send it Friday)",
+        "Tell us which trainer leads the summer class"
+      ]
+    },
+    {
+      "type": "sources",
+      "items": [
+        "Email numbers: the email platform's campaign reports, pulled May 1.",
+        "Text numbers: the texting platform's message log, pulled May 1.",
+        "RSVPs: the sign up form export, pulled May 1, duplicates removed."
+      ]
+    }
+  ]
+}
