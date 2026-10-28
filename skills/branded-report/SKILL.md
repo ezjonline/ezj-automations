@@ -1,6 +1,6 @@
 ---
 name: branded-report
-description: Turns facts, numbers and notes into a branded EZJ Online PDF report, the kind a client reads on their phone in two minutes. A one page project update, release notes, a campaign results report, a retrospective or postmortem, a status sheet. Claude writes a short JSON spec, the bundled renderer lays it out in the house look (black and orange, Figtree, the locked logo, stat tiles, funnels, tables, bar charts, cards, an asks box) and checks it for dashes, placeholders, overflow and a stranded last page. Use when someone says "make a branded report", "branded PDF", "make a PDF for <client>", "results report", "campaign report", "numbers report", "retrospective", "postmortem", "update sheet", "one pager for the client", or "/branded-report". Do not use for priced proposals (proposal-builder), AI audit reports on a web page (ai-audit-report), developer handoff docs (ezj-handoff-doc), invoices, live dashboards (dashboard) or slide decks.
+description: Turns facts, numbers and notes into a branded EZJ Online PDF report, the kind a client reads on their phone in two minutes. A one page project update, release notes, a campaign results report, a retrospective or postmortem, a status sheet. Claude writes a short JSON spec, the bundled renderer lays it out in the house look (black and orange, Figtree, the locked logo, stat tiles, funnels, tables, bar charts, cards, an asks box) and checks it for dashes, placeholders, overflow and a stranded last page. Use when someone says "make a branded report", "branded PDF", "make a PDF for <client>", "results report", "campaign report", "numbers report", "retrospective", "postmortem", "update sheet", "one pager for the client", "one pager update", "a quick one page update", "here's everything we changed", "here's what we're waiting on from you", "send the client a recap of the changes", or "/branded-report". Do not use for priced proposals (proposal-builder), AI audit reports on a web page (ai-audit-report), developer handoff docs (ezj-handoff-doc), invoices, live dashboards (dashboard) or slide decks.
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 
@@ -49,6 +49,8 @@ If a number you need is missing, ask for it (step "Inputs"), or leave that line 
 | Report | Header | Pages | Shape, in order |
 |---|---|---|---|
 | Update sheet | `light` | 1 | Full width "Live now" card, two cards for what is finishing and what is dated, a dark card or `asks` box for what we need from them, a closing line |
+
+**Update sheets: the "what we need from you" list comes from live status, not memory.** Before writing it, check where the client really is (their onboarding or intake progress, open questions in the latest email thread, assets they promised). Put the step that unblocks the most work first, with its link. Every item is one line they can act on.
 | Release notes | `dark` | 1 | Numbered headings, each with 2 to 5 bullets, a `callout` for "how to get it" |
 | Results, retrospective, postmortem | `dark` | 2 to 4 | `stats` row (3 or 4 tiles, the headline result as the `accent` tile), one `lead` sentence that states the result, `01` how it performed (a `funnel` per channel, `bars`), `02` every send (`table` with a total row), `03` what worked and what we change (two `cards`, Keep and Change), a `callout` for next time, `asks`, `sources` |
 
